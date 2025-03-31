@@ -7,7 +7,8 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: true,
         unique: true,
-        index: true
+        index: true,
+        trim: true
     },
     fullname: {
         firstname: {
@@ -28,11 +29,11 @@ const userSchema = new mongoose.Schema({
         required: true,
         unique: true,
         lowercase: true,
-        trim: true
+        trim: true,
+        index: true
     },
     password: {
         type: String,
-        required: true,
         trim: true
     },
     authtype: {
@@ -43,7 +44,7 @@ const userSchema = new mongoose.Schema({
     },
     skills: {
         type: [String],
-        default: []
+        required: true
     },
     links: {
         xlink: {
@@ -129,3 +130,9 @@ const userSchema = new mongoose.Schema({
 },{
     timestamps: true,
 })
+
+userSchema.methods.isPasswordCorrect = async function(password){
+    return await bcrypt.compare(password, this.password)
+}
+
+export const User = mongoose.model('User', userSchema)
