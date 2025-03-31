@@ -5,7 +5,7 @@ import UserProtectedWrapper from "./components/UserProtectedWrapper.jsx";
 
 function App() {
   return (
-    <>
+    <div className='bg-[#1a1a1a] h-screen w-screen'>
       <Routes>
         <Route
           path="/"
@@ -22,7 +22,7 @@ function App() {
           }
         />
       </Routes>
-    </>
+    </div>
   );
 }
 
