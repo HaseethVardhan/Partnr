@@ -22,11 +22,11 @@ const isUserNameAvailable = asyncHandler(async (req, res) => {
     
     if (user) {
         return res
-            .status(400)
+            .status(200)
             .json(
                 new ApiResponse(
-                    400,
-                    {msg: "Username already exists"},
+                    200,
+                    {available: false, msg: "Username already exists"},
                     "Username already exists"
                 ) 
             )  
@@ -36,7 +36,7 @@ const isUserNameAvailable = asyncHandler(async (req, res) => {
         .json(
             new ApiResponse(
                 200,
-                {msg: "Username is available"},
+                {available: true, msg: "Username is available"},
                 "Username is available"
             ) 
         )  
@@ -62,11 +62,11 @@ const isMailExists = asyncHandler(async (req, res) => {
     
     if (user) {
         return res
-            .status(400)
+            .status(200)
             .json(
                 new ApiResponse(
-                    400,
-                    {msg: "Email already exists"},
+                    200,
+                    {exists: true, msg: "Email already exists"},
                     "Email already exists"
                 ) 
             )  
@@ -76,7 +76,7 @@ const isMailExists = asyncHandler(async (req, res) => {
         .json(
             new ApiResponse(
                 200,
-                {msg: "Email is available"},
+                {exists: false, msg: "Email is available"},
                 "Email is available"
             ) 
         )  
@@ -84,4 +84,10 @@ const isMailExists = asyncHandler(async (req, res) => {
 
 })
 
-export { isUserNameAvailable, isMailExists };
+const getProfile = asyncHandler(async (req, res) => {
+    return res
+        .status(200)
+        .json(new ApiResponse(200, {user: req.user, message: "User profile fetched successfully"}, "User profile fetched successfully"))
+})
+
+export { isUserNameAvailable, isMailExists, getProfile };

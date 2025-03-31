@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { body } from "express-validator";
-import { isMailExists, isUserNameAvailable } from "../controllers/user.controller";
+import { isMailExists, isUserNameAvailable, getProfile } from "../controllers/user.controller.js";
+import { verifyUser } from "../middlewares/auth.middleware.js";
 
 const router = Router()
 
@@ -14,5 +15,7 @@ router.route('/isMailExists').get(
     body('email').isEmail().withMessage('Email is required')
 ,
 isMailExists)
+
+router.route('/getProfile').get(verifyUser, getProfile)
 
 export default router
