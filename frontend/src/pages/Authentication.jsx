@@ -1,4 +1,6 @@
 import React from 'react'
+import {Link} from 'react-router-dom'
+import Button from '../components/Button'
 
 const Authentication = () => {
   return (
@@ -37,9 +39,19 @@ const Authentication = () => {
             <div className='flex text-white text-left w-[88%] font-inter font-[400] text-base'>Email</div>
             <input className='flex flex-row w-[90%] bg-[#333333] h-9 rounded-lg gap-3 text-[#b3b3b3] font-inter font-[400] text-sm px-2' type="email" placeholder='you@youremail.com'/>
         </div>
-        <div className='flex flex-col items-center gap-3 w-full tracking-[0.5px] py-3'>
+        <div className='flex flex-col items-center gap-3 w-full tracking-[0.5px] py-3 mb-3'>
             <div className='flex text-white text-left w-[88%] font-inter font-[400] text-base'>Password</div>
             <input className='flex flex-row w-[90%] bg-[#333333] h-9 rounded-lg gap-3 text-[#b3b3b3] font-inter font-[400] text-sm px-2' type="email" placeholder='At least 8 characters.'/>
+        </div>
+        <Button text="Create Account"/>
+        <div className='flex flex-col items-center text-center w-full py-6'>
+            <p className='font-inter font-[500] text-xs tracking-[0.5px] w-[90%] text-[#aaaaaa]'>By Clicking “Create Account” you agree to our code of 
+            conduct, terms of Service and privacy Policy.</p>
+        </div>
+        <div className='flex flex-row items-center text-center w-full py-2 font-inter font-[400] text-sm tracking-[0.1px] text-[#aaaaaa]'>
+            <p className='flex flex-row items-center justify-center w-full'>
+                Already have an account?&nbsp;<Link className='text-white font-[500]'> Log In</Link>
+            </p>
         </div>
     </div>
   )
