@@ -3,8 +3,12 @@ import {Link} from 'react-router-dom'
 import Button from '../components/Button'
 
 const Authentication = () => {
+
+    const [email, setEmail] = React.useState('')
+    const [password, setPassword] = React.useState('')
+
   return (
-    <div className='flex flex-col items-center h-screen w-screen bg-[#1a1a1a]'>
+    <div className='flex flex-col items-center w-screen bg-[#1a1a1a]'>
         <div className='mt-20'>
             <img src={import.meta.env.VITE_app_logo} className='w-11 h-11 rounded-lg'/>
         </div>
@@ -37,11 +41,11 @@ const Authentication = () => {
         </div>
         <div className='flex flex-col items-center gap-3 w-full tracking-[0.5px] py-1'>
             <div className='flex text-white text-left w-[88%] font-inter font-[400] text-base'>Email</div>
-            <input className='flex flex-row w-[90%] bg-[#333333] h-9 rounded-lg gap-3 text-[#b3b3b3] font-inter font-[400] text-sm px-2' type="email" placeholder='you@youremail.com'/>
+            <input className='flex flex-row w-[90%] bg-[#333333] h-9 rounded-lg gap-3 text-[#b3b3b3] font-inter font-[400] text-sm px-2' type="email" placeholder='you@youremail.com' value={email} onChange={(e) => {setEmail(e.target.value)}}/>
         </div>
         <div className='flex flex-col items-center gap-3 w-full tracking-[0.5px] py-3 mb-3'>
             <div className='flex text-white text-left w-[88%] font-inter font-[400] text-base'>Password</div>
-            <input className='flex flex-row w-[90%] bg-[#333333] h-9 rounded-lg gap-3 text-[#b3b3b3] font-inter font-[400] text-sm px-2' type="email" placeholder='At least 8 characters.'/>
+            <input className='flex flex-row w-[90%] bg-[#333333] h-9 rounded-lg gap-3 text-[#b3b3b3] font-inter font-[400] text-sm px-2' type="password" placeholder='At least 8 characters.' value={password} onChange={(e) => {setPassword(e.target.value)}}/>
         </div>
         <Button text="Create Account"/>
         <div className='flex flex-col items-center text-center w-full py-6'>
