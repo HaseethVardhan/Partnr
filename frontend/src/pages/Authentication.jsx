@@ -33,6 +33,14 @@ const Authentication = () => {
                 <span className="mx-4 text-[#aaaaaa] font-inter font-[400] text-sm">or continue with email</span>
             <div className="flex-1" style={{ borderTop: "0.1px solid rgba(244, 244, 244, 0.2)" }}></div>
         </div>
+        <div className='flex flex-col items-center gap-3 w-full tracking-[0.5px] py-1'>
+            <div className='flex text-white text-left w-[88%] font-inter font-[400] text-base'>Email</div>
+            <input className='flex flex-row w-[90%] bg-[#333333] h-9 rounded-lg gap-3 text-[#b3b3b3] font-inter font-[400] text-sm px-2' type="email" placeholder='you@youremail.com'/>
+        </div>
+        <div className='flex flex-col items-center gap-3 w-full tracking-[0.5px] py-3'>
+            <div className='flex text-white text-left w-[88%] font-inter font-[400] text-base'>Password</div>
+            <input className='flex flex-row w-[90%] bg-[#333333] h-9 rounded-lg gap-3 text-[#b3b3b3] font-inter font-[400] text-sm px-2' type="email" placeholder='At least 8 characters.'/>
+        </div>
     </div>
   )
 }
