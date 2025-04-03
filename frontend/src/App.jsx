@@ -2,6 +2,8 @@ import { Routes, Route } from "react-router-dom";
 import Home from "./pages/Home";
 import Authentication from "./pages/Authentication";
 import UserProtectedWrapper from "./components/UserProtectedWrapper.jsx";
+import UpdateUsername from "./pages/UpdateUsername.jsx";
+import UpdateLinks from "./pages/UpdateLinks.jsx";
 
 function App() {
   return (
@@ -19,6 +21,18 @@ function App() {
           path="/authentication"
           element={
             <Authentication />
+          }
+        />
+        <Route 
+          path="/update-username"
+          element={
+            <UpdateUsername />
+          }
+        />
+        <Route 
+          path="/update-links"
+          element={
+            <UpdateLinks />
           }
         />
       </Routes>
