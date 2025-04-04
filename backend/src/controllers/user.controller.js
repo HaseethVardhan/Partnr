@@ -22,10 +22,10 @@ const isUserNameAvailable = asyncHandler(async (req, res) => {
     
     if (user) {
         return res
-            .status(200)
+            .status(400)
             .json(
                 new ApiResponse(
-                    200,
+                    400,
                     {available: false, msg: "Username already exists"},
                     "Username already exists"
                 ) 

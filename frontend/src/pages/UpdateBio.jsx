@@ -1,7 +1,14 @@
-import React from 'react'
-import Button from '../components/Button'
+import React, { useContext } from "react";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
+import Button from "../components/Button";
+import { UserDataContext } from "../context/UserContext";
 
 const UpdateBio = () => {
+    const { user, setuser } = useContext(UserDataContext);
+    const navigate = useNavigate();
+
+    console.log(user)
 
     const [bio, setBio] = React.useState('')
     
