@@ -41,7 +41,7 @@ const UpdateUsername = () => {
           ...user,
           username: username,
         });
-        navigate("/update-bio");
+        navigate('/update-name');
       }
     }
 

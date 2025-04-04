@@ -44,7 +44,6 @@ const userSchema = new mongoose.Schema({
     },
     skills: {
         type: [String],
-        required: true
     },
     links: {
         xlink: {
@@ -133,6 +132,11 @@ const userSchema = new mongoose.Schema({
 
 userSchema.methods.isPasswordCorrect = async function(password){
     return await bcrypt.compare(password, this.password)
+}
+
+userSchema.methods.generateAuthToken = async function(){
+    const token = await jwt.sign({_id: this._id}, process.env.JWT_TOKEN_SECRET, {expiresIn: '10d'})
+    return token
 }
 
 export const User = mongoose.model('User', userSchema)

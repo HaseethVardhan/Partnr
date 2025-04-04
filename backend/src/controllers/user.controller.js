@@ -90,4 +90,76 @@ const getProfile = asyncHandler(async (req, res) => {
         .json(new ApiResponse(200, {user: req.user, message: "User profile fetched successfully"}, "User profile fetched successfully"))
 })
 
-export { isUserNameAvailable, isMailExists, getProfile };
+const registerUser = asyncHandler(async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res
+            .status(400)
+            .json(
+                new ApiResponse(
+                    400,
+                    {errors: errors.array()},
+                    "Please ensure all fields are filled correctly.",
+                )
+            )
+    }
+
+    const { email, password, username, authtype, firstname, lastname } = req.body;
+    
+    const user = await User.findOne({ email });
+    
+    if (user) {
+        return res
+            .status(400)
+            .json(
+                new ApiResponse(
+                    400,
+                    {exists: true, msg: "Email already exists"},
+                    "Email already exists. Please login or use another email."
+                ) 
+            )  
+    }
+
+    if(authtype === "local") {
+        const newUser = await User.create({
+            email,
+            password,
+            username,
+            fullname: {
+                firstname,
+                lastname
+            },
+            authtype,
+        })
+
+        if(!newUser) {
+            return res
+                .status(400)
+                .json(
+                    new ApiResponse(
+                        400,
+                        {msg: "User not created"},
+                        "There was a problem on our side. Please try again later."
+                    ) 
+                )  
+        }
+
+
+        const { _id } = newUser.toObject();
+
+        const token = await newUser.generateAuthToken()
+
+        return res
+            .status(200)
+            .json(
+                new ApiResponse(
+                    200,
+                    {user: {_id}, token, msg: "User created successfully"},
+                    "User created successfully"
+                ) 
+            )  
+    }
+
+})
+
+export { isUserNameAvailable, isMailExists, getProfile, registerUser };

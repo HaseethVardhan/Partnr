@@ -11,6 +11,7 @@ import UpdateWork from "./pages/UpdateWork.jsx";
 import UpdateProject from "./pages/UpdateProject.jsx";
 import UpdatePicture from "./pages/UpdatePicture.jsx";
 import UpdatePreferences from "./pages/UpdatePreferences.jsx";
+import UpdateName from "./pages/UpdateName.jsx";
 
 function App() {
   return (
@@ -58,6 +59,12 @@ function App() {
           path="/update-profession"
           element={
             <UpdateProfession />
+          }
+        />
+        <Route 
+          path="/update-name"
+          element={
+            <UpdateName />
           }
         />
         <Route 
