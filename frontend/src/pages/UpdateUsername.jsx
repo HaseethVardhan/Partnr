@@ -1,10 +1,15 @@
-import React from 'react'
+import React, {useContext} from 'react'
+import { useNavigate } from 'react-router-dom'
 import Button from '../components/Button'
+import { UserDataContext } from '../context/UserContext'
 
 const UpdateUsername = () => {
 
+    const { user, setuser } = useContext(UserDataContext)
+    const navigate = useNavigate()
+
     const [username, setUsername] = React.useState('')
-    const [error, setError] = React.useState('Username “adrain7” is not available, Try another one.')
+    const [error, setError] = React.useState('')
 
   return (
     <div className='w-full h-full bg-[#1a1a1a] flex flex-col items-center'>

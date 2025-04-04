@@ -6,8 +6,8 @@ import userRouter from './routes/user.routes.js'
 const app = express()
 
 app.use(cors({
-    origin: process.env.ORIGIN_CORS,
-    credentials: true 
+    // origin: process.env.ORIGIN_CORS,
+    // credentials: true 
 }))
 
 app.use(express.json({limit: "16kb"}))

@@ -1,6 +1,6 @@
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
-import { User } from '../models/user.models.js'
+import {User} from '../models/user.model.js'
 import jwt from "jsonwebtoken"
 
 export const verifyUser = asyncHandler(async (req,res, next) => {
@@ -29,4 +29,4 @@ export const verifyUser = asyncHandler(async (req,res, next) => {
 
 })
 
-export {verifyUser}
+export default verifyUser;

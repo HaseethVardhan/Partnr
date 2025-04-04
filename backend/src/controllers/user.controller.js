@@ -1,5 +1,5 @@
 import { asyncHandler } from "../utils/asyncHandler.js";
-import { User } from "../models/user.models.js";
+import {User} from "../models/user.model.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { validationResult } from "express-validator";
 
@@ -62,12 +62,12 @@ const isMailExists = asyncHandler(async (req, res) => {
     
     if (user) {
         return res
-            .status(200)
+            .status(400)
             .json(
                 new ApiResponse(
-                    200,
+                    400,
                     {exists: true, msg: "Email already exists"},
-                    "Email already exists"
+                    "Email already exists. Please login or use another email."
                 ) 
             )  
     } else {

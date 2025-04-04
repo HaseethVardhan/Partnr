@@ -11,7 +11,7 @@ router.route('/isUserNameAvailable').get([
 ],
 isUserNameAvailable)
 
-router.route('/isMailExists').get(
+router.route('/isMailExists').post(
     body('email').isEmail().withMessage('Email is required')
 ,
 isMailExists)
