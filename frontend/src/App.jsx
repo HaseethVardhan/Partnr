@@ -10,6 +10,7 @@ import UpdateProfession from "./pages/UpdateProfession.jsx";
 import UpdateWork from "./pages/UpdateWork.jsx";
 import UpdateProject from "./pages/UpdateProject.jsx";
 import UpdatePicture from "./pages/UpdatePicture.jsx";
+import UpdatePreferences from "./pages/UpdatePreferences.jsx";
 
 function App() {
   return (
@@ -75,6 +76,12 @@ function App() {
           path="/update-picture"
           element={
             <UpdatePicture />
+          }
+        />
+        <Route 
+          path="/update-preferences"
+          element={
+            <UpdatePreferences />
           }
         />
       </Routes>
