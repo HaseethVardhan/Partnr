@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Button from "../components/Button";
 import axios from "axios";
@@ -9,9 +9,12 @@ const Authentication = () => {
 
   const { user, setuser } = useContext(UserDataContext);
 
-  if (user._id) {
-    navigate("/");
-  }
+  useEffect(() => {
+    if (user._id) {
+      navigate('/'
+        );
+    }
+  }, []);
 
   const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");
