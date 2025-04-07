@@ -1,13 +1,60 @@
 import React from "react";
 import Button from "../components/Button";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 const UpdateWork = () => {
+
+  const navigate = useNavigate()
+  
+    const [loading, setLoading] = React.useState(false);
+    const [error, setError] = React.useState(null);
 
     const [organization, setOrganization] = React.useState("");
     const [role, setRole] = React.useState("");
     const [startDate, setStartDate] = React.useState("");
     const [endDate, setEndDate] = React.useState("");
     const [description, setDescription] = React.useState("");
+
+    const handleNext = async (e) => {
+        setLoading(true);
+        e.preventDefault();
+        if (organization.length < 1) {
+          setError("Please enter an organization name.");
+        } else if (role.length < 1) {
+          setError("Please enter a role.");
+        } else if (startDate.length < 1) {
+          setError("Please enter a start date.");
+        } else if (endDate.length < 1) {
+          setError("Please enter an end date.");
+        } else if (description.length < 1) {
+          setError("Please enter a description.");
+        } else {
+          const response = await axios.post(
+            `${import.meta.env.VITE_BASE_URL}/user/update-user-work`,
+            {
+              company: organization,
+              role,
+              from: startDate,
+              to: endDate,
+              experience: description,
+            },
+            {
+              headers: {
+                Authorization: `Bearer ${localStorage.getItem("token")}`,
+              },
+            }
+          ); 
+    
+          if (response.status >= 400) {
+            setError(response.data.message);
+          } else {
+            setError("");
+            navigate("/update-picture");
+          }
+        }
+        setLoading(false);
+    }
 
   return (
     <div className="w-full h-full bg-[#1a1a1a] flex flex-col items-center">
@@ -89,13 +136,17 @@ const UpdateWork = () => {
           <p className="flex w-full text-[#aaaaaa] text-xs font-inter font-[400] tracking-[0.5px] px-2 justify-end">
             {description?.length || 0}/200
           </p>
+          {error && <p className='flex w-full text-[#ff857f] text-[11px] font-inter font-[400] tracking-[0.5px] px-2'>{error}</p>}
+
         </div>
       </div>
       <div className='w-full h-screen flex flex-col items-center justify-end mb-18 gap-5 mt-5'>
-            <button className='flex flex-row w-[90%] items-center justify-center h-12 rounded-lg text-white font-inter font-[500] text-base tracking-[0.5px] border-1 border-[#ffffff5d]'>
+            <button className='flex flex-row w-[90%] items-center justify-center h-12 rounded-lg text-white font-inter font-[500] text-base tracking-[0.5px] border-1 border-[#ffffff5d]' onClick={() => {navigate('/update-picture')}}>
                 Skip
             </button>
-            <Button text="Next" />
+            <div className="flex flex-row w-[90%] items-center justify-between" onClick={(e) => {handleNext(e)}}>
+              <Button text="Next" />
+            </div>
         </div>
     </div>
   );

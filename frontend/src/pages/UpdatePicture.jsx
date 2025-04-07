@@ -1,4 +1,5 @@
 import React from "react";
+import axios from "axios";
 import Button from "../components/Button";
 
 const UpdatePicture = () => {
@@ -28,7 +29,7 @@ const UpdatePicture = () => {
           Change Picture
         </button>
       </div>
-      <div className="w-full h-screen flex flex-col items-center justify-end mb-18 gap-5">
+      <div className="w-[90%] h-screen flex flex-col items-center justify-end mb-18 gap-5">
         <Button text="Next" />
       </div>
     </div>

@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { body } from "express-validator";
-import { isMailExists, isUserNameAvailable, getProfile, registerUser } from "../controllers/user.controller.js";
+import { isMailExists, isUserNameAvailable, getProfile, registerUser, updateProfession, updateSkills, updateBio, updateLinks, updateProjects, updateWork } from "../controllers/user.controller.js";
 import { verifyUser } from "../middlewares/auth.middleware.js";
 
 const router = Router()
@@ -28,5 +28,32 @@ router.route('/register-user').post([
     // body('fullname').isObject().notEmpty().withMessage('Full name is required'),
 ],
 registerUser)
+
+router.route('/update-user-profession').post([
+    body('profession').isString().notEmpty().withMessage('Profession is required'),
+], verifyUser, updateProfession)
+
+router.route('/update-user-skills').post([
+    body('skills').isArray().notEmpty().withMessage('Skills are required'),
+], verifyUser, updateSkills)
+
+router.route('/update-user-bio').post([
+    body('bio').isString().notEmpty().withMessage('Bio is required'),
+], verifyUser, updateBio)
+
+router.route('/update-user-links').post(verifyUser, updateLinks)
+
+router.route('/update-user-project').post([
+    body('title').isString().notEmpty().withMessage('Project title is required'),
+    body('details').isString().notEmpty().withMessage('Project description is required'),
+], verifyUser, updateProjects)
+
+router.route('/update-user-work').post([
+    body('company').isString().notEmpty().withMessage('Company name is required'),
+    body('role').isString().notEmpty().withMessage('Position is required'),
+    body('experience').isString().notEmpty().withMessage('Duration is required'),
+    body('from').isDate().notEmpty().withMessage('Start date is required'),
+    body('to').isDate().notEmpty().withMessage('End date is required'),
+], verifyUser, updateWork)
 
 export default router

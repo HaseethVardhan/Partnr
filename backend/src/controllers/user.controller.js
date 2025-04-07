@@ -2,6 +2,8 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 import {User} from "../models/user.model.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { validationResult } from "express-validator";
+import {Project} from "../models/project.model.js";
+import { Work } from "../models/work.model.js";
 
 const isUserNameAvailable = asyncHandler(async (req, res) => {
     const errors = validationResult(req);
@@ -162,4 +164,289 @@ const registerUser = asyncHandler(async (req, res) => {
 
 })
 
-export { isUserNameAvailable, isMailExists, getProfile, registerUser };
+const updateProfession = asyncHandler(async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res
+            .status(400)
+            .json(
+                new ApiResponse(
+                    400,
+                    {errors: errors.array()},
+                    "Please ensure all fields are filled correctly.",
+                )
+            )
+    }
+
+    const { profession } = req.body;
+
+    const user = await User.findByIdAndUpdate(req.user._id, {profession}, {new: true});
+    
+    if(!user) {
+        return res
+            .status(400)
+            .json(
+                new ApiResponse(
+                    400,
+                    {msg: "User not updated"},
+                    "There was a problem on our side. Please try again later."
+                ) 
+            )  
+    }
+
+    return res
+        .status(200)
+        .json(new ApiResponse(200, {msg: "User profile updated successfully"}, "User profile updated successfully"))
+    }           
+)
+
+const updateSkills = asyncHandler(async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res
+            .status(400)
+            .json(
+                new ApiResponse(
+                    400,
+                    {errors: errors.array()},
+                    "Please ensure all fields are filled correctly.",
+                )
+            )
+    }
+
+    const { skills } = req.body;
+
+    const user = await User.findByIdAndUpdate(req.user._id, {skills}, {new: true});
+    
+    if(!user) {
+        return res
+            .status(400)
+            .json(
+                new ApiResponse(
+                    400,
+                    {msg: "User not updated"},
+                    "There was a problem on our side. Please try again later."
+                ) 
+            )  
+    }
+
+    return res
+        .status(200)
+        .json(new ApiResponse(200, {msg: "User profile updated successfully"}, "User profile updated successfully"))
+})
+
+const updateBio = asyncHandler(async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res
+            .status(400)
+            .json(
+                new ApiResponse(
+                    400,
+                    {errors: errors.array()},
+                    "Please ensure all fields are filled correctly.",
+                )
+            )
+    }
+
+    const { bio } = req.body;
+
+    const user = await User.findByIdAndUpdate(req.user._id, {about:bio}, {new: true});
+    
+    if(!user) {
+        return res
+            .status(400)
+            .json(
+                new ApiResponse(
+                    400,
+                    {msg: "User not updated"},
+                    "There was a problem on our side. Please try again later."
+                ) 
+            )  
+    }
+
+    return res
+        .status(200)
+        .json(new ApiResponse(200, {msg: "User profile updated successfully"}, "User profile updated successfully"))
+})
+
+const updateLinks = asyncHandler(async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res
+            .status(400)
+            .json(
+                new ApiResponse(
+                    400,
+                    {errors: errors.array()},
+                    "Please ensure all fields are filled correctly.",
+                )
+            )
+    }
+    const { xlink, linkedInlink, portfoliolink } = req.body;
+
+    const links = {};
+    if (xlink) links.xlink = xlink;
+    if (linkedInlink) links.linkedInlink = linkedInlink;
+    if (portfoliolink) links.portfoliolink = portfoliolink;
+
+    if (Object.keys(links).length === 0) {
+        return res
+            .status(400)
+            .json(
+                new ApiResponse(
+                    400,
+                    { msg: "At least one link is required" },
+                    "Please provide at least one link"
+                )
+            );
+    }
+
+    const user = await User.findByIdAndUpdate(req.user._id, {links}, {new: true});
+    
+    if(!user) {
+        return res
+            .status(400)
+            .json(
+                new ApiResponse(
+                    400,
+                    {msg: "User not updated"},
+                    "There was a problem on our side. Please try again later."
+                ) 
+            )  
+    }
+
+    return res
+        .status(200)
+        .json(new ApiResponse(200, {msg: "User profile updated successfully"}, "User profile updated successfully"))
+})
+
+const updateProjects = asyncHandler(async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res
+        .status(400)
+        .json(
+            new ApiResponse(
+                400,
+                {errors: errors.array()},
+                "Please ensure all fields are filled correctly.",
+            )
+        )
+    } 
+    
+    const { title, details } = req.body;
+    
+    const project = await Project.create({
+        title,
+        details
+    });
+    
+    if (!project) {
+        return res
+        .status(400)
+        .json(
+            new ApiResponse(
+                400,
+                {msg: "Project not created"},
+                "There was a problem creating the project. Please try again."
+            )
+        )
+    }
+    
+    const user = await User.findByIdAndUpdate(
+        req.user._id,
+        { $push: { projectsArray: project._id } },
+        { new: true }
+    );
+    
+    
+    if (!user) {
+        return res
+        .status(400)
+        .json(
+            new ApiResponse(
+                400,
+                    {msg: "User not updated"},
+                    "There was a problem updating user projects."
+                )
+            )
+        }
+        
+        return res
+        .status(200)
+        .json(
+            new ApiResponse(
+                200,
+                {msg: "Project added successfully"},
+                "Project added successfully"
+            )
+        )
+}) 
+
+const updateWork = asyncHandler(async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res
+            .status(400)
+            .json(
+                new ApiResponse(
+                    400,
+                    {errors: errors.array()},
+                    "Please ensure all fields are filled correctly.",
+                )
+            )
+    }
+
+    const { company, role, from, to, experience } = req.body;
+
+    const work = await Work.create({
+        company,
+        role,
+        from,
+        to,
+        experience
+    });
+
+    if (!work) {
+        return res
+            .status(400)
+            .json(
+                new ApiResponse(
+                    400,
+                    {msg: "Work experience not created"},
+                    "There was a problem creating the work experience. Please try again."
+                )
+            )
+    }
+
+    const user = await User.findByIdAndUpdate(
+        req.user._id,
+        { $push: { workArray: work._id } },
+        { new: true }
+    );
+
+    if (!user) {
+        return res
+            .status(400)
+            .json(
+                new ApiResponse(
+                    400,
+                    {msg: "User not updated"},
+                    "There was a problem updating user work experience."
+                )
+            )
+    }
+
+    return res
+        .status(200)
+        .json(
+            new ApiResponse(
+                200,
+                {msg: "Work experience added successfully"},
+                "Work experience added successfully"
+            )
+        )
+})
+
+export { isUserNameAvailable, isMailExists, getProfile, registerUser, updateProfession, updateSkills, updateBio, updateLinks, updateProjects, updateWork };

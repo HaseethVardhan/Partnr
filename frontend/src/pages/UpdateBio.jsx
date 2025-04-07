@@ -2,15 +2,39 @@ import React, { useContext } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import Button from "../components/Button";
-import { UserDataContext } from "../context/UserContext";
+
 
 const UpdateBio = () => {
-    const { user, setuser } = useContext(UserDataContext);
     const navigate = useNavigate();
 
-    console.log(user)
-
     const [bio, setBio] = React.useState('')
+
+    const [loading, setLoading] = React.useState(false)
+    const [error, setError] = React.useState(null) 
+
+    const handleNext = async (e) => {
+        setLoading(true)
+        e.preventDefault()
+        if (bio.length < 1) {
+            setError("Please enter a bio.")
+        } else {
+            const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/user/update-user-bio`, {
+                bio
+            }, {
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                }
+            })
+            
+            if (response.status >= 400) {
+                setError(response.data.message)
+            } else {
+                setError('')
+                navigate('/update-links')
+            }
+        }
+        setLoading(false)
+    }
     
 
   return (
@@ -26,12 +50,15 @@ const UpdateBio = () => {
         <div className='flex flex-col w-[90%] gap-2'>
             <textarea className='flex flex-row w-full bg-[#333333] h-70 rounded-xl placeholder-[#aaaaaa] font-inter font-[400] text-sm px-6 py-3 text-white' type="text" maxLength={500} placeholder='Tell us about yourself!' value={bio} onChange={(e)=>setBio(e.target.value)}/>
             <p className='flex w-full text-[#aaaaaa] text-[11px] font-inter font-[400] tracking-[0.5px] px-2 justify-end'>{bio.length}/500</p>
+            {error && <p className='flex w-full text-[#ff857f] text-[11px] font-inter font-[400] tracking-[0.5px] px-2'>{error}</p>}
         </div>
-        <div className='w-full h-screen flex flex-col items-center justify-end mb-18 gap-5'>
-            <button className='flex flex-row w-[90%] items-center justify-center h-12 rounded-lg text-white font-inter font-[500] text-base tracking-[0.5px] border-1 border-[#ffffff5d]'>
+        <div className='w-[90%] h-screen flex flex-col items-center justify-end mb-18 gap-5'>
+            <button className='flex flex-row w-full items-center justify-center h-12 rounded-lg text-white font-inter font-[500] text-base tracking-[0.5px] border-1 border-[#ffffff5d]' onClick={()=>{navigate('/update-links')}}>
                 Skip
             </button>
-            <Button text="Next" />
+            <div className="w-full flex flex-row items-center justify-end gap-2" onClick={(e)=>{handleNext(e)}}>
+                <Button text="Next" />
+            </div>
         </div>
     </div>
   )

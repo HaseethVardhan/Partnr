@@ -1,17 +1,38 @@
 import React, { useContext } from 'react'
+import axios from 'axios'
 import { useNavigate } from 'react-router-dom'
 import Button from '../components/Button'
-import { UserDataContext } from '../context/UserContext'
 
 const UpdateProfession = () => {
     const navigate = useNavigate()
-    const { user, setuser } = useContext(UserDataContext)
-
-    console.log(user)
-
-
+   
     const [profession, setProfession] = React.useState('')
     const [error, setError] = React.useState('')
+    const [loading, setLoading] = React.useState(false)
+
+    const handleNext = async (e) => {
+        setLoading(true)
+        e.preventDefault()
+        if (!profession) {
+            setError("Please fill all the fields.")
+        } else {
+            const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/user/update-user-profession`, {
+                profession
+            }, {
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                }
+            })
+
+            if (response.status >= 400) {
+                setError(response.data.message)
+            } else {
+                setError('')
+                navigate('/update-skills')
+            }
+        }
+        setLoading(false)
+    }
 
   return (
     <div className='w-full h-full bg-[#1a1a1a] flex flex-col items-center'>
@@ -27,7 +48,7 @@ const UpdateProfession = () => {
             <input className='flex flex-row w-full bg-[#333333] h-14 rounded-xl placeholder-[#aaaaaa] font-inter font-[400] text-sm px-6 text-white' type="text" placeholder='e.g student/web developer' value={profession} onChange={(e) => {setProfession(e.target.value)}}/>
             {error && <p className='flex w-full text-[#ff857f] text-[11px] font-inter font-[400] tracking-[0.5px] px-2'>{error}</p>}
         </div>
-        <div className='w-[90%] h-screen flex flex-col items-center justify-end mb-18'>
+        <div className='w-[90%] h-screen flex flex-col items-center justify-end mb-18' onClick={(e) => {handleNext(e)}}>
             <Button text="Next" />
         </div>
     </div>

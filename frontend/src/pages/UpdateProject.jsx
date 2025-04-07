@@ -1,9 +1,48 @@
 import React from "react";
 import Button from "../components/Button";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 const UpdateProject = () => {
+
+  const navigate = useNavigate()
+
+  const [loading, setLoading] = React.useState(false);
+  const [error, setError] = React.useState(null);
+
   const [title, setTitle] = React.useState("");
   const [description, setDescription] = React.useState("");
+
+  const handleNext = async (e) => {
+    setLoading(true);
+    e.preventDefault();
+    if (title.length < 1) {
+      setError("Please enter a project title.");
+    } else if (description.length < 1) {
+      setError("Please enter a project description.");
+    } else {
+      const response = await axios.post(
+        `${import.meta.env.VITE_BASE_URL}/user/update-user-project`,
+        {
+          title,
+        details: description,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      ); 
+ 
+      if (response.status >= 400) {
+        setError(response.data.message);
+      } else {
+        setError("");
+        navigate("/update-work");
+      }
+    }
+    setLoading(false);
+  }
 
   return (
     <div className="w-full h-full bg-[#1a1a1a] flex flex-col items-center">
@@ -48,12 +87,17 @@ const UpdateProject = () => {
             {description?.length || 0}/400
           </p>
         </div>
+        <div>
+          {error && <p className='flex w-full text-[#ff857f] text-[11px] font-inter font-[400] tracking-[0.5px] px-2'>{error}</p>}
+        </div>
       </div>
       <div className="w-full h-screen flex flex-col items-center justify-end mb-18 gap-5">
-        <button className="flex flex-row w-[90%] items-center justify-center h-12 rounded-lg text-white font-inter font-[500] text-base tracking-[0.5px] border-1 border-[#ffffff5d]">
+        <button className="flex flex-row w-[90%] items-center justify-center h-12 rounded-lg text-white font-inter font-[500] text-base tracking-[0.5px] border-1 border-[#ffffff5d]"   onClick={() => {navigate('/update-work')}}>
           Skip
         </button>
-        <Button text="Next" />
+        <div className="flex flex-row w-[90%] items-center justify-between" onClick={(e) => {handleNext(e)}}>
+          <Button text="Next" />
+        </div>
       </div>
     </div>
   );

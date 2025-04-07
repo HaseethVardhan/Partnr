@@ -1,5 +1,7 @@
 import React from 'react'
 import Button from '../components/Button';
+import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 const UpdateSkills = () => {
 
@@ -12,6 +14,7 @@ const UpdateSkills = () => {
         "Frontend Development", "Game Development"
     ];
 
+    const navigate = useNavigate()
     const [selectedSkills, setSelectedSkills] = React.useState([]);
 
     const handleSkillSelect = (skill) => {
@@ -21,6 +24,33 @@ const UpdateSkills = () => {
             setSelectedSkills([...selectedSkills, skill]);
         }
     };
+
+    const [error, setError] = React.useState('')
+    const [loading, setLoading] = React.useState(false)
+
+    const handleNext = async (e) => {
+        setLoading(true)
+        e.preventDefault()
+        if (selectedSkills.length < 1) {
+            setError("Please select at least one skill.")
+        } else {
+            const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/user/update-user-skills`, {
+                skills: selectedSkills
+            }, {
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                }
+            })
+            
+            if (response.status >= 400) {
+                setError(response.data.message)
+            } else {
+                setError('')
+                navigate('/update-bio')
+            }
+        }
+        setLoading(false)
+    }
 
   return (
     <div className='w-full h-full bg-[#1a1a1a] flex flex-col items-center'>
@@ -47,7 +77,10 @@ const UpdateSkills = () => {
                     </div>
                 ))}
         </div>
-        <div className='w-full h-screen flex flex-col items-center justify-end mb-18 gap-5'>
+        <div className='flex flex-col w-[90%] gap-2 mt-5'>
+            {error && <p className='flex w-full text-[#ff857f] text-[11px] font-inter font-[400] tracking-[0.5px] px-2'>{error}</p>}
+        </div>
+        <div className='w-[90%] h-screen flex flex-col items-center justify-end mb-18 gap-5' onClick={(e)=>{handleNext(e)}}>
             <Button text="Next" />
         </div>
     </div>
