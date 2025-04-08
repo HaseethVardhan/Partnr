@@ -1,7 +1,8 @@
 import { Router } from "express";
 import { body } from "express-validator";
-import { isMailExists, isUserNameAvailable, getProfile, registerUser, updateProfession, updateSkills, updateBio, updateLinks, updateProjects, updateWork } from "../controllers/user.controller.js";
+import { isMailExists, isUserNameAvailable, getProfile, registerUser, updateProfession, updateSkills, updateBio, updateLinks, updateProjects, updateWork, updatePicture, getUserPicture, updatePreferences } from "../controllers/user.controller.js";
 import { verifyUser } from "../middlewares/auth.middleware.js";
+import { upload } from "../middlewares/multer.middleware.js";
 
 const router = Router()
 
@@ -55,5 +56,13 @@ router.route('/update-user-work').post([
     body('from').isDate().notEmpty().withMessage('Start date is required'),
     body('to').isDate().notEmpty().withMessage('End date is required'),
 ], verifyUser, updateWork)
+ 
+router.route('/update-user-picture').post(verifyUser, upload.single('picture') ,updatePicture)
+
+router.route('/update-user-preferences').post([
+    body('preferences').isArray().notEmpty().withMessage('Preferences are required'),
+], verifyUser, updatePreferences)
+
+router.route('/get-user-picture').get(verifyUser, getUserPicture)
 
 export default router

@@ -1,7 +1,14 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
 import Button from "../components/Button";
 
 const UpdatePreferences = () => {
+
+  const [error, setError] = React.useState(null);
+    const [loading, setLoading] = React.useState(false);
+  
+    const navigate = useNavigate();
 
     const preferences = [
             "Artificial Intelligence", "Graphic Design",
@@ -21,6 +28,28 @@ const UpdatePreferences = () => {
                 setSelectedPreferences([...selectedPreferences, preference]);
             }
         };
+
+        const handleSave = async () => {
+            setLoading(true);
+            setError(null);
+
+            try {
+                const response = await axios.post(
+                    `${import.meta.env.VITE_BASE_URL}/user/update-user-preferences`,
+                    { preferences: selectedPreferences },
+                    {
+                        headers: {
+                            Authorization: `Bearer ${localStorage.getItem("token")}`,
+                        },
+                    }
+                );
+                setLoading(false);
+                navigate("/");
+            } catch (error) {
+                setLoading(false);
+                setError(error.response.data.message);
+            }
+        }
 
   return (
     <div className="w-full h-full bg-[#1a1a1a] flex flex-col items-center">
@@ -51,9 +80,9 @@ const UpdatePreferences = () => {
                     </div>
                 ))}
         </div>
-        <div className='w-full h-screen flex flex-col items-center justify-end mb-18 gap-5'>
-            <Button text="Save" />
-        </div>
+        <div className="w-[90%] h-screen flex flex-col items-center justify-end mb-18 gap-5" onClick={()=>{handleSave()}}>
+        <Button text="Save" />
+      </div>
     </div>
   );
 };

@@ -61,7 +61,7 @@ const userSchema = new mongoose.Schema({
     },
     profilePicture: {
         type: String,
-        default: 'https://res.cloudinary.com/dbzcsfi3e/image/upload/w_1000,ar_1:1,c_fill,g_auto,e_art:hokusai/v1743434367/default_pfp_wngp1j.jpg'
+        default: "https://res.cloudinary.com/dbzcsfi3e/image/upload/v1743434367/default_pfp_wngp1j.jpg"
     },
     profession: {
         type: String,
