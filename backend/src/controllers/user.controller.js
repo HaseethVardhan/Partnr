@@ -128,6 +128,44 @@ const registerUser = asyncHandler(async (req, res) => {
       );
   }
 
+  if(authtype === "google") {
+    const newUser = await User.create({
+      email,
+      username,
+      fullname: {
+        firstname,
+        lastname,
+      },
+      authtype,
+    });
+
+    if (!newUser) {
+      return res
+        .status(400)
+        .json(
+          new ApiResponse(
+            400,
+            { msg: "User not created" },
+            "There was a problem on our side. Please try again later."
+          )
+        );
+    }
+
+    const { _id } = newUser.toObject();
+
+    const token = await newUser.generateAuthToken();
+
+    return res
+      .status(200)
+      .json(
+        new ApiResponse(
+          200,
+          { user: { _id }, token, msg: "User created successfully" },
+          "User created successfully"
+        )
+      );
+  }
+
   if (authtype === "local") {
     const newUser = await User.create({
       email,
@@ -621,6 +659,34 @@ const getUserPicture = asyncHandler(async (req, res) => {
     );
 })
 
+const findUserByEmail = asyncHandler(async (req, res) => {
+  const { email } = req.body;
+
+  const user = await User.findOne({ email });
+  if (!user) {
+    return res
+      .status(400)
+      .json(
+        new ApiResponse(
+          400,
+          { msg: "User not found" },
+          "There was a problem fetching the user."
+        )
+      );
+  }
+
+
+  return res
+    .status(200)
+    .json(
+      new ApiResponse(
+        200,
+        { userId: user._id, msg: "User fetched successfully" },
+        "User fetched successfully"
+      )
+    );
+})
+
 export {
   isUserNameAvailable,
   isMailExists,
@@ -634,5 +700,6 @@ export {
   updateWork,
   updatePicture,
   updatePreferences,
-  getUserPicture
+  getUserPicture,
+  findUserByEmail
 };

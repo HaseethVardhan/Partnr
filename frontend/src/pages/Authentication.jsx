@@ -34,6 +34,20 @@ const Authentication = () => {
     }
   };
 
+  const googleAuth = async () => {
+    setLoading(true);
+    document.cookie.split(";").forEach((cookie) => {
+      const eqPos = cookie.indexOf("=");
+      const name = eqPos > -1 ? cookie.substr(0, eqPos) : cookie;
+      document.cookie = name + "=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/";
+    });
+    window.open(
+      `${import.meta.env.VITE_BASE_URL}/auth/google`,
+      "_self"
+    );
+    setLoading(false);
+  }  
+
   const handleCreateAccount = async (e) => {
     setLoading(true);
     e.preventDefault();
@@ -93,7 +107,7 @@ const Authentication = () => {
         </p>
       </div>
       <div className="flex flex-col items-center gap-4 text-white font-inter font-[400] text-base w-full tracking-[0.8px] py-4">
-        <button className="flex flex-row w-[90%] bg-[#333333] h-10 rounded-lg gap-3 items-center justify-center">
+        <button className="flex flex-row w-[90%] bg-[#333333] h-10 rounded-lg gap-3 items-center justify-center" onClick={googleAuth}>
           <div className="flex items-center justify-end ">
             <img
               className="w-4 "

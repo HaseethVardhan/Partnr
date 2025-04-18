@@ -3,8 +3,8 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import Button from "../components/Button";
 import { UserDataContext } from "../context/UserContext";
-import { Trefoil } from 'ldrs/react'
-import 'ldrs/react/Trefoil.css'
+import { Trefoil } from "ldrs/react";
+import "ldrs/react/Trefoil.css";
 
 const UpdateUsername = () => {
   const { user, setuser } = useContext(UserDataContext);
@@ -14,6 +14,44 @@ const UpdateUsername = () => {
   const [error, setError] = React.useState("");
 
   const [loading, setLoading] = React.useState(false);
+
+  React.useEffect(() => {
+    setLoading(true);
+    const cookies = document.cookie.split(";").reduce((acc, cookie) => {
+      const [key, value] = cookie.trim().split("=");
+      acc[key] = decodeURIComponent(value);
+      return acc;
+    }, {});
+
+    
+    if (cookies?.email) {
+      const func = async () => {
+        try {
+          const response = await axios.post(
+            `${import.meta.env.VITE_BASE_URL}/user/find-user-by-email`,
+            {
+              email: cookies.email,
+            }
+          );
+
+
+          if(response.data.data.userId){
+            setuser(response.data.data.userId);
+            navigate("/");
+          }
+        } catch (error) {
+          setuser({
+            email: cookies.email,
+            authtype: "google",
+          });
+        }
+      };
+
+      func();
+    }
+
+    setLoading(false);
+  }, [])
 
   const handleCreateUsername = async (e) => {
     setLoading(true);
@@ -43,7 +81,7 @@ const UpdateUsername = () => {
           ...user,
           username: username,
         });
-        navigate('/update-name');
+        navigate("/update-name");
       }
     }
 
@@ -51,16 +89,18 @@ const UpdateUsername = () => {
   };
   return (
     <div className="w-full h-full bg-[#1a1a1a] flex flex-col items-center">
-      {loading && <div className="absolute top-0 left-0 w-full h-full flex items-center backdrop-blur-3xl justify-center z-50">
-        <Trefoil
-  size="40"
-  stroke="4"
-  strokeLength="0.15"
-  bgOpacity="0.3"
-  speed="1.4"
-  color="#8b5cf6" 
-/>
-        </div>}
+      {loading && (
+        <div className="absolute top-0 left-0 w-full h-full flex items-center backdrop-blur-3xl justify-center z-50">
+          <Trefoil
+            size="40"
+            stroke="4"
+            strokeLength="0.15"
+            bgOpacity="0.3"
+            speed="1.4"
+            color="#8b5cf6"
+          />
+        </div>
+      )}
       <div className="flex flex-col items-center justify-center w-[90%] gap-1 py-10">
         <div className="text-left w-full">
           <h1 className="font-poppins font-[500] text-3xl tracking-[-0.5px] text-white">
