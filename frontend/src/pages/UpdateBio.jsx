@@ -2,6 +2,8 @@ import React, { useContext } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import Button from "../components/Button";
+import { Trefoil } from 'ldrs/react'
+import 'ldrs/react/Trefoil.css'
 
 
 const UpdateBio = () => {
@@ -39,6 +41,16 @@ const UpdateBio = () => {
 
   return (
     <div className='w-full h-full bg-[#1a1a1a] flex flex-col items-center'>
+        {loading && <div className="absolute top-0 left-0 w-full h-full flex items-center backdrop-blur-3xl justify-center z-50">
+        <Trefoil
+  size="40"
+  stroke="4"
+  strokeLength="0.15"
+  bgOpacity="0.3"
+  speed="1.4"
+  color="#8b5cf6" 
+/>
+        </div>}
         <div className='flex flex-col items-center justify-center w-[90%] gap-1 py-10'> 
             <div className='text-left w-full'>
                 <h1 className='font-poppins font-[500] text-3xl tracking-[-0.5px] text-white'>Add Bio</h1>

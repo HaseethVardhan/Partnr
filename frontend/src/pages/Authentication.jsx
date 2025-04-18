@@ -3,6 +3,8 @@ import { Link, useNavigate } from "react-router-dom";
 import Button from "../components/Button";
 import axios from "axios";
 import { UserDataContext } from "../context/UserContext";
+import { Trefoil } from 'ldrs/react'
+import 'ldrs/react/Trefoil.css'
 
 const Authentication = () => {
   const navigate = useNavigate();
@@ -66,6 +68,16 @@ const Authentication = () => {
 
   return (
     <div className="flex flex-col items-center w-screen bg-[#1a1a1a]">
+      {loading && <div className="absolute top-0 left-0 w-full h-full flex items-center backdrop-blur-3xl justify-center z-50">
+        <Trefoil
+  size="40"
+  stroke="4"
+  strokeLength="0.15"
+  bgOpacity="0.3"
+  speed="1.4"
+  color="#8b5cf6" 
+/>
+        </div>}
       <div className="mt-10">
         <img
           src={import.meta.env.VITE_app_logo}
