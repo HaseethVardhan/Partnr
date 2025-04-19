@@ -687,6 +687,58 @@ const findUserByEmail = asyncHandler(async (req, res) => {
     );
 })
 
+const login = asyncHandler(async (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res
+      .status(400)
+      .json(
+        new ApiResponse(
+          400,
+          { errors: errors.array() },
+          "Please ensure all fields are filled correctly."
+        )
+      );
+  }
+
+  const {email, password} = req.body
+
+  const user = await User.findOne({email})
+
+  if(!user){
+    return res
+      .status(400)
+      .json(new ApiResponse(400, {msg: "Email do not exist"}, "Email do not exist."))
+  }
+
+  if(user.authtype !== 'local'){
+    return res
+      .status(400)
+      .json(new ApiResponse(400, {msg: 'Please login using your google or github.'}, 'Please login using your google or github.'))
+  }
+
+  const valid = await user.isPasswordCorrect(password)
+
+  if(valid){
+    const token = await user.generateAuthToken();
+    return res
+      .status(200)
+      .json(new ApiResponse(
+        200,
+        {user: user._id, token, msg: 'Succesful LogIn'},
+        'Successful LogIn'
+      ))
+  }else{
+    return res
+      .status(400)
+      .json(new ApiResponse(
+        400,
+        {msg: 'Incorrect Password'},
+        'Incorrect Password'
+      ))
+  }
+})
+
 export {
   isUserNameAvailable,
   isMailExists,
@@ -701,5 +753,6 @@ export {
   updatePicture,
   updatePreferences,
   getUserPicture,
-  findUserByEmail
+  findUserByEmail,
+  login
 };

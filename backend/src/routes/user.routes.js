@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { body } from "express-validator";
-import { isMailExists, isUserNameAvailable, getProfile, registerUser, updateProfession, updateSkills, updateBio, updateLinks, updateProjects, updateWork, updatePicture, getUserPicture, updatePreferences, findUserByEmail } from "../controllers/user.controller.js";
+import { isMailExists, isUserNameAvailable, getProfile, registerUser, updateProfession, updateSkills, updateBio, updateLinks, updateProjects, updateWork, updatePicture, getUserPicture, updatePreferences, findUserByEmail, login } from "../controllers/user.controller.js";
 import { verifyUser } from "../middlewares/auth.middleware.js";
 import { upload } from "../middlewares/multer.middleware.js";
 
@@ -66,5 +66,10 @@ router.route('/update-user-preferences').post([
 router.route('/get-user-picture').get(verifyUser, getUserPicture)
 
 router.route('/find-user-by-email').post(findUserByEmail)
+
+router.route('/login').post([
+    body('email').isEmail().withMessage('Email is required'),
+    body('password').isString().withMessage('Password is required')
+],login)
 
 export default router

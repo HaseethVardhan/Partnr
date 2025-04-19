@@ -1,4 +1,4 @@
-import React, { useContext, useEffect } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Button from "../components/Button";
 import axios from "axios";
@@ -10,6 +10,8 @@ const Authentication = () => {
   const navigate = useNavigate();
 
   const { user, setuser } = useContext(UserDataContext);
+
+  const [login, setLogin] = useState(false);
 
   useEffect(() => {
     if (user._id) {
@@ -62,6 +64,45 @@ const Authentication = () => {
     setLoading(false);
   } 
 
+
+  const handleLogIn = async (e) => {
+    setLoading(true);
+    e.preventDefault();
+    if (!email || !password) {
+      setError("Please fill all the fields.");
+    } else if (!validateEmail(email)) {
+      setError("Please enter a valid email address.");
+    } else if (password.length < 8) {
+      setError("Password must be at least 8 characters long.");
+    } else {
+
+      try {
+        const response = await axios.post(
+          `${import.meta.env.VITE_BASE_URL}/user/login`,
+          {
+            email,
+            password
+          }
+        );
+
+
+        if (response.status >= 400) {
+          setError(response.data.message);
+        } else {
+          setError("");
+          setuser(response.data.data.user);
+          localStorage.setItem("token", response.data.data.token);
+          navigate("/");
+        }
+
+      } catch (error) {
+        setError(error.response.data.message);
+      }
+
+      setLoading(false);
+    }
+  }  
+
   const handleCreateAccount = async (e) => {
     setLoading(true);
     e.preventDefault();
@@ -72,23 +113,27 @@ const Authentication = () => {
     } else if (password.length < 8) {
       setError("Password must be at least 8 characters long.");
     } else {
-      const response = await axios.post(
-        `${import.meta.env.VITE_BASE_URL}/user/isMailExists`,
-        {
-          email,
+      try {
+        const response = await axios.post(
+          `${import.meta.env.VITE_BASE_URL}/user/isMailExists`,
+          {
+            email,
+          }
+        );
+  
+        if (response.status >= 400) {
+          setError(response.data.message);
+        } else {
+          setError("");
+          setuser({
+            email: email,
+            password: password,
+            authtype: "local",
+          });
+          navigate("/update-username");
         }
-      );
-
-      if (response.status >= 400) {
-        setError(response.data.message);
-      } else {
-        setError("");
-        setuser({
-          email: email,
-          password: password,
-          authtype: "local",
-        });
-        navigate("/update-username");
+      } catch (error) {
+        setError(error.response.data.message);
       }
       setLoading(false);
     }
@@ -113,12 +158,25 @@ const Authentication = () => {
         />
       </div>
       <div className="flex flex-col items-center justify-center py-6 w-[90%]">
-        <p className="text-white font-poppins font-semibold text-3xl py-2">
+      {!login ? (
+            <>
+            <p className="text-white font-poppins font-semibold text-3xl py-2">
           Sign up Account
         </p>
         <p className="text-[#aaaaaa] font-inter font-[400] text-base tracking-[0.8px] text-center">
           Enter information to create your account
         </p>
+            </>
+          ) : (
+            <>
+              <p className="text-white font-poppins font-semibold text-3xl py-2">
+          Log in Account
+        </p>
+        <p className="text-[#aaaaaa] font-inter font-[400] text-base tracking-[0.8px] text-center">
+          Enter your credentials to access your account
+        </p>
+            </>
+          )}
       </div>
       <div className="flex flex-col items-center gap-4 text-white font-inter font-[400] text-base w-full tracking-[0.8px] py-4">
         <button className="flex flex-row w-[90%] bg-[#333333] h-10 rounded-lg gap-3 items-center justify-center" onClick={googleAuth}>
@@ -190,14 +248,25 @@ const Authentication = () => {
           </p>
         )}
       </div>
-      <div
-        className="w-[90%] flex flex-col items-center"
-        onClick={(e) => {
-          handleCreateAccount(e);
-        }}
-      >
-        <Button text="Create Account" />
-      </div>
+      {login ? (
+          <div
+          className="w-[90%] flex flex-col items-center"
+          onClick={(e) => {
+            handleLogIn(e);
+          }}
+        >
+          <Button text="Log In" />
+        </div>
+        ) : (
+          <div
+          className="w-[90%] flex flex-col items-center"
+          onClick={(e) => {
+            handleCreateAccount(e);
+          }}
+        >
+          <Button text="Create Account" />
+        </div>
+        )}
       <div className="flex flex-col items-center text-center w-full py-6">
         <p className="font-inter font-[500] text-xs tracking-[0.5px] w-[90%] text-[#aaaaaa]">
           By Clicking “Create Account” you agree to our code of conduct, terms
@@ -206,8 +275,17 @@ const Authentication = () => {
       </div>
       <div className="flex flex-row items-center text-center w-full py-2 font-inter font-[400] text-sm tracking-[0.1px] text-[#aaaaaa]">
         <p className="flex flex-row items-center justify-center w-full">
-          Already have an account?&nbsp;
-          <Link className="text-white font-[500]"> Log In</Link>
+          {!login ? (
+            <>
+              <span>Already have an account?</span>&nbsp;
+              <span className="text-white font-[500]" onClick={()=>setLogin(!login)}>Log In</span>
+            </>
+          ) : (
+            <>
+              <span>Don't have an account yet?</span>&nbsp;
+              <span className="text-white font-[500]" onClick={()=>setLogin(!login)}>Sign Up</span>
+            </>
+          )}
         </p>
       </div>
     </div>
