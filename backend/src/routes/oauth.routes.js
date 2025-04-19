@@ -25,7 +25,30 @@ router.get('/google', passport.authenticate('google', {
     scope: ['profile', 'email']
 }));
 
+router.get('/github', passport.authenticate('github', {
+    scope: ['user:email']
+}));
+
 router.get('/google/callback', passport.authenticate('google', {
+    failureRedirect: 'http://localhost:5173/authentication',
+    session: false
+}),
+(req,res) => {
+    try {
+        res.cookie('email', req.user, {
+            httpOnly: false, 
+            secure:true,
+            sameSite: 'lax',
+            maxAge: 5 * 60 * 1000 
+          });
+        res.redirect('http://localhost:5173/update-username')
+    } catch (error) {
+        console.log(error);
+        res.redirect('http://localhost:5173/authentication')
+    }
+});
+
+router.get('/github/callback', passport.authenticate('github', {
     failureRedirect: 'http://localhost:5173/authentication',
     session: false
 }),
