@@ -1,6 +1,7 @@
 import passport from 'passport';
 import { Router } from "express";
 import { ApiResponse } from '../utils/ApiResponse.js';
+import { User } from '../models/user.model.js';
 
 const router = Router();
 
@@ -64,6 +65,21 @@ router.get('/github/callback', passport.authenticate('github', {
     } catch (error) {
         console.log(error);
         res.redirect('http://localhost:5173/authentication')
+    }
+});
+
+router.route('/get-token').post(async (req, res) => {
+    try {
+        const { user } = req.body;
+        if (!user) {
+            return res.status(401).json(new ApiResponse(401, null, 'Unauthorized'));
+        }
+        const findUser = await User.findById(user);
+        const token = await findUser.generateAuthToken();
+        res.status(200).json(new ApiResponse(200, { token }, 'Token retrieved successfully'));
+    } catch (error) {
+        console.error(error);
+        res.status(500).json(new ApiResponse(500, null, 'Internal Server Error'));
     }
 });
 

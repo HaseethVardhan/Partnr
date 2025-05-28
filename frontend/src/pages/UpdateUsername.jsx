@@ -23,7 +23,6 @@ const UpdateUsername = () => {
       return acc;
     }, {});
 
-    
     if (cookies?.email) {
       const func = async () => {
         try {
@@ -34,9 +33,15 @@ const UpdateUsername = () => {
             }
           );
 
-
-          if(response.data.data.userId){
+          if(response.data.data.userId) {
             setuser(response.data.data.userId);
+            const tokenResponse = await axios.post(
+              `${import.meta.env.VITE_BASE_URL}/auth/get-token`, 
+              {
+                user: response.data.data.userId,
+              }
+            );
+            localStorage.setItem('token', tokenResponse.data.data.token);
             navigate("/");
           }
         } catch (error) {
