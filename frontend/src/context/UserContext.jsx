@@ -13,10 +13,6 @@ const UserContext = ({children}) => {
         }
     }, [])
 
-    useEffect(() => {
-        localStorage.setItem('user', JSON.stringify(user))
-    }, [user])
-
   return (
     <div>
         <UserDataContext.Provider value={{user, setuser}}>

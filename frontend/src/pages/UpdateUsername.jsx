@@ -41,7 +41,11 @@ const UpdateUsername = () => {
                 user: response.data.data.userId,
               }
             );
+            localStorage.removeItem('user');
             localStorage.setItem('token', tokenResponse.data.data.token);
+            document.cookie.split(";").forEach(function(c) { 
+              document.cookie = c.trim().split("=")[0] + "=;" + "expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/";
+            });
             navigate("/");
           }
         } catch (error) {
