@@ -12,6 +12,7 @@ import UpdateProject from "./pages/UpdateProject.jsx";
 import UpdatePicture from "./pages/UpdatePicture.jsx";
 import UpdatePreferences from "./pages/UpdatePreferences.jsx";
 import UpdateName from "./pages/UpdateName.jsx";
+import SelfProfilePage from "./pages/SelfProfilePage.jsx";
 
 function App() {
   return (
@@ -89,6 +90,14 @@ function App() {
           path="/update-preferences"
           element={
             <UpdatePreferences />
+          }
+        />
+        <Route
+          path="/profile"
+          element={
+            <UserProtectedWrapper>
+              <SelfProfilePage />
+            </UserProtectedWrapper>
           }
         />
       </Routes>
