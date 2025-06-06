@@ -13,10 +13,11 @@ import UpdatePicture from "./pages/UpdatePicture.jsx";
 import UpdatePreferences from "./pages/UpdatePreferences.jsx";
 import UpdateName from "./pages/UpdateName.jsx";
 import SelfProfilePage from "./pages/SelfProfilePage.jsx";
+import UserProfilePage from "./pages/UserProfilePage.jsx";
 
 function App() {
   return (
-    <div className='bg-[#1a1a1a] h-screen w-screen'>
+    <div className='bg-[#1a1a1a] h-screen w-screen overflow-scroll'>
       <Routes>
         <Route
           path="/"
@@ -97,6 +98,14 @@ function App() {
           element={
             <UserProtectedWrapper>
               <SelfProfilePage />
+            </UserProtectedWrapper>
+          }
+        />
+        <Route
+          path="/user-profile"
+          element={
+            <UserProtectedWrapper>
+              <UserProfilePage />
             </UserProtectedWrapper>
           }
         />

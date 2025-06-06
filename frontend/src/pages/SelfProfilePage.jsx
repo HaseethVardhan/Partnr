@@ -52,7 +52,7 @@ const SelfProfilePage = () => {
     };
 
     return (
-        <div className="flex flex-col h-full bg-[#1a1a1a]">
+        <div className="flex flex-col h-screen bg-[#1a1a1a]">
             <div className="flex flex-row items-center justify-between px-4 py-10">
                 <div className="flex flex-row items-center gap-3">
                     <img
