@@ -14,6 +14,7 @@ import UpdatePreferences from "./pages/UpdatePreferences.jsx";
 import UpdateName from "./pages/UpdateName.jsx";
 import SelfProfilePage from "./pages/SelfProfilePage.jsx";
 import UserProfilePage from "./pages/UserProfilePage.jsx";
+import NotificationPage from "./pages/NotificationPage.jsx";
 
 function App() {
   return (
@@ -106,6 +107,14 @@ function App() {
           element={
             <UserProtectedWrapper>
               <UserProfilePage />
+            </UserProtectedWrapper>
+          }
+        />
+        <Route
+          path="/notifications"
+          element={
+            <UserProtectedWrapper>
+              <NotificationPage />
             </UserProtectedWrapper>
           }
         />
