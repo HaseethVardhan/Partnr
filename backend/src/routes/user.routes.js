@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { body } from "express-validator";
-import { isMailExists, isUserNameAvailable, getProfile, registerUser, updateProfession, updateSkills, updateBio, updateLinks, updateProjects, updateWork, updatePicture, getUserPicture, updatePreferences, findUserByEmail, login } from "../controllers/user.controller.js";
+import { isMailExists, isUserNameAvailable, getProfile, registerUser, updateProfession, updateSkills, updateBio, updateLinks, updateProjects, updateWork, updatePicture, getUserPicture, updatePreferences, findUserByEmail, login, suggestedUsers, fetchUserDetailsForProfile, newConnection, fetchSelfDetails } from "../controllers/user.controller.js";
 import { verifyUser } from "../middlewares/auth.middleware.js";
 import { upload } from "../middlewares/multer.middleware.js";
 
@@ -71,5 +71,17 @@ router.route('/login').post([
     body('email').isEmail().withMessage('Email is required'),
     body('password').isString().withMessage('Password is required')
 ],login)
+
+router.route('/suggested-users').post(verifyUser, suggestedUsers)
+
+router.route('/fetch-user-details-for-profile').post([
+    body('userId').isString().notEmpty().withMessage('User ID is required')
+], verifyUser, fetchUserDetailsForProfile)
+
+router.route('/new-connection').post([
+    body('userId').isString().notEmpty().withMessage('User ID is required')
+], verifyUser, newConnection)
+
+router.route('/fetch-self-details').post(verifyUser, fetchSelfDetails)
 
 export default router

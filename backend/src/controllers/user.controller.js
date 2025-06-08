@@ -5,6 +5,7 @@ import { validationResult } from "express-validator";
 import { Project } from "../models/project.model.js";
 import { Work } from "../models/work.model.js";
 import { cloudinaryUpload } from "../utils/cloudinary.js";
+import { Connection } from "../models/connection.model.js";
 
 const isUserNameAvailable = asyncHandler(async (req, res) => {
   const errors = validationResult(req);
@@ -739,6 +740,228 @@ const login = asyncHandler(async (req, res) => {
   }
 })
 
+const suggestedUsers = asyncHandler(async (req, res) => {
+  const user = await User.findById(req.user._id);
+  const halfSwipedUsers = user.halfSwipedArray || [];
+  const halfSwipedLimit = Math.min(5, halfSwipedUsers.length);
+
+  const halfSwipedResults = await User.find(
+    { _id: { $in: halfSwipedUsers.slice(0, halfSwipedLimit) } },
+    {
+      fullname: 1,
+      profession: 1,
+      skills: 1,
+      profilePicture: 1,
+      _id: 1
+    }
+  );
+
+  const excludedUsers = [
+    ...user.SwipedArray,
+    ...halfSwipedUsers,
+    user._id
+  ];
+
+  const skillsLimit = 10 - halfSwipedResults.length;
+
+  let skillsResults = [];
+  if (skillsLimit > 0) {
+    skillsResults = await User.find(
+      {
+        _id: { $nin: excludedUsers },
+        skills: { $in: user.preferences }
+      },
+      {
+        fullname: 1,
+        profession: 1,
+        skills: 1,
+        profilePicture: 1,
+        _id: 1
+      }
+    ).limit(skillsLimit);
+  }
+
+  const recommended = [...halfSwipedResults, ...skillsResults];
+
+  if (recommended.length === 0) {
+    return res
+      .status(200)
+      .json(
+        new ApiResponse(
+          200,
+          { msg: "No recommended users found" },
+          "No recommended users found"
+        )
+      );
+  }
+
+  return res
+    .status(201)
+    .json(
+      new ApiResponse(
+        201,
+        { users: recommended, msg: "Recommended users fetched successfully" },
+        "Recommended users fetched successfully"
+      )
+    );
+});
+
+const fetchUserDetailsForProfile = asyncHandler(async (req, res) => {
+  const {userId} = req.body;
+  
+  const user = await User.findById(userId)
+    .select("fullname username profilePicture connectionsArray likesArray about projectsArray workArray links");
+
+  await user.populate([
+    { path: "workArray", select: "company role from to experience" },
+    { path: "projectsArray", select: "title details" },
+    { path: "connectionsArray", select: "first_connect second_connect status" }
+  ]);
+
+  if (!user) {
+    return res
+      .status(404)
+      .json(
+        new ApiResponse(
+          404,
+          { msg: "User not found" },
+          "User not found"
+        )
+      );
+  }
+
+  // Determine connection status
+  let connectionStatus = null;
+  if (req.user && Array.isArray(user.connectionsArray)) {
+    const connection = user.connectionsArray.find(conn => {
+      return (
+        (conn.first_connect?.toString() === req.user._id.toString()) ||
+        (conn.second_connect?.toString() === req.user._id.toString())
+      );
+    });
+    if (connection) {
+      connectionStatus = connection.status === "accepted" ? "connected" : "pending";
+    }
+  }
+
+  const userDetails = {
+    fullname: user.fullname.firstname.charAt(0).toUpperCase() + user.fullname.firstname.slice(1).toLowerCase() + " " + user.fullname.lastname.charAt(0).toUpperCase() + user.fullname.lastname.slice(1).toLowerCase(),
+    username: user.username,
+    profilePicture: user.profilePicture,
+    connectionsCount: user.connectionsArray.length,
+    likesCount: user.likesArray.length,
+    about: user.about,
+    projects: user.projectsArray,
+    workExperience: user.workArray,
+    ...(user.links && (user.links.xlink || user.links.linkedInlink || user.links.portfoliolink)
+      ? { links: user.links }
+      : {}),
+    connectionStatus
+  };
+
+  return res
+    .status(200)
+    .json(
+      new ApiResponse(
+        200,
+        { user: userDetails, msg: "User details fetched successfully" },
+        "User details fetched successfully"
+      )
+    );
+});
+
+const fetchSelfDetails = asyncHandler(async (req, res) => {
+  
+  const user = await User.findById(req.user._id)
+    .select("fullname username profilePicture connectionsArray likesArray about projectsArray workArray links");
+
+  await user.populate([
+    { path: "workArray", select: "company role from to experience" },
+    { path: "projectsArray", select: "title details" },
+    { path: "connectionsArray", select: "first_connect second_connect status" }
+  ]);
+
+  if (!user) {
+    return res
+      .status(404)
+      .json(
+        new ApiResponse(
+          404,
+          { msg: "User not found" },
+          "User not found"
+        )
+      );
+  }
+
+  const userDetails = {
+    fullname: user.fullname.firstname.charAt(0).toUpperCase() + user.fullname.firstname.slice(1).toLowerCase() + " " + user.fullname.lastname.charAt(0).toUpperCase() + user.fullname.lastname.slice(1).toLowerCase(),
+    username: user.username,
+    profilePicture: user.profilePicture,
+    connectionsCount: user.connectionsArray.length,
+    likesCount: user.likesArray.length,
+    about: user.about,
+    projectsArray: user.projectsArray,
+    workArray: user.workArray,
+    ...(user.links && (user.links.xlink || user.links.linkedInlink || user.links.portfoliolink)
+      ? { links: user.links }
+      : {}),
+  };
+
+  return res
+    .status(200)
+    .json(
+      new ApiResponse(
+        200,
+        { user: userDetails, msg: "User details fetched successfully" },
+        "User details fetched successfully"
+      )
+    );
+})
+
+const newConnection = asyncHandler(async (req, res) => {
+  const { userId } = req.body;
+
+  if (!userId) {
+    return res
+      .status(400)
+      .json(
+        new ApiResponse(
+          400,
+          { msg: "User ID is required" },
+          "Please provide a valid user ID."
+        )
+      );
+  }
+
+  const connection = await Connection.create({
+    first_connect: req.user._id,
+    second_connect: userId,
+    status: "pending"
+  });
+
+  if (!connection) {
+    return res
+      .status(400)
+      .json(
+        new ApiResponse(
+          400,
+          { msg: "Connection not created" },
+          "There was a problem creating the connection. Please try again."
+        )
+      );
+  }
+
+  return res
+    .status(201)
+    .json(
+      new ApiResponse(
+        201,
+        { msg: "Connection request sent successfully" },
+        "Connection request sent successfully"
+      )
+    );
+});
+
 export {
   isUserNameAvailable,
   isMailExists,
@@ -754,5 +977,9 @@ export {
   updatePreferences,
   getUserPicture,
   findUserByEmail,
-  login
+  login,
+  suggestedUsers,
+  fetchUserDetailsForProfile,
+  newConnection,
+  fetchSelfDetails
 };

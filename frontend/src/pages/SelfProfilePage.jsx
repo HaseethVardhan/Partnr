@@ -1,66 +1,226 @@
-import BottomNavbar from "../components/BottomNavbar";
-import React, { useState } from "react";
-
-const sections = [
-    {
-        key: "about",
-        icon: "https://res.cloudinary.com/dbzcsfi3e/image/upload/v1749043298/Vector_6_drfg5u.png",
-        label: "About me",
-        content: (
-            <div className="px-7 py-3 text-white text-sm">
-                This is the About me section content.
-            </div>
-        ),
-    },
-    {
-        key: "work",
-        icon: "https://res.cloudinary.com/dbzcsfi3e/image/upload/v1749043298/Vector_7_bgvpgk.png",
-        label: "Work Experience",
-        content: (
-            <div className="px-7 py-3 text-white text-sm">
-                This is the Work Experience section content.
-            </div>
-        ),
-    },
-    {
-        key: "projects",
-        icon: "https://res.cloudinary.com/dbzcsfi3e/image/upload/v1749043298/Vector_8_g8govl.png",
-        label: "Projects",
-        content: (
-            <div className="px-7 py-3 text-white text-sm">
-                This is the Projects section content.
-            </div>
-        ),
-    },
-    {
-        key: "links",
-        icon: "https://res.cloudinary.com/dbzcsfi3e/image/upload/v1749043298/prime_link_hq2avd.png",
-        label: "Links",
-        content: (
-            <div className="px-7 py-3 text-white text-sm">
-                This is the Links section content.
-            </div>
-        ),
-    },
-];
+import axios from "axios";
+import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const SelfProfilePage = () => {
     const [openSection, setOpenSection] = useState(null);
+    const [loading, setLoading] = useState(false);
+      const [error, setError] = useState(null);
+    
+      const [user, setUser] = useState(null);
+
+      const [sections, setSections] = useState([]);
+    
+      const navigate = useNavigate();
 
     const handleToggle = (key) => {
         setOpenSection(openSection === key ? null : key);
     };
 
+    useEffect(() => {
+        setLoading(true);
+        const fetchData = async () => {
+          try {
+            const response = await axios.post(
+              `${
+                import.meta.env.VITE_BASE_URL
+              }/user/fetch-self-details`,
+              {},
+              {
+                headers: {
+                  Authorization: `Bearer ${localStorage.getItem("token")}`,
+                },
+              }
+            );
+            if (response.status === 200) {
+              // Helper function to format date to dd-mm-yyyy
+              const formatDate = (dateStr) => {
+                if (!dateStr) return "";
+                const date = new Date(dateStr);
+                if (isNaN(date)) return dateStr;
+                const day = String(date.getDate()).padStart(2, "0");
+                const month = String(date.getMonth() + 1).padStart(2, "0");
+                const year = date.getFullYear();
+                return `${day}-${month}-${year}`;
+              };
+
+              const userData = [
+                {
+                  key: "about",
+                  icon: "https://res.cloudinary.com/dbzcsfi3e/image/upload/v1749043298/Vector_6_drfg5u.png",
+                  label: "About me",
+                  content: (
+                    <div className="px-7 py-3 overflow-scroll text-white text-sm">
+                      { response.data.data.user.about || "No about available."}
+                    </div>
+                  ),
+                },
+                {
+                  key: "work",
+                  icon: "https://res.cloudinary.com/dbzcsfi3e/image/upload/v1749043298/Vector_7_bgvpgk.png",
+                  label: "Work Experience",
+                  content: (
+                    <div className="px-7 py-3 text-white text-sm">
+                    {response.data.data.user.workArray && response.data.data.user.workArray.length > 0 ? (
+                        <div className="flex flex-col gap-4">
+                            {response.data.data.user.workArray.map((exp, idx) => (
+                                <div
+                                    key={idx}
+                                    className="flex flex-col w-full rounded-lg p-4 shadow"
+                                >
+                                    <div className="flex flex-col gap-1">
+                                        <span className="text-xl font-poppins font-bold text-[#ffffff]">{exp.company.toUpperCase()}</span>
+                                        <span className="text-base text-white font-[500] font-inter">{exp.role.toUpperCase()}</span>
+                                    </div>
+                                    <div className="flex flex-col">
+                                        <span className="text-sm font-semibold text-[#aaaaaa] py-2">
+                                            {formatDate(exp.from)} to {exp.to ? formatDate(exp.to) : "Present"}
+                                        </span>
+                                        <span className="text-base text-[#ffffff] font-semibold overflow-scroll">
+                                            {exp.experience}
+                                        </span>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    ) : (
+                        <div className="text-[#aaaaaa]">No Work Experience Available.</div>
+                    )}
+                    </div>
+                  ),
+                },
+                {
+                  key: "projects",
+                  icon: "https://res.cloudinary.com/dbzcsfi3e/image/upload/v1749043298/Vector_8_g8govl.png",
+                  label: "Projects",
+                  content: (
+                    <div className="px-7 py-3 text-white text-sm">
+                    {response.data.data.user.projectsArray && response.data.data.user.projectsArray.length > 0 ? (
+                        <div className="flex flex-col gap-4 w-[90%]">
+                            {response.data.data.user.projectsArray.map((project, idx) => (
+            
+                                    <div className="flex flex-col gap-1">
+                                        <span className="text-xl font-poppins font-bold text-[#ffffff]">{project.title}</span>
+                                        <span className="text-base text-[#ffffff] font-semibold overflow-scroll">{project.details}</span>
+                                    </div>
+                                
+                            ))}
+                        </div>
+                    ) : (
+                        <div className="text-[#aaaaaa]">No Projects Available.</div>
+                    )}
+                    </div>
+                  ),
+                },
+                {
+                  key: "links",
+                  icon: "https://res.cloudinary.com/dbzcsfi3e/image/upload/v1749043298/prime_link_hq2avd.png",
+                  label: "Links",
+                  content: (
+                    <div className="px-7 py-3 text-white text-sm">
+                    <div className="flex flex-col gap-4">
+                        {response.data.data.user.links ? (
+                            <div className="flex flex-col gap-3">
+                                {response.data.data.user.links.linkedinlink && (
+                                    <a
+                                        href={response.data.data.user.links.linkedInlink}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="flex items-center gap-3 px-4 py-2 rounded-lg"
+                                    >
+                                        <img
+                                            src="https://cdn.freebiesupply.com/logos/large/2x/linkedin-icon-1-logo-black-and-white.png"
+                                            alt="LinkedIn"
+                                            className="w-6 h-6 brightness-0 invert-100"
+                                        />
+                                        <span className="text-white text-base font-inter font-semibold">{response.data.data.user.links.linkedInlink}</span>
+                                    </a>
+                                )}
+                                {response.data.data.user.links.xlink && (
+                                    <a
+                                        href={response.data.data.user.links.xlink}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="flex items-center gap-3 px-4 py-2 rounded-lg"
+                                    >
+                                        <img
+                                            src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/57/X_logo_2023_%28white%29.png/500px-X_logo_2023_%28white%29.png"
+                                            alt="X"
+                                            className="w-6 h-6"
+                                        />
+                                        <span className="text-white text-base font-inter font-semibold">{response.data.data.user.links.xlink}</span>
+                                    </a>
+                                )}
+                                {response.data.data.user.links.portfoliolink && (
+                                    <a
+                                        href={response.data.data.user.links.portfoliolink}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="flex items-center gap-3 px-4 py-2 rounded-lg "
+                                    >
+                                        <img
+                                            src="https://img.icons8.com/ios-filled/50/ffffff/domain.png"
+                                            alt="Portfolio"
+                                            className="w-6 h-6"
+                                        />
+                                        <span className="text-white text-base font-inter font-semibold">{response.data.data.user.links.portfoliolink}</span>
+                                    </a>
+                                )}
+                            </div>
+                        ) : (
+                            <div className="text-[#aaaaaa]">No Links Available.</div>
+                        )}
+                    </div>
+                    </div>
+                  ),
+                },
+              ];
+              setError(null);
+              setSections(userData);
+                setUser(response.data.data.user);
+            }
+    
+          } catch (err) {
+            setError("Failed to load data. Please try again later.");
+            console.error("Error fetching user data:", err);
+            setLoading(false);
+          }
+        };
+        fetchData();
+        setLoading(false); 
+      }, []);
+  
     return (
         <div className="flex flex-col h-screen bg-[#1a1a1a]">
+            {loading && (
+        <div className="absolute top-0 left-0 w-full h-full flex items-center backdrop-blur-3xl justify-center z-50">
+          <Trefoil
+            size="40"
+            stroke="4"
+            strokeLength="0.15"
+            bgOpacity="0.3"
+            speed="1.4"
+            color="#8b5cf6"
+          />
+        </div>
+      )}
+      {error !== null && (
+        <div className="absolute top-0 left-0 w-full h-full flex items-center justify-center z-50 px-10 bg-[#1a1a1a]">
+          <p className="text-[#aaaaaa] font-inter font-[500] text-lg">
+            {error}
+          </p>
+        </div>
+      )}
             <div className="flex flex-row items-center justify-between px-4 py-10">
-                <div className="flex flex-row items-center gap-3">
+                <div className="flex flex-row items-center gap-3"
+                    onClick={() => navigate(-1)}
+                >
                     <img
                         className="h-5 w-6 object-contain"
                         src="https://res.cloudinary.com/dbzcsfi3e/image/upload/v1748781336/Vector_5_labewm.png"
                     />
                     <div className="font-poppins font-[500] text-3xl  text-white">
-                        James
+                        {user?.fullname}
                     </div>
                 </div>
                 <div className="flex flex-row items-center gap-2 px-2">
@@ -74,22 +234,22 @@ const SelfProfilePage = () => {
                 <div className="flex flex-col items-center justify-center py-5">
                     <img
                         className="h-30 w-30 rounded-full object-cover"
-                        src="https://www.zmo.ai/wp-content/uploads/2024/03/Activity-options-for-AI-face-generator.webp"
+                        src={user?.profilePicture}
                     />
                 </div>
                 <div className="flex flex-col items-center justify-center ">
                     <div className="font-poppins font-[500] text-2xl text-white">
-                        James
+                        {user?.fullname}
                     </div>
                     <div className="font-poppins font-[500] text-base text-[#aaaaaa]">
-                        @p.james
+                        @{user?.username}
                     </div>
                 </div>
             </div>
             <div className="flex flex-row items-center justify-center mt-8 gap-9">
                 <div className="flex flex-col items-center justify-center gap-1">
                     <div className="font-inter font-[500] text-base tracking-[0.5px] text-white">
-                        350
+                        {user?.connectionsCount}
                     </div>
                     <div className="font-inter font-[500] text-sm tracking-[1px] text-[#aaaaaa]">
                         Connections
@@ -97,7 +257,7 @@ const SelfProfilePage = () => {
                 </div>
                 <div className="flex flex-col items-center justify-center gap-1">
                     <div className="font-inter font-[500] text-base tracking-[0.5px] text-white">
-                        250
+                        {user?.likesCount}
                     </div>
                     <div className="font-inter font-[500] text-sm tracking-[1px] text-[#aaaaaa]">
                         Kudos

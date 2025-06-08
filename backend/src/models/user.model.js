@@ -116,6 +116,12 @@ const userSchema = new mongoose.Schema({
             ref: 'User'
         }
     ],
+    halfSwipedArray: [
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'User'
+        }
+    ],
     workArray: [
         {
             type: mongoose.Schema.Types.ObjectId,
