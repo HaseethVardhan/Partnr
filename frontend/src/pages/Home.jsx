@@ -1,9 +1,10 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import BottomNavbar from "../components/BottomNavbar";
 import ProfileCard from "../components/ProfileCard";
 import axios from "axios";
 import { Trefoil } from "ldrs/react";
 import "ldrs/react/Trefoil.css";
+import { UserDataContext } from "../context/UserContext";
 
 const Home = () => {
   const [loading, setLoading] = useState(false);
@@ -11,11 +12,13 @@ const Home = () => {
 
   const [limit, setLimit] = useState(5);
 
-  const [cards, setCards] = useState([]);
+  // const [cards, setCards] = useState([]);
+  const { cards, setCards } = useContext(UserDataContext);
+  let reload = cards.length > 0 ? false: true;
 
   useEffect(() => {
     setLoading(true);
-    if (cards.length < limit) {
+    if (cards.length < limit && reload) {
       const fetchCards = async () => {
         try {
           const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/user/suggested-users`,{},{

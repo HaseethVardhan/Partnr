@@ -16,6 +16,7 @@ import SelfProfilePage from "./pages/SelfProfilePage.jsx";
 import UserProfilePage from "./pages/UserProfilePage.jsx";
 import NotificationPage from "./pages/NotificationPage.jsx";
 import MessagesPage from "./pages/MessagesPage.jsx";
+import EditProfilePage from "./pages/EditProfilePage.jsx";
 
 function App() {
   return (
@@ -124,6 +125,14 @@ function App() {
           element={
             <UserProtectedWrapper>
               <MessagesPage />
+            </UserProtectedWrapper>
+          }
+        />
+        <Route
+          path="/edit-profile"
+          element={
+            <UserProtectedWrapper>
+              <EditProfilePage />
             </UserProtectedWrapper>
           }
         />

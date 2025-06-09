@@ -266,23 +266,23 @@ const UserProfilePage = () => {
           </div>
         </div>
       </div>
-      <div className="flex flex-row items-center justify-center mt-8 max-w-100 px-5 gap-3">
+      <div className="flex flex-row items-center justify-center mt-8 w-full px-5 gap-3">
         {user?.connectionStatus === null && (
-            <div className="flex flex-row items-center justify-center w-full py-3 bg-[#8b5cf6] rounded-lg font-inter font-[500] text-base tracking-[0.5px] text-white">
+            <div className="flex flex-row items-center justify-center max-w-100 w-full py-3 bg-[#8b5cf6] rounded-lg font-inter font-[500] text-base tracking-[0.5px] text-white">
                 Connect
             </div>
         )}
         {user?.connectionStatus === "pending" && (
-            <div className="flex flex-row items-center justify-center w-full py-3 bg-[#8b5cf6] rounded-lg font-inter font-[500] text-base tracking-[0.5px] text-white">
+            <div className="flex flex-row items-center justify-center max-w-100 w-full py-3 bg-[#8b5cf6] rounded-lg font-inter font-[500] text-base tracking-[0.5px] text-white">
                 Pending
             </div>
         )}
         {user?.connectionStatus === "accepted" && (
             <>
-                <div className="flex flex-row items-center justify-center w-full py-3 rounded-lg font-inter font-[500] text-base tracking-[0.5px] text-white">
+                <div className="flex flex-row items-center justify-center max-w-100 w-full py-3 rounded-lg font-inter font-[500] text-base tracking-[0.5px] text-white">
                     Connected
                 </div>
-                <div className="flex flex-row items-center justify-center w-full py-3 bg-[#333333] rounded-lg font-inter font-[500] text-base tracking-[0.5px] text-white">
+                <div className="flex flex-row items-center justify-center max-w-100 w-full py-3 bg-[#333333] rounded-lg font-inter font-[500] text-base tracking-[0.5px] text-white">
                     Message
                 </div>
             </>

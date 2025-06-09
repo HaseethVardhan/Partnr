@@ -50,7 +50,7 @@ const SelfProfilePage = () => {
                   icon: "https://res.cloudinary.com/dbzcsfi3e/image/upload/v1749043298/Vector_6_drfg5u.png",
                   label: "About me",
                   content: (
-                    <div className="px-7 py-3 overflow-scroll text-white text-sm">
+                    <div className="px-7 py-3 overflow-scroll text-white text-sm max-w-100">
                       { response.data.data.user.about || "No about available."}
                     </div>
                   ),
@@ -60,7 +60,7 @@ const SelfProfilePage = () => {
                   icon: "https://res.cloudinary.com/dbzcsfi3e/image/upload/v1749043298/Vector_7_bgvpgk.png",
                   label: "Work Experience",
                   content: (
-                    <div className="px-7 py-3 text-white text-sm">
+                    <div className="px-7 py-3 text-white text-sm w-full">
                     {response.data.data.user.workArray && response.data.data.user.workArray.length > 0 ? (
                         <div className="flex flex-col gap-4">
                             {response.data.data.user.workArray.map((exp, idx) => (
@@ -264,12 +264,14 @@ const SelfProfilePage = () => {
                     </div>
                 </div>
             </div>
-            <div className="flex flex-row align- items-center justify-center ">
+            <div className="flex flex-row align- items-center justify-center "
+                onClick={()=>{navigate('/edit-profile')}}
+            >
                 <div className="flex flex-row align- items-center justify-center mt-8 max-w-100 w-[90%] py-4 bg-[#333333] rounded-lg font-inter font-[500] text-base tracking-[0.5px] text-white">
                     Edit Profile
                 </div>
             </div>
-            <div className="flex flex-col align- items-center justify-center gap-3 mt-8">
+            <div className="flex flex-col items-center justify-center gap-3 mt-8">
                 {sections.map((section) => (
                     <React.Fragment key={section.key}>
                         <div
@@ -295,7 +297,7 @@ const SelfProfilePage = () => {
                             </div>
                         </div>
                         {openSection === section.key && (
-                            <div className="w-[90%] mx-auto bg-[#222] rounded-b-lg mb-2">
+                            <div className="max-w-100 w-[90%] mx-auto bg-[#222] rounded-b-lg mb-2">
                                 {section.content}
                             </div>
                         )}

@@ -5,6 +5,7 @@ export const UserDataContext = createContext()
 const UserContext = ({children}) => {
 
     const [user, setuser] = useState({})
+    const [cards, setCards] = useState([])
 
     useEffect(() => {
         const user = localStorage.getItem('user')
@@ -15,7 +16,7 @@ const UserContext = ({children}) => {
 
   return (
     <div>
-        <UserDataContext.Provider value={{user, setuser}}>
+        <UserDataContext.Provider value={{user, setuser, cards, setCards}}>
             {children}
         </UserDataContext.Provider>
     </div>
