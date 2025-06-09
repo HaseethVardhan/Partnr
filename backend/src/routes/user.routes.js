@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { body } from "express-validator";
-import { isMailExists, isUserNameAvailable, getProfile, registerUser, updateProfession, updateSkills, updateBio, updateLinks, updateProjects, updateWork, updatePicture, getUserPicture, updatePreferences, findUserByEmail, login, suggestedUsers, fetchUserDetailsForProfile, newConnection, fetchSelfDetails } from "../controllers/user.controller.js";
+import { isMailExists, isUserNameAvailable, getProfile, registerUser, updateProfession, updateSkills, updateBio, updateLinks, updateProjects, updateWork, updatePicture, getUserPicture, updatePreferences, findUserByEmail, login, suggestedUsers, fetchUserDetailsForProfile, newConnection, fetchSelfDetails, updateAllDetails } from "../controllers/user.controller.js";
 import { verifyUser } from "../middlewares/auth.middleware.js";
 import { upload } from "../middlewares/multer.middleware.js";
 
@@ -83,5 +83,7 @@ router.route('/new-connection').post([
 ], verifyUser, newConnection)
 
 router.route('/fetch-self-details').post(verifyUser, fetchSelfDetails)
+
+router.route('/update-all-details').post(verifyUser, updateAllDetails)
 
 export default router

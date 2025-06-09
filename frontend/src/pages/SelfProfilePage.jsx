@@ -1,4 +1,6 @@
 import axios from "axios";
+import { Trefoil } from "ldrs/react";
+import "ldrs/react/Trefoil.css";
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -212,10 +214,9 @@ const SelfProfilePage = () => {
         </div>
       )}
             <div className="flex flex-row items-center justify-between px-4 py-10">
-                <div className="flex flex-row items-center gap-3"
-                    onClick={() => navigate(-1)}
-                >
+                <div className="flex flex-row items-center gap-3">
                     <img
+                        onClick={() => navigate(-1)}
                         className="h-5 w-6 object-contain"
                         src="https://res.cloudinary.com/dbzcsfi3e/image/upload/v1748781336/Vector_5_labewm.png"
                     />
@@ -244,9 +245,12 @@ const SelfProfilePage = () => {
                     <div className="font-poppins font-[500] text-base text-[#aaaaaa]">
                         @{user?.username}
                     </div>
+                    <div className="font-poppins font-[500] text-base text-[#aaaaaa] mt-2">
+                        {user?.profession}
+                    </div>
                 </div>
             </div>
-            <div className="flex flex-row items-center justify-center mt-8 gap-9">
+            <div className="flex flex-row items-center justify-center mt-5 gap-9">
                 <div className="flex flex-col items-center justify-center gap-1">
                     <div className="font-inter font-[500] text-base tracking-[0.5px] text-white">
                         {user?.connectionsCount}

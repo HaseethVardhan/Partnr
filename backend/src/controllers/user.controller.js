@@ -810,7 +810,7 @@ const fetchUserDetailsForProfile = asyncHandler(async (req, res) => {
   const {userId} = req.body;
   
   const user = await User.findById(userId)
-    .select("fullname username profilePicture connectionsArray likesArray about projectsArray workArray links");
+    .select("fullname username profession profilePicture connectionsArray likesArray about projectsArray workArray links");
 
   await user.populate([
     { path: "workArray", select: "company role from to experience" },
@@ -847,12 +847,13 @@ const fetchUserDetailsForProfile = asyncHandler(async (req, res) => {
   const userDetails = {
     fullname: user.fullname.firstname.charAt(0).toUpperCase() + user.fullname.firstname.slice(1).toLowerCase() + " " + user.fullname.lastname.charAt(0).toUpperCase() + user.fullname.lastname.slice(1).toLowerCase(),
     username: user.username,
+    profession: user.profession,
     profilePicture: user.profilePicture,
     connectionsCount: user.connectionsArray.length,
     likesCount: user.likesArray.length,
     about: user.about,
-    projects: user.projectsArray,
-    workExperience: user.workArray,
+    projectsArray: user.projectsArray,
+    workArray: user.workArray,
     ...(user.links && (user.links.xlink || user.links.linkedInlink || user.links.portfoliolink)
       ? { links: user.links }
       : {}),
@@ -873,13 +874,12 @@ const fetchUserDetailsForProfile = asyncHandler(async (req, res) => {
 const fetchSelfDetails = asyncHandler(async (req, res) => {
   
   const user = await User.findById(req.user._id)
-    .select("fullname username profilePicture connectionsArray likesArray about projectsArray workArray links");
+    .select("fullname username profession profilePicture connectionsArray likesArray about projectsArray workArray links");
 
   await user.populate([
     { path: "workArray", select: "company role from to experience" },
     { path: "projectsArray", select: "title details" },
-    { path: "connectionsArray", select: "first_connect second_connect status" }
-  ]);
+    ]);
 
   if (!user) {
     return res
@@ -896,6 +896,7 @@ const fetchSelfDetails = asyncHandler(async (req, res) => {
   const userDetails = {
     fullname: user.fullname.firstname.charAt(0).toUpperCase() + user.fullname.firstname.slice(1).toLowerCase() + " " + user.fullname.lastname.charAt(0).toUpperCase() + user.fullname.lastname.slice(1).toLowerCase(),
     username: user.username,
+    profession: user.profession,
     profilePicture: user.profilePicture,
     connectionsCount: user.connectionsArray.length,
     likesCount: user.likesArray.length,
@@ -962,6 +963,94 @@ const newConnection = asyncHandler(async (req, res) => {
     );
 });
 
+const updateAllDetails = asyncHandler(async(req, res) => {
+  const user = await User.findById(req.user._id)
+    .select("fullname profession about projectsArray workArray links");
+
+  await user.populate([
+    { path: "workArray", select: "company role from to experience" },
+    { path: "projectsArray", select: "title details" },
+  ]);
+
+  const {firstname, lastname, profession, about, workArray, projectsArray, links} = req.body;
+
+  if(firstname !== user.fullname.firstname){
+    user.fullname.firstname = firstname;
+    await user.save();
+  }
+
+  if(lastname !== user.fullname.lastname){
+    user.fullname.lastname = lastname;
+    await user.save();
+  }
+
+  if (profession !== user.profession) {
+    user.profession = profession;
+    await user.save();
+  }
+
+  if (about !== user.about) {
+    user.about = about;
+    await user.save();
+  }
+
+  // Update projectsArra
+    // Remove all existing projects (sequentially, no Promise.all)
+    for (const projectId of user.projectsArray) {
+      await Project.findByIdAndDelete(projectId);
+    }
+    // Add new projects
+    // Add new projects (sequentially, no Promise.all)
+    const newProjects = [];
+    for (const p of projectsArray) {
+      const project = await Project.create({
+      title: p.title,
+      details: p.details
+      });
+      newProjects.push(project);
+    }
+    user.projectsArray = newProjects.map(p => p._id);
+    await user.save();
+    
+
+    // Update workArray
+    
+    // Remove all existing work experiences (sequentially)
+    for (const workId of user.workArray) {
+      await Work.findByIdAndDelete(workId);
+    }
+    // Add new work experiences (sequentially)
+    const newWorks = [];
+    for (const w of workArray) {
+      const work = await Work.create({
+      company: w.company,
+      role: w.role,
+      from: w.from,
+      to: w.to,
+      experience: w.experience
+      });
+      newWorks.push(work);
+    }
+    user.workArray = newWorks.map(w => w._id);
+    await user.save();
+    
+
+    // Update links
+    if (links && typeof links === "object") {
+    user.links = links;
+    await user.save();
+    }
+
+    return res.status(200).json(
+    new ApiResponse(
+      200,
+      { msg: "User details updated successfully" },
+      "User details updated successfully"
+    )
+    );
+   
+})
+
 export {
   isUserNameAvailable,
   isMailExists,
@@ -981,5 +1070,6 @@ export {
   suggestedUsers,
   fetchUserDetailsForProfile,
   newConnection,
-  fetchSelfDetails
+  fetchSelfDetails,
+  updateAllDetails
 };
