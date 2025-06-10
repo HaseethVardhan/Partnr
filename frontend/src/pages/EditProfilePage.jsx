@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 
 const EditProfilePage = () => {
   const [loading, setLoading] = useState(false);
+  
   const [error, setError] = useState(null);
   const [error1, setError1] = useState(null);
   const navigate = useNavigate();
@@ -47,13 +48,23 @@ const EditProfilePage = () => {
     setProjectsArray(updated);
   };
 
-  const handleSave = () => {
-    setLoading(true);
+  const handleSave = async () => {
     setError1(null);
+    setLoading(true);
 
     // Validate fields
     if (!firstname.trim()) {
       setError1("First name is required.");
+      setLoading(false);
+      return;
+    }
+    if (firstname.includes(" ")) {
+      setError1("First name cannot contain spaces.");
+      setLoading(false);
+      return;
+    }
+    if (lastname.includes(" ")) {
+      setError1("Last name cannot contain spaces.");
       setLoading(false);
       return;
     }
@@ -101,7 +112,7 @@ const EditProfilePage = () => {
         return;
       }
     }
-
+    setLoading(true)
     const userData = {
         firstname,
         lastname,
@@ -133,7 +144,7 @@ const EditProfilePage = () => {
     }
 
     update();
-    setLoading(false);
+  
   };
 
   useEffect(() => {
@@ -184,7 +195,7 @@ const EditProfilePage = () => {
   return (
     <div className="flex flex-col p-5 bg-[#1a1a1a]  text-white gap-6">
       {loading && (
-        <div className="absolute top-0 left-0 w-full h-full flex items-center backdrop-blur-3xl justify-center z-50">
+        <div className="absolute top-0 left-0 w-full h-screen flex items-center backdrop-blur-3xl justify-center z-50">
           <Trefoil
             size="40"
             stroke="4"

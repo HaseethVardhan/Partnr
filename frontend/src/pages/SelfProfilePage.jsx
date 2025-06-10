@@ -186,10 +186,12 @@ const SelfProfilePage = () => {
             setError("Failed to load data. Please try again later.");
             console.error("Error fetching user data:", err);
             setLoading(false);
+          }finally{
+            setLoading(false); 
           }
         };
         fetchData();
-        setLoading(false); 
+        
       }, []);
   
     return (
@@ -216,7 +218,7 @@ const SelfProfilePage = () => {
             <div className="flex flex-row items-center justify-between px-4 py-10">
                 <div className="flex flex-row items-center gap-3">
                     <img
-                        onClick={() => navigate(-1)}
+                        onClick={() => navigate('/')}
                         className="h-5 w-6 object-contain"
                         src="https://res.cloudinary.com/dbzcsfi3e/image/upload/v1748781336/Vector_5_labewm.png"
                     />
@@ -232,11 +234,23 @@ const SelfProfilePage = () => {
                 </div>
             </div>
             <div className="flex flex-col items-center justify-center">
-                <div className="flex flex-col items-center justify-center py-5">
+                <div className="flex flex-col relative items-center justify-center py-5">
                     <img
                         className="h-30 w-30 rounded-full object-cover"
                         src={user?.profilePicture}
                     />
+                    <button
+                            className="absolute bottom-2 right-2 bg-[#333] rounded-full p-1 border border-[#444] hover:bg-[#444] transition"
+                            onClick={() => navigate('/edit-profile-picture')}
+                            aria-label="Edit profile picture"
+                            type="button"
+                        >
+                            <img
+                                src="https://img.icons8.com/material-outlined/24/ffffff/edit--v1.png"
+                                alt="Edit"
+                                className="w-5 h-5"
+                            />
+                        </button>
                 </div>
                 <div className="flex flex-col items-center justify-center ">
                     <div className="font-poppins font-[500] text-2xl text-white">

@@ -36,7 +36,7 @@ const UserProfilePage = () => {
             },
           }
         );
-        console.log("Response from server:", response);
+        
         if (response.status === 200) {
           const formatDate = (dateStr) => {
                 if (!dateStr) return "";
@@ -188,10 +188,11 @@ const UserProfilePage = () => {
         setError("Failed to load data. Please try again later.");
         console.error("Error fetching user data:", err);
         setLoading(false);
+      }finally{
+        setLoading(false);
       }
     };
     fetchData();
-    setLoading(false);
   }, []);
 
   return (
@@ -219,7 +220,7 @@ const UserProfilePage = () => {
         <div className="flex flex-row items-center gap-3"
         >
           <img
-            onClick={() => navigate(-1)}
+            onClick={() => navigate('/')}
             className="h-5 w-6 object-contain"
             src="https://res.cloudinary.com/dbzcsfi3e/image/upload/v1748781336/Vector_5_labewm.png"
           />
