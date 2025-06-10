@@ -1,9 +1,12 @@
-import React from 'react'
+import React, {useState} from 'react'
+import axios from 'axios';
 import { useNavigate, Link } from 'react-router-dom';
 import { motion, useMotionValue, useTransform } from "framer-motion";
 
 const ProfileCard = ({ _id, setCards, cards, fullname, profession, skills, profilePicture }) => {
   const x = useMotionValue(0);
+  const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(null);
   
   const rotateRaw = useTransform(x, [-150, 150], [-18, 18]);
   const opacity = useTransform(x, [-150, 0, 150], [0.7, 1, 0.7]);
@@ -16,6 +19,29 @@ const ProfileCard = ({ _id, setCards, cards, fullname, profession, skills, profi
       setCards((pv) => pv.filter((v) => v._id !== _id));
     }
   };
+
+  // const bookmark = async () => {
+  //     setLoading(true);
+  //     try {
+  //       const response = await axios.post(
+  //           `${
+  //             import.meta.env.VITE_BASE_URL
+  //           }/user/bookmark`,
+  //           { userId: _id },
+  //           {
+  //             headers: {
+  //               Authorization: `Bearer ${localStorage.getItem("token")}`,
+  //             },
+  //           }
+  //         );
+  //         console.log(response.data)
+  //     } catch (error) {
+  //       console.log(error)
+  //       setError("Unknown Error occured. Please try again later.")
+  //     }finally{
+  //       setLoading(false);
+  //     }
+  //   }
 
   return (
     <motion.div
@@ -72,7 +98,7 @@ const ProfileCard = ({ _id, setCards, cards, fullname, profession, skills, profi
       </div>
       <div className='flex flex-row items-center justify-end px-1 gap-3'>
         <img className='h-[32px] w-[32px] object-contain' src="https://res.cloudinary.com/dbzcsfi3e/image/upload/v1748710879/iconamoon_heart-light_jililb.png" />
-        <img className='h-[22px] w-[22px] object-contain' src="https://res.cloudinary.com/dbzcsfi3e/image/upload/v1748710879/Vector_4_kq2v16.png"/>
+        {/* <img onClick={bookmark} className='h-[22px] w-[22px] object-contain' src="https://res.cloudinary.com/dbzcsfi3e/image/upload/v1748710879/Vector_4_kq2v16.png"/> */}
       </div>
       </Link>
     </motion.div>

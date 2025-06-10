@@ -9,6 +9,8 @@ const UserProfilePage = () => {
   const [openSection, setOpenSection] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  
+  const [refresh, setRefresh] = useState(true);
 
   const [user, setUser] = useState(null);
 
@@ -20,6 +22,98 @@ const UserProfilePage = () => {
   const handleToggle = (key) => {
     setOpenSection(openSection === key ? null : key);
   };
+
+  const newConnection = async () => {
+    setLoading(true);
+    try {
+      const response = await axios.post(
+          `${
+            import.meta.env.VITE_BASE_URL
+          }/user/new-connection`,
+          { userId: searchParams.get("userid") },
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+          }
+        );
+    } catch (error) {
+      console.log(error)
+      setError("Unknown Error occured. Please try again later.")
+    }finally{
+      setLoading(false);
+      setRefresh(!refresh);
+    }
+  }
+
+  const acceptConnection = async () => {
+    setLoading(true);
+    try {
+      const response = await axios.post(
+          `${
+            import.meta.env.VITE_BASE_URL
+          }/user/accept-connection`,
+          { userId: searchParams.get("userid") },
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+          }
+        );
+    } catch (error) {
+      console.log(error)
+      setError("Unknown Error occured. Please try again later.")
+    }finally{
+      setLoading(false);
+      setRefresh(!refresh);
+    }
+  }
+
+   const rejectConnection = async () => {
+    setLoading(true);
+    try {
+      const response = await axios.post(
+          `${
+            import.meta.env.VITE_BASE_URL
+          }/user/reject-connection`,
+          { userId: searchParams.get("userid") },
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+          }
+        );
+    } catch (error) {
+      console.log(error)
+      setError("Unknown Error occured. Please try again later.")
+    }finally{
+      setLoading(false);
+      setRefresh(!refresh);
+    }
+  }
+
+  const disconnect = async () => {
+    setLoading(true);
+    try {
+      const response = await axios.post(
+          `${
+            import.meta.env.VITE_BASE_URL
+          }/user/disconnect-connection`,
+          { userId: searchParams.get("userid") },
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+          }
+        );
+    } catch (error) {
+      console.log(error)
+      setError("Unknown Error occured. Please try again later.")
+    }finally{
+      setLoading(false);
+      setRefresh(!refresh);
+    }
+  }
 
   useEffect(() => {
     setLoading(true);
@@ -193,7 +287,7 @@ const UserProfilePage = () => {
       }
     };
     fetchData();
-  }, []);
+  }, [refresh]);
 
   return (
     <div className="flex flex-col h-screen bg-[#1a1a1a]">
@@ -274,21 +368,39 @@ const UserProfilePage = () => {
       </div>
       <div className="flex flex-row items-center justify-center mt-8 w-full px-5 gap-3">
         {user?.connectionStatus === null && (
-            <div className="flex flex-row items-center justify-center max-w-100 w-full py-3 bg-[#8b5cf6] rounded-lg font-inter font-[500] text-base tracking-[0.5px] text-white">
+            <div
+              onClick={newConnection}
+            className="flex flex-row items-center justify-center max-w-100 w-full py-3 bg-[#8b5cf6] rounded-lg font-inter font-[500] text-base tracking-[0.5px] text-white">
                 Connect
             </div>
         )}
         {user?.connectionStatus === "pending" && (
-            <div className="flex flex-row items-center justify-center max-w-100 w-full py-3 bg-[#8b5cf6] rounded-lg font-inter font-[500] text-base tracking-[0.5px] text-white">
+            <div className="flex flex-row items-center justify-center max-w-100 w-full py-3 border-1 rounded-lg font-inter font-[500] text-base tracking-[0.5px] text-white">
                 Pending
             </div>
         )}
-        {user?.connectionStatus === "accepted" && (
+        {user?.connectionStatus === "accept" && (
+          <>
+            <div 
+            onClick={acceptConnection}
+            className="flex flex-row items-center justify-center max-w-50 w-full py-3 bg-[#8b5cf6] rounded-lg font-inter font-[500] text-base tracking-[0.5px] text-white">
+                Accept
+            </div>
+            <div
+            onClick={rejectConnection}
+            className="flex flex-row items-center justify-center max-w-50 w-full py-3 bg-[#f65c5c] rounded-lg font-inter font-[500] text-base tracking-[0.5px] text-white">
+                Reject
+            </div>
+          </>
+        )}
+        {user?.connectionStatus === "connected" && (
             <>
-                <div className="flex flex-row items-center justify-center max-w-100 w-full py-3 rounded-lg font-inter font-[500] text-base tracking-[0.5px] text-white">
-                    Connected
+                <div
+                onClick={disconnect}
+                className="flex flex-row items-center justify-center max-w-50 w-full py-3 rounded-lg font-inter border-1 border-[#f65c5c] font-[500] text-base tracking-[0.5px] text-white">
+                    Disconnect
                 </div>
-                <div className="flex flex-row items-center justify-center max-w-100 w-full py-3 bg-[#333333] rounded-lg font-inter font-[500] text-base tracking-[0.5px] text-white">
+                <div className="flex flex-row items-center justify-center max-w-50 w-full py-3 bg-[#333333] rounded-lg font-inter font-[500] text-base tracking-[0.5px] text-white">
                     Message
                 </div>
             </>

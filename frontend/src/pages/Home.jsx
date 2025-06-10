@@ -5,10 +5,13 @@ import axios from "axios";
 import { Trefoil } from "ldrs/react";
 import "ldrs/react/Trefoil.css";
 import { UserDataContext } from "../context/UserContext";
+import { useNavigate } from "react-router-dom";
 
 const Home = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+
+  const navigate = useNavigate()
 
   const [limit, setLimit] = useState(5);
 
@@ -26,7 +29,6 @@ const Home = () => {
                     Authorization : `Bearer ${localStorage.getItem('token')}`
                 }
             });
-            // console.log("Response from server:", response);
           if(response.status === 201){
             if(response.data.data.users.length < 5){
               setLimit(0);
@@ -76,7 +78,10 @@ const Home = () => {
         <div className="font-poppins font-[700] text-3xl text-white">
           Partnr
         </div>
-        <div>
+        <div
+        onClick={()=>{navigate('/update-preferences')}} 
+        className="z-999"
+        >
           <img src="https://res.cloudinary.com/dbzcsfi3e/image/upload/v1748694120/Vector_1_qwnwxs.png" />
         </div>
       </div>

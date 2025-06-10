@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { body } from "express-validator";
-import { isMailExists, isUserNameAvailable, getProfile, registerUser, updateProfession, updateSkills, updateBio, updateLinks, updateProjects, updateWork, updatePicture, getUserPicture, updatePreferences, findUserByEmail, login, suggestedUsers, fetchUserDetailsForProfile, newConnection, fetchSelfDetails, updateAllDetails } from "../controllers/user.controller.js";
+import { isMailExists, isUserNameAvailable, getProfile, registerUser, updateProfession, updateSkills, updateBio, updateLinks, updateProjects, updateWork, updatePicture, getUserPicture, updatePreferences, findUserByEmail, login, suggestedUsers, fetchUserDetailsForProfile, newConnection, fetchSelfDetails, updateAllDetails, acceptConnection, rejectConnection, disconnect } from "../controllers/user.controller.js";
 import { verifyUser } from "../middlewares/auth.middleware.js";
 import { upload } from "../middlewares/multer.middleware.js";
 
@@ -81,6 +81,22 @@ router.route('/fetch-user-details-for-profile').post([
 router.route('/new-connection').post([
     body('userId').isString().notEmpty().withMessage('User ID is required')
 ], verifyUser, newConnection)
+
+router.route('/accept-connection').post([
+    body('userId').isString().notEmpty().withMessage('User ID is required')
+], verifyUser, acceptConnection)
+
+router.route('/reject-connection').post([
+    body('userId').isString().notEmpty().withMessage('User ID is required')
+], verifyUser, rejectConnection)
+
+router.route('/disconnect-connection').post([
+    body('userId').isString().notEmpty().withMessage('User ID is required')
+], verifyUser, disconnect)
+
+// router.route('/bookmark').post([
+//     body('userId').isString().notEmpty().withMessage('User ID is required')
+// ], verifyUser, bookmark)
 
 router.route('/fetch-self-details').post(verifyUser, fetchSelfDetails)
 

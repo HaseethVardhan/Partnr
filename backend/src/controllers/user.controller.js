@@ -831,18 +831,41 @@ const fetchUserDetailsForProfile = asyncHandler(async (req, res) => {
   }
 
   // Determine connection status
+  // let connectionStatus = null;
+  // if (req.user && Array.isArray(user.connectionsArray)) {
+  //   const connection = user.connectionsArray.find(conn => {
+  //     return (
+  //       (conn.first_connect?.toString() === req.user._id.toString()) ||
+  //       (conn.second_connect?.toString() === req.user._id.toString())
+  //     );
+  //   });
+  //   if (connection) {
+  //     connectionStatus = connection.status === "accepted" ? "connected" : "pending";
+  //   }
+  // }
+  // Check connection status using Connection model
   let connectionStatus = null;
-  if (req.user && Array.isArray(user.connectionsArray)) {
-    const connection = user.connectionsArray.find(conn => {
-      return (
-        (conn.first_connect?.toString() === req.user._id.toString()) ||
-        (conn.second_connect?.toString() === req.user._id.toString())
-      );
+  if (req.user && req.user._id && user._id) {
+    const connection = await Connection.findOne({
+      $or: [
+        { first_connect: req.user._id, second_connect: user._id },
+        { first_connect: user._id, second_connect: req.user._id }
+      ]
     });
+
     if (connection) {
-      connectionStatus = connection.status === "accepted" ? "connected" : "pending";
+      if (connection.status === "accepted") {
+        connectionStatus = "connected";
+      } else if (connection.status === "pending") {
+        if (connection.first_connect.toString() === req.user._id.toString()) {
+          connectionStatus = "pending";
+        } else {
+          connectionStatus = "accept";
+        }
+      }
     }
   }
+  
 
   const userDetails = {
     fullname: user.fullname.firstname.charAt(0).toUpperCase() + user.fullname.firstname.slice(1).toLowerCase() + " " + user.fullname.lastname.charAt(0).toUpperCase() + user.fullname.lastname.slice(1).toLowerCase(),
@@ -963,6 +986,96 @@ const newConnection = asyncHandler(async (req, res) => {
     );
 });
 
+const acceptConnection = asyncHandler(async(req, res) => {
+  const {userId} = req.body;
+  const connection = await Connection.findOneAndUpdate(
+    { first_connect: userId, second_connect: req.user._id, status: "pending" },
+    { status: "accepted" },
+  );
+
+  if (!connection) {
+    return res
+      .status(404)
+      .json(
+        new ApiResponse(
+          404,
+          { msg: "Connection not found or already accepted" },
+          "Connection not found or already accepted"
+        )
+      );
+  }
+
+  // Push connection to both users' connectionsArray
+  await User.findByIdAndUpdate(req.user._id, { $addToSet: { connectionsArray: connection._id } });
+  await User.findByIdAndUpdate(userId, { $addToSet: { connectionsArray: connection._id } });
+
+  return res
+    .status(200)
+    .json(
+      new ApiResponse(
+        200,
+        { msg: "Connection accepted successfully" },
+        "Connection accepted successfully"
+      )
+    );
+})
+
+const rejectConnection = asyncHandler(async(req, res) => {
+  const {userId} = req.body;
+  const connection = await Connection.findOneAndDelete(
+    { first_connect: userId, second_connect: req.user._id, status: "pending" }
+  );
+
+  return res
+    .status(200)
+    .json(
+      new ApiResponse(
+        200,
+        { msg: "Connection rejected successfully" },
+        "Connection rejected successfully"
+      )
+    );
+})
+
+const disconnect = asyncHandler(async (req, res) => {
+  const {userId} = req.body;
+  const connection = await Connection.findOne({
+    $or: [
+      { first_connect: req.user._id, second_connect: userId },
+      { first_connect: userId, second_connect: req.user._id }
+    ]
+  });
+
+  if (!connection) {
+    return res
+      .status(404)
+      .json(
+        new ApiResponse(
+          404,
+          { msg: "Connection not found" },
+          "Connection not found"
+        )
+      );
+  }
+
+  // Remove connection reference from both users
+  await User.findByIdAndUpdate(req.user._id, { $pull: { connectionsArray: connection._id } });
+  await User.findByIdAndUpdate(userId, { $pull: { connectionsArray: connection._id } });
+
+  // Delete the connection itself
+  await Connection.findByIdAndDelete(connection._id);
+
+  return res
+    .status(200)
+    .json(
+      new ApiResponse(
+        200,
+        { msg: "Disconnected successfully" },
+        "Disconnected successfully"
+      )
+    );
+})
+
 const updateAllDetails = asyncHandler(async(req, res) => {
   const user = await User.findById(req.user._id)
     .select("fullname profession about projectsArray workArray links");
@@ -1051,6 +1164,49 @@ const updateAllDetails = asyncHandler(async(req, res) => {
    
 })
 
+// const bookmark = asyncHandler(async (req, res) => {
+//   const {userId} = req.body;
+//   if (!userId) {
+//     return res
+//       .status(400)
+//       .json(
+//         new ApiResponse(
+//           400,
+//           { msg: "User ID is required" },
+//           "Please provide a valid user ID."
+//         )
+//       );
+//   }
+
+//   const user = await User.findByIdAndUpdate(
+//     req.user._id,
+//     { $addToSet: { bookmarksArray: userId } },
+//     { new: true }
+//   );
+
+//   if (!user) {
+//     return res
+//       .status(404)
+//       .json(
+//         new ApiResponse(
+//           404,
+//           { msg: "User not found" },
+//           "User not found"
+//         )
+//       );
+//   }
+
+//   return res
+//     .status(200)
+//     .json(
+//       new ApiResponse(
+//         200,
+//         { msg: "User bookmarked successfully" },
+//         "User bookmarked successfully"
+//       )
+//     );
+// })
+
 export {
   isUserNameAvailable,
   isMailExists,
@@ -1067,9 +1223,13 @@ export {
   getUserPicture,
   findUserByEmail,
   login,
-  suggestedUsers,
+  suggestedUsers, 
   fetchUserDetailsForProfile,
   newConnection,
   fetchSelfDetails,
-  updateAllDetails
+  updateAllDetails,
+  acceptConnection,
+  rejectConnection,
+  disconnect,
+  // bookmark
 };
