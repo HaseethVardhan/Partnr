@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { body } from "express-validator";
-import { isMailExists, isUserNameAvailable, getProfile, registerUser, updateProfession, updateSkills, updateBio, updateLinks, updateProjects, updateWork, updatePicture, getUserPicture, updatePreferences, findUserByEmail, login, suggestedUsers, fetchUserDetailsForProfile, newConnection, fetchSelfDetails, updateAllDetails, acceptConnection, rejectConnection, disconnect } from "../controllers/user.controller.js";
+import { isMailExists, isUserNameAvailable, getProfile, registerUser, updateProfession, updateSkills, updateBio, updateLinks, updateProjects, updateWork, updatePicture, getUserPicture, updatePreferences, findUserByEmail, login, suggestedUsers, fetchUserDetailsForProfile, newConnection, fetchSelfDetails, updateAllDetails, acceptConnection, rejectConnection, disconnect, swipeRight, swipeLeft } from "../controllers/user.controller.js";
 import { verifyUser } from "../middlewares/auth.middleware.js";
 import { upload } from "../middlewares/multer.middleware.js";
 
@@ -93,6 +93,14 @@ router.route('/reject-connection').post([
 router.route('/disconnect-connection').post([
     body('userId').isString().notEmpty().withMessage('User ID is required')
 ], verifyUser, disconnect)
+
+router.route('/swipe-right').post([
+    body('userId').isString().notEmpty().withMessage('User ID is required')
+], verifyUser, swipeRight)
+
+router.route('/swipe-left').post([
+    body('userId').isString().notEmpty().withMessage('User ID is required')
+], verifyUser, swipeLeft)
 
 // router.route('/bookmark').post([
 //     body('userId').isString().notEmpty().withMessage('User ID is required')

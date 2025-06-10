@@ -4,6 +4,7 @@ import { ApiResponse } from "../utils/ApiResponse.js";
 import { validationResult } from "express-validator";
 import { Project } from "../models/project.model.js";
 import { Work } from "../models/work.model.js";
+import { Like } from "../models/like.model.js";
 import { cloudinaryUpload } from "../utils/cloudinary.js";
 import { Connection } from "../models/connection.model.js";
 
@@ -1207,6 +1208,88 @@ const updateAllDetails = asyncHandler(async(req, res) => {
 //     );
 // })
 
+const swipeRight = asyncHandler(async (req, res) => {
+  const {userId} = req.body;
+
+  if (!userId) {
+    return res
+      .status(400)
+      .json(
+        new ApiResponse(
+          400,
+          { msg: "User ID is required" },
+          "Please provide a valid user ID."
+        )
+      );
+  }
+
+  // Add req.user._id to userId's halfSwipedArray
+  await User.findByIdAndUpdate(
+    userId,
+    { $addToSet: { halfSwipedArray: req.user._id } }
+  );
+
+  // Add userId to req.user._id's SwipedArray
+  await User.findByIdAndUpdate(
+    req.user._id,
+    { $addToSet: { SwipedArray: userId } }
+  );
+
+  // Create a like object and add reference
+  const like = await Like.create({
+    liked_by: req.user._id,
+    liked_to: userId
+  });
+
+  // Add like object to userId's likesArray
+  await User.findByIdAndUpdate(
+    userId,
+    { $addToSet: { likesArray: like._id } }
+  );
+
+  return res
+    .status(200)
+    .json(
+      new ApiResponse(
+        200,
+        { msg: "Swiped right successfully" },
+        "Swiped right successfully"
+      )
+    );
+})
+
+const swipeLeft = asyncHandler(async (req, res) => {
+  const {userId} = req.body;
+
+  if (!userId) {
+    return res
+      .status(400)
+      .json(
+        new ApiResponse(
+          400,
+          { msg: "User ID is required" },
+          "Please provide a valid user ID."
+        )
+      );
+  }
+
+  // Add userId to req.user._id's SwipedArray
+  await User.findByIdAndUpdate(
+    req.user._id,
+    { $addToSet: { SwipedArray: userId } }
+  );
+
+  return res
+    .status(200)
+    .json(
+      new ApiResponse(
+        200,
+        { msg: "Swiped right successfully" },
+        "Swiped right successfully"
+      )
+    );
+})
+
 export {
   isUserNameAvailable,
   isMailExists,
@@ -1231,5 +1314,7 @@ export {
   acceptConnection,
   rejectConnection,
   disconnect,
-  // bookmark
+  // bookmark,
+  swipeRight,
+  swipeLeft
 };
