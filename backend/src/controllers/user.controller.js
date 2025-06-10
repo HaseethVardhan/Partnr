@@ -747,7 +747,9 @@ const suggestedUsers = asyncHandler(async (req, res) => {
   const halfSwipedLimit = Math.min(5, halfSwipedUsers.length);
 
   const halfSwipedResults = await User.find(
-    { _id: { $in: halfSwipedUsers.slice(0, halfSwipedLimit) } },
+    { 
+      _id: { $in: halfSwipedUsers.slice(0, halfSwipedLimit), $nin: user.SwipedArray }
+    },
     {
       fullname: 1,
       profession: 1,
