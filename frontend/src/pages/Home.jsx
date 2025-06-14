@@ -6,8 +6,11 @@ import { Trefoil } from "ldrs/react";
 import "ldrs/react/Trefoil.css";
 import { UserDataContext } from "../context/UserContext";
 import { useNavigate } from "react-router-dom";
+import {SocketContext} from '../context/SocketContext'
 
 const Home = () => {
+  const {socket} = useContext(SocketContext)
+
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
@@ -35,24 +38,30 @@ const Home = () => {
             }
             setCards((prevCards) => [...prevCards, ...response.data.data.users]);
             setError(null);
+            setLoading(false)
             
           }else{
 
             setLimit(0);
             setError("No relevant users found. Please change your preferences or try again later.");
+            setLoading(false)
           }
         } catch (error) {
           console.error("Error fetching cards:", error);
+          setLoading(false);
         } finally {
           setLoading(false);
         }
       };
       fetchCards();
+      }else{
+        setLoading(false);
       }
       if(cards.length === 0){
           setError("No relevant users found. Please change your preferences or try again later.");
+          setLoading(false)
       }
-      setLoading(false);
+      
   }, [cards]);  
 
   return (

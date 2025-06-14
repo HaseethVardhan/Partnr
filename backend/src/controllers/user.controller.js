@@ -1292,6 +1292,51 @@ const swipeLeft = asyncHandler(async (req, res) => {
     );
 })
 
+const updateSocketId = asyncHandler(async (req, res) => {
+  const { socketId } = req.body;
+  
+  if (!socketId) {
+    return res
+      .status(400)
+      .json(
+        new ApiResponse(
+          400,
+          { msg: "Socket ID is required" },
+          "Please provide a socket ID"
+        )
+      );
+  }
+
+  const user = await User.findByIdAndUpdate(
+    req.user._id,
+    { socketId },
+    { new: true }
+  );
+
+  if (!user) {
+    return res
+      .status(400)
+      .json(
+        new ApiResponse(
+          400,
+          { msg: "User not updated" },
+          "There was a problem updating the socket ID"
+        )
+      );
+  }
+
+  return res
+    .status(200)
+    .json(
+      new ApiResponse(
+        200,
+        { msg: "Socket ID updated successfully" },
+        "Socket ID updated successfully"
+      )
+    );
+});
+
+
 export {
   isUserNameAvailable,
   isMailExists,
@@ -1318,5 +1363,6 @@ export {
   disconnect,
   // bookmark,
   swipeRight,
-  swipeLeft
+  swipeLeft,
+  updateSocketId
 };
