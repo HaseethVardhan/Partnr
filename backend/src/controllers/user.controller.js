@@ -7,6 +7,7 @@ import { Work } from "../models/work.model.js";
 import { Like } from "../models/like.model.js";
 import { cloudinaryUpload } from "../utils/cloudinary.js";
 import { Connection } from "../models/connection.model.js";
+import { Notification } from "../models/notification.model.js"
 
 const isUserNameAvailable = asyncHandler(async (req, res) => {
   const errors = validationResult(req);
@@ -978,6 +979,17 @@ const newConnection = asyncHandler(async (req, res) => {
       );
   }
 
+  const notification = await Notification.create({
+    type: "connection",
+    user: req.user._id,
+    connection: connection._id,
+  });
+
+  await User.findByIdAndUpdate(
+    userId,
+    { $addToSet: { notificationsArray: notification._id } }
+  );
+
   return res
     .status(201)
     .json(
@@ -1012,6 +1024,19 @@ const acceptConnection = asyncHandler(async(req, res) => {
   await User.findByIdAndUpdate(req.user._id, { $addToSet: { connectionsArray: connection._id } });
   await User.findByIdAndUpdate(userId, { $addToSet: { connectionsArray: connection._id } });
 
+  const notification = await Notification.findOneAndDelete({
+    type: "connection",
+    connection: connection._id,
+    user: userId
+  });
+
+  if (notification) {
+    await User.findByIdAndUpdate(
+      req.user._id,
+      { $pull: { notificationsArray: notification._id } }
+    );
+  }
+
   return res
     .status(200)
     .json(
@@ -1028,6 +1053,19 @@ const rejectConnection = asyncHandler(async(req, res) => {
   const connection = await Connection.findOneAndDelete(
     { first_connect: userId, second_connect: req.user._id, status: "pending" }
   );
+
+  const notification = await Notification.findOneAndDelete({
+    type: "connection",
+    connection: connection._id,
+    user: userId
+  });
+
+  if (notification) {
+    await User.findByIdAndUpdate(
+      req.user._id,
+      { $pull: { notificationsArray: notification._id } }
+    );
+  }
 
   return res
     .status(200)
@@ -1249,6 +1287,18 @@ const swipeRight = asyncHandler(async (req, res) => {
     { $addToSet: { likesArray: like._id } }
   );
 
+  const notification = await Notification.create({
+    type: "like",
+    user: req.user._id,
+    like: like._id,
+    expire: Date.now() + 7 * 24 * 60 * 60 * 1000 // 7 days from now
+  });
+
+  await User.findByIdAndUpdate(
+    userId,
+    { $addToSet: { notificationsArray: notification._id } }
+  );
+
   return res
     .status(200)
     .json(
@@ -1336,6 +1386,67 @@ const updateSocketId = asyncHandler(async (req, res) => {
     );
 });
 
+const fetchNotifications = asyncHandler(async(req, res) => {
+  const user = await User.findById(req.user._id).select("notificationsArray");
+
+  if (!user) {
+    return res
+      .status(404)
+      .json(
+        new ApiResponse(
+          404,
+          { msg: "User not found" },
+          "User not found"
+        )
+      );
+  }
+
+  // Get the notificationsArray and fetch the latest 5 connection and 5 like notifications by timestamp
+  // Step 1: Fetch the notification objects for all IDs in notificationsArray
+  const notifications = await Notification.find({
+    _id: { $in: user.notificationsArray }
+  })
+    .select("type createdAt")
+    .sort({ createdAt: -1 }); // sort all notifications by createdAt desc
+
+  // Step 2: Filter and get latest 5 connection and 5 like notification IDs
+  const connectionIds = notifications
+    .filter(n => n.type === "connection")
+    .slice(0, 5)
+    .map(n => n._id);
+
+  const likeIds = notifications
+    .filter(n => n.type === "like")
+    .slice(0, 5)
+    .map(n => n._id);
+
+  // Step 3: Populate the latest 5 connection notifications
+  const connectionNotifications = await Notification.find({ _id: { $in: connectionIds } })
+    .sort({ createdAt: -1 })
+    .populate([
+      { path: "user", select: "username profilePicture _id" }
+    ]);
+
+  // Step 4: Populate the latest 5 like notifications
+  const likeNotifications = await Notification.find({ _id: { $in: likeIds } })
+    .sort({ createdAt: -1 })
+    .populate([
+      { path: "user", select: "username profilePicture _id" }
+    ]);
+
+  return res.status(200).json(
+    new ApiResponse(
+      200,
+      {
+        connectionNotifications,
+        likeNotifications,
+        msg: "Notifications fetched successfully"
+      },
+      "Notifications fetched successfully"
+    )
+  );
+}) 
+
 
 export {
   isUserNameAvailable,
@@ -1364,5 +1475,6 @@ export {
   // bookmark,
   swipeRight,
   swipeLeft,
-  updateSocketId
+  updateSocketId,
+  fetchNotifications
 };

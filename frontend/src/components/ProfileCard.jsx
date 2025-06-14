@@ -21,6 +21,7 @@ const ProfileCard = ({
   const isFront = _id === cards[cards.length - 1]._id;
 
   const animateSwipeRight = () => {
+    swipedRight();
     x.stop();
     x.set(0);
     animate(x, 200, {
@@ -30,7 +31,6 @@ const ProfileCard = ({
       onUpdate: (latest) => {
         if (latest > 100) {
           x.stop();
-          swipedRight();
         }
       },
     });
@@ -56,7 +56,7 @@ const ProfileCard = ({
           },
         }
       );
-      console.log(response);
+      
     } catch (error) {
       console.log(error);
     }
