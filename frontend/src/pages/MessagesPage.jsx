@@ -1,11 +1,16 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 
 const MessagesPage = () => {
+
+  const navigate = useNavigate()
+
   return (
     <div className="flex flex-col">
       <div className="flex flex-row items-center justify-between px-4 py-10">
         <div className="flex flex-row items-center gap-3">
           <img
+            onClick={()=>{navigate('/')}}
             className="h-5 w-6 object-contain"
             src="https://res.cloudinary.com/dbzcsfi3e/image/upload/v1748781336/Vector_5_labewm.png"
           />

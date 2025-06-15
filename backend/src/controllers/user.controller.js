@@ -8,6 +8,7 @@ import { Like } from "../models/like.model.js";
 import { cloudinaryUpload } from "../utils/cloudinary.js";
 import { Connection } from "../models/connection.model.js";
 import { Notification } from "../models/notification.model.js"
+import { Conversation } from "../models/conversation.model.js";
 
 const isUserNameAvailable = asyncHandler(async (req, res) => {
   const errors = validationResult(req);
@@ -1036,6 +1037,14 @@ const acceptConnection = asyncHandler(async(req, res) => {
       { $pull: { notificationsArray: notification._id } }
     );
   }
+
+  const conversation = await Conversation.create({
+    user1: userId,
+    user2: req.user._id
+  });
+
+  await User.findByIdAndUpdate(req.user._id, { $addToSet: { conversationsArray: conversation._id } });
+  await User.findByIdAndUpdate(userId, { $addToSet: { conversationsArray: conversation._id } });
 
   return res
     .status(200)

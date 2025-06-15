@@ -5,6 +5,7 @@ import userRouter from './routes/user.routes.js'
 import passport from "passport"
 import './controllers/oauth.controller.js'
 import oauthRouter from './routes/oauth.routes.js'
+import messageRouter from './routes/message.routes.js'
 import session from 'express-session'
 
 
@@ -36,5 +37,6 @@ app.use(passport.session())
 
 app.use('/user', userRouter)
 app.use('/auth', oauthRouter)
+app.use('/message', messageRouter)
 
 export { app }

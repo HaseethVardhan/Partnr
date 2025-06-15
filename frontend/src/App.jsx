@@ -18,6 +18,7 @@ import NotificationPage from "./pages/NotificationPage.jsx";
 import MessagesPage from "./pages/MessagesPage.jsx";
 import EditProfilePage from "./pages/EditProfilePage.jsx";
 import EditProfilePicture from "./pages/EditProfilePicture.jsx";
+import Conversation from "./pages/Conversation.jsx";
 
 function App() {
   return (
@@ -142,6 +143,14 @@ function App() {
           element={
             <UserProtectedWrapper>
               <EditProfilePicture />
+            </UserProtectedWrapper>
+          }
+        />
+        <Route
+          path="/conversation"
+          element={
+            <UserProtectedWrapper>
+              <Conversation />
             </UserProtectedWrapper>
           }
         />
