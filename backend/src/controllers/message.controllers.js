@@ -62,27 +62,34 @@ const fetchConversations = asyncHandler (async (req, res) => {
 
     const activeConversations = user.conversationsArray;
 
-    for (let idx = 0; idx < activeConversations.length; idx++) {
-        const conv = activeConversations[idx];
-        const otherUserId = conv.user1.equals(req.user._id) ? conv.user2 : conv.user1;
-        const otherUser = await User.findById(otherUserId).select('+username +fullname +profilePicture');
-        
-        // Get the most recent chat object from chats array
-        let latestChat = null;
-        if (conv.chats && conv.chats.length > 0) {
-            // Assuming chats are stored as ObjectIds, get the last one
-            const lastChatId = conv.chats[conv.chats.length - 1];
-            latestChat = await Chat.findById(lastChatId).text;
-        }
+    const conversationsWithDetails = await Promise.all(
+        activeConversations.map(async (conv) => {
+            // Populate latest chat
+            const populatedConv = await Conversation.findById(conv._id)
+                .populate({
+                    path: 'chats',
+                    options: { sort: { createdAt: -1 }, limit: 1 },
+                    model: 'Chat'
+                })
+                .populate([
+                    { path: 'user1', select: '_id fullname profilePicture' },
+                    { path: 'user2', select: '_id fullname profilePicture' }
+                ]);
 
-        activeConversations[idx] = {
-            ...conv.toObject(),
-            otherUser,
-            latestChat
-        };
-    }
+            // Determine the other user
+            const otherUser = populatedConv.user1._id.equals(req.user._id)
+                ? populatedConv.user2
+                : populatedConv.user1;
 
-    return res.status(200).json(new ApiResponse(200, activeConversations, "Active conversations fetched successfully"));
+            return {
+                conversationId: populatedConv._id,
+                otherUser,
+                latestChat: populatedConv.chats[0] || null
+            };
+        })
+    );
+
+    return res.status(200).json(new ApiResponse(200, conversationsWithDetails, "Active conversations fetched successfully"));
 })
 
 const loadConversation = asyncHandler (async (req, res) => {

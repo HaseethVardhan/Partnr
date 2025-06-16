@@ -1,40 +1,45 @@
-import React, {useState, useEffect} from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
 const MessagesPage = () => {
-
-  const navigate = useNavigate()
+  const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
   const [conversations, setConversations] = useState([]);
 
-  useEffect(()=>{
+  useEffect(() => {
     setLoading(true);
-   const fetchConversations = async() => {
-     try {
-      const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/message/fetch-conversations`,{},{
-                headers: {
-                    Authorization : `Bearer ${localStorage.getItem('token')}`
-                }
-      });
-      setConversations(response.data.data);
-    } catch (error) {
-      console.log(error);
-    }finally{
-      setLoading(false);
-    }
-   }
-   fetchConversations()
-  },[])
+    const fetchConversations = async () => {
+      try {
+        const response = await axios.post(
+          `${import.meta.env.VITE_BASE_URL}/message/fetch-conversations`,
+          {},
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+          }
+        );
+        setConversations(response.data.data);
+      } catch (error) {
+        console.log(error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchConversations();
+  }, []);
 
   return (
     <div className="flex flex-col">
       <div className="flex flex-row items-center justify-between px-4 py-10">
         <div className="flex flex-row items-center gap-3">
           <img
-            onClick={()=>{navigate('/')}}
+            onClick={() => {
+              navigate("/");
+            }}
             className="h-5 w-6 object-contain"
             src="https://res.cloudinary.com/dbzcsfi3e/image/upload/v1748781336/Vector_5_labewm.png"
           />
@@ -51,73 +56,81 @@ const MessagesPage = () => {
       </div>
       <div className="flex flex-col items-center justify-center w-full px-5 py-2">
         <div className="flex flex-row items-center justify-start gap-3 bg-[#333333] py-3 w-full px-4 rounded-sm">
-            <img
-                className="h-5 w-5 object-cover"
-                src="https://res.cloudinary.com/dbzcsfi3e/image/upload/v1749284397/search-01_ljxoiu.png"
-            />
-            <input type="text" placeholder="Search Messages" className="font-inter font-[400] text-lg tracking-[0.5px] text-[#aaaaaa]" />
+          <img
+            className="h-5 w-5 object-cover"
+            src="https://res.cloudinary.com/dbzcsfi3e/image/upload/v1749284397/search-01_ljxoiu.png"
+          />
+          <input
+            type="text"
+            placeholder="Search Messages"
+            className="font-inter font-[400] text-lg tracking-[0.5px] text-[#aaaaaa]"
+          />
         </div>
       </div>
       <div className="flex flex-row items-center justify-center w-full px-5 py-3 gap-2">
         <div className="flex flex-row items-center justify-center w-1/4 bg-[#333333] py-3 px-2 rounded-lg font-inter font-[400] text-xs tracking-[0.5px] text-white">
-            All
+          All
         </div>
         <div className="flex flex-row items-center justify-center w-1/4 bg-[#333333] py-3 px-2 rounded-lg font-inter font-[400] text-xs tracking-[0.5px] text-white">
-            Unread
+          Unread
         </div>
         <div className="flex flex-row items-center justify-center w-1/4 bg-[#333333] py-3 px-2 rounded-lg font-inter font-[400] text-xs tracking-[0.5px] text-white">
-            Archived
+          Archived
         </div>
         <div className="flex flex-row items-center justify-center w-1/4 bg-[#333333] py-3 px-2 rounded-lg font-inter font-[400] text-xs tracking-[0.5px] text-white">
-            <img className="h-4 w-4 object-cover" src="https://res.cloudinary.com/dbzcsfi3e/image/upload/v1749285716/mail-add-01_njiiam.png" />
+          <img
+            className="h-4 w-4 object-cover"
+            src="https://res.cloudinary.com/dbzcsfi3e/image/upload/v1749285716/mail-add-01_njiiam.png"
+          />
         </div>
       </div>
       <div className="flex flex-col px-5 py-4 gap-5">
-        <div className="flex flex-row items-center">
+        {conversations?.length === 0 && (
+          <p className="font-inter text-[#aaaaaa] justify-between items-center">
+            No conversations available.
+          </p>
+        )}
+        {conversations?.map((conv, idx) => (
+          <div 
+            key={idx}
+            onClick={()=>{navigate(`/conversation?userId=${conv.otherUser._id}`)}}
+            className="flex flex-row items-center"
+            style={{ overflow: "hidden", whiteSpace: "nowrap", textOverflow: "ellipsis" }}
+          >
             <div className="flex flex-row items-center justify-start w-[20%]">
-                <img className="h-13 w-13 rounded-full object-cover" src="https://www.zmo.ai/wp-content/uploads/2024/03/Activity-options-for-AI-face-generator.webp" />
+              <img
+                className="h-13 w-13 rounded-full object-cover"
+                src={conv.otherUser.profilePicture}
+              />
             </div>
-            <div className="flex flex-col items-start justify-between py-2 w-[80%]">
-                <div className="flex flex-row items-center justify-start w-full gap-1">
-                    <div className="font-inter font-[500] text-base tracking-[0.5px] text-white">Adrian</div>
-                    <div className="font-inter font-[400] text-sm tracking-[1px] text-[#838383]">@uiuxadrian•</div>
-                    <div className="font-inter font-[400] text-sm tracking-[1px] text-[#838383]">Now</div>
+            <div className="flex flex-col items-start justify-between py-2 w-[80%] overflow-hidden">
+              <div className="flex flex-row items-center justify-start w-full gap-1">
+                <div className="font-inter font-[500] text-base tracking-[0.5px] text-white truncate max-w-[60%]">
+                  {conv.otherUser.fullname.firstname.charAt(0).toUpperCase()+conv.otherUser.fullname.firstname.slice(1).toLowerCase()+" "+conv.otherUser.fullname.lastname.charAt(0).toUpperCase()+conv.otherUser.fullname.lastname.slice(1).toLowerCase()}
                 </div>
-                <div className="font-inter font-[300] text-sm tracking-[1px] text-[#f4f4f4]">
-                    Sent a link!
+                <div className="font-inter font-[400] text-sm tracking-[1px] text-[#838383] truncate max-w-[40%]">
+                  {(() => {
+                    const createdAt = new Date(conv.latestChat.createdAt);
+                    const now = new Date();
+                    const diffMs = now - createdAt;
+                    const diffSec = Math.floor(diffMs / 1000);
+                    const diffMin = Math.floor(diffSec / 60);
+                    const diffHr = Math.floor(diffMin / 60);
+                    const diffDay = Math.floor(diffHr / 24);
+
+                    if (diffMin < 1) return "now";
+                    if (diffMin < 60) return `${diffMin}m`;
+                    if (diffHr < 24) return `${diffHr}h`;
+                    return `${diffDay}d`;
+                  })()}
                 </div>
+              </div>
+              <div className="font-inter font-[300] text-sm tracking-[1px] text-[#f4f4f4] truncate w-full">
+                {conv.latestChat.text}
+              </div>
             </div>
-        </div>
-        <div className="flex flex-row items-center">
-            <div className="flex flex-row items-center justify-start w-[20%]">
-                <img className="h-13 w-13 rounded-full object-cover" src="https://www.zmo.ai/wp-content/uploads/2024/03/Activity-options-for-AI-face-generator.webp" />
-            </div>
-            <div className="flex flex-col items-start justify-between py-2 w-[80%]">
-                <div className="flex flex-row items-center justify-start w-full gap-1">
-                    <div className="font-inter font-[500] text-base tracking-[0.5px] text-white">Adrian</div>
-                    <div className="font-inter font-[400] text-sm tracking-[1px] text-[#838383]">@uiuxadrian•</div>
-                    <div className="font-inter font-[400] text-sm tracking-[1px] text-[#838383]">Now</div>
-                </div>
-                <div className="font-inter font-[300] text-sm tracking-[1px] text-[#f4f4f4]">
-                    Sent a link!
-                </div>
-            </div>
-        </div>
-        <div className="flex flex-row items-center">
-            <div className="flex flex-row items-center justify-start w-[20%]">
-                <img className="h-13 w-13 rounded-full object-cover" src="https://www.zmo.ai/wp-content/uploads/2024/03/Activity-options-for-AI-face-generator.webp" />
-            </div>
-            <div className="flex flex-col items-start justify-between py-2 w-[80%]">
-                <div className="flex flex-row items-center justify-start w-full gap-1">
-                    <div className="font-inter font-[500] text-base tracking-[0.5px] text-white">Adrian</div>
-                    <div className="font-inter font-[400] text-sm tracking-[1px] text-[#838383]">@uiuxadrian•</div>
-                    <div className="font-inter font-[400] text-sm tracking-[1px] text-[#838383]">Now</div>
-                </div>
-                <div className="font-inter font-[300] text-sm tracking-[1px] text-[#f4f4f4]">
-                    Sent a link!
-                </div>
-            </div>
-        </div>
+          </div>
+        ))}
       </div>
     </div>
   );
