@@ -1,9 +1,33 @@
-import React from "react";
+import React, {useState, useEffect} from "react";
+import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
 const MessagesPage = () => {
 
   const navigate = useNavigate()
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  const [conversations, setConversations] = useState([]);
+
+  useEffect(()=>{
+    setLoading(true);
+   const fetchConversations = async() => {
+     try {
+      const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/message/fetch-conversations`,{},{
+                headers: {
+                    Authorization : `Bearer ${localStorage.getItem('token')}`
+                }
+      });
+      setConversations(response.data.data);
+    } catch (error) {
+      console.log(error);
+    }finally{
+      setLoading(false);
+    }
+   }
+   fetchConversations()
+  },[])
 
   return (
     <div className="flex flex-col">

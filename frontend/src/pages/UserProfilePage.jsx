@@ -413,7 +413,9 @@ const UserProfilePage = () => {
             >
               Disconnect
             </div>
-            <div className="flex flex-row items-center justify-center max-w-50 w-full py-3 bg-[#333333] rounded-lg font-inter font-[500] text-base tracking-[0.5px] text-white">
+            <div
+            onClick={()=>{navigate(`/conversation?userId=${searchParams.get("userid")}`)}}
+            className="flex flex-row items-center justify-center max-w-50 w-full py-3 bg-[#333333] rounded-lg font-inter font-[500] text-base tracking-[0.5px] text-white">
               Message
             </div>
           </>
