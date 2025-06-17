@@ -265,7 +265,9 @@ const SelfProfilePage = () => {
                 </div>
             </div>
             <div className="flex flex-row items-center justify-center mt-5 gap-9">
-                <div className="flex flex-col items-center justify-center gap-1">
+                <div
+                onClick={()=>{navigate('/connections')}}
+                className="flex flex-col items-center justify-center gap-1">
                     <div className="font-inter font-[500] text-base tracking-[0.5px] text-white">
                         {user?.connectionsCount}
                     </div>
@@ -273,12 +275,14 @@ const SelfProfilePage = () => {
                         Connections
                     </div>
                 </div>
-                <div className="flex flex-col items-center justify-center gap-1">
+                <div
+                onClick={()=>{navigate('/likes')}}
+                className="flex flex-col items-center justify-center gap-1">
                     <div className="font-inter font-[500] text-base tracking-[0.5px] text-white">
                         {user?.likesCount}
                     </div>
                     <div className="font-inter font-[500] text-sm tracking-[1px] text-[#aaaaaa]">
-                        Kudos
+                        Likes
                     </div>
                 </div>
             </div>

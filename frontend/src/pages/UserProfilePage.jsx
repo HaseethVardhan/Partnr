@@ -371,7 +371,7 @@ const UserProfilePage = () => {
             {user?.likesCount}
           </div>
           <div className="font-inter font-[500] text-sm tracking-[1px] text-[#aaaaaa]">
-            Kudos
+            Likes
           </div>
         </div>
       </div>

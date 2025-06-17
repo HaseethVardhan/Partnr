@@ -19,6 +19,8 @@ import MessagesPage from "./pages/MessagesPage.jsx";
 import EditProfilePage from "./pages/EditProfilePage.jsx";
 import EditProfilePicture from "./pages/EditProfilePicture.jsx";
 import Conversation from "./pages/Conversation.jsx";
+import ViewConnections from "./pages/ViewConnections.jsx";
+import ViewLikes from "./pages/viewLikes.jsx";
 
 function App() {
   return (
@@ -151,6 +153,22 @@ function App() {
           element={
             <UserProtectedWrapper>
               <Conversation />
+            </UserProtectedWrapper>
+          }
+        />
+        <Route
+          path="/connections"
+          element={
+            <UserProtectedWrapper>
+              <ViewConnections />
+            </UserProtectedWrapper>
+          }
+        />
+        <Route
+          path="/likes"
+          element={
+            <UserProtectedWrapper>
+              <ViewLikes />
             </UserProtectedWrapper>
           }
         />

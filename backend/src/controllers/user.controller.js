@@ -1456,6 +1456,72 @@ const fetchNotifications = asyncHandler(async(req, res) => {
   );
 }) 
 
+const viewConnections = asyncHandler(async (req,res) => {
+  const user = await User.findById(req.user._id).select("connectionsArray");
+  if (!user) {
+    return res.status(404).json(
+      new ApiResponse(
+        404,
+        { msg: "User not found" },
+        "User not found"
+      )
+    );
+  }
+
+  // Fetch all connections and populate both users
+  const connections = await Connection.find({ _id: { $in: user.connectionsArray } })
+    .populate([
+      { path: "first_connect", select: "_id username profilePicture" },
+      { path: "second_connect", select: "_id username profilePicture" }
+    ]);
+
+  // For each connection, pick the user that is NOT req.user._id
+  const connectedUsers = connections.map(conn => {
+    let otherUser;
+    if (conn.first_connect && conn.first_connect._id.toString() !== req.user._id.toString()) {
+      otherUser = conn.first_connect;
+    } else if (conn.second_connect && conn.second_connect._id.toString() !== req.user._id.toString()) {
+      otherUser = conn.second_connect;
+    }
+    return otherUser ? {
+      _id: otherUser._id,
+      username: otherUser.username,
+      profilePicture: otherUser.profilePicture
+    } : null;
+  }).filter(Boolean);
+
+  return res.status(200).json(
+    new ApiResponse(
+      200,
+      { connections: connectedUsers, msg: "Connections fetched successfully" },
+      "Connections fetched successfully"
+    )
+  );
+})
+
+const viewLikes = asyncHandler(async (req, res) => {
+  const user = await User.findById(req.user._id).select("likesArray");
+  if (!user) {
+    return res.status(404).json(
+      new ApiResponse(
+        404,
+        { msg: "User not found" },
+        "User not found"
+      )
+    );
+  }
+
+  const likes = await Like.find({ _id: { $in: user.likesArray } })
+    .populate({ path: "liked_by", select: "_id username profilePicture" });
+
+  return res.status(200).json(
+    new ApiResponse(
+      200,
+      { likes, msg: "Likes fetched successfully" },
+      "Likes fetched successfully"
+    )
+  );
+})
 
 export {
   isUserNameAvailable,
@@ -1485,5 +1551,7 @@ export {
   swipeRight,
   swipeLeft,
   updateSocketId,
-  fetchNotifications
+  fetchNotifications,
+  viewConnections,
+  viewLikes
 };
