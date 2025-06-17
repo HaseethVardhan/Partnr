@@ -128,11 +128,18 @@ const loadConversation = asyncHandler (async (req, res) => {
 
     const otherUser = conversation.user1._id.equals(req.user._id) ? conversation.user2 : conversation.user1;
 
+    // Check if userId is in req.user._id's connectionsArray
+    const userWithConnections = await User.findById(req.user._id).populate('connectionsArray');
+    const isConnected = userWithConnections.connectionsArray.some(conn =>
+        conn.first_connect.equals(userId) || conn.second_connect.equals(userId)
+    );
+
     return res.status(200).json(new ApiResponse(200, {
         conversation: {
             ...conversation.toObject(),
             otherUser
-        }
+        },
+        isConnected
     }, "Conversation loaded successfully"));
 })
 

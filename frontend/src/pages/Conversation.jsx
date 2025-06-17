@@ -16,6 +16,7 @@ const Conversation = () => {
   const [otheruser, setOtherUser] = useState();
   const [user, setUser] = useState();
   const [refresh, setRefresh] = useState(true);
+  const [connected, setConnected] = useState();
 
   const textareaRef = useRef(null);
   const messageEndRef = useRef(null);
@@ -35,7 +36,7 @@ const Conversation = () => {
                 }
         });
 
-        console.log(response)
+        setConnected(response.data.data.isConnected);
         setOtherUser(response.data.data.conversation.otherUser)
         const conversation = response.data.data.conversation;
         const user =
@@ -121,7 +122,7 @@ const Conversation = () => {
           <div className="font-poppins font-[500] text-2xl  text-white">
             <div
               onClick={() => {
-                navigate(`/user-profile?userId=${userId}`);
+                navigate(`/user-profile?userid=${userId}`);
               }}
               className="flex flex-row items-center"
             >
@@ -178,7 +179,7 @@ const Conversation = () => {
         ))}
       </div>
       <div className="p-4 mb-3 w-full">
-        <form
+        {connected === true ?  (<form
           onSubmit={(e) => {submitHandler(e)}}
           className="flex items-center gap-2 min-h-10 border-1 border-[#aaaaaa] rounded-xl px-2 py-2"
         >
@@ -209,7 +210,9 @@ const Conversation = () => {
               src="https://res.cloudinary.com/dbzcsfi3e/image/upload/v1749994052/send-fept9s28oheau3ys9l4ce_xroh8n.webp"
             />
           </button>
-        </form>
+        </form>) : (
+          <p className="text-[#aaaaaa] font-inter font-[400]">You cannot text eachother since both are not connected.</p>
+        )}
       </div>
     </div>
   );
