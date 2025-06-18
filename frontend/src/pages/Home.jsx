@@ -9,7 +9,7 @@ import { useNavigate } from "react-router-dom";
 import {SocketContext} from '../context/SocketContext'
 
 const Home = () => {
-  const {socket} = useContext(SocketContext)
+  const {socket, connectSocket} = useContext(SocketContext)
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -21,6 +21,10 @@ const Home = () => {
   // const [cards, setCards] = useState([]);
   const { cards, setCards } = useContext(UserDataContext);
   let reload = cards.length > 0 ? false: true;
+
+  useEffect(()=>{
+    connectSocket();
+  },[])
 
   useEffect(() => {
     setLoading(true);
