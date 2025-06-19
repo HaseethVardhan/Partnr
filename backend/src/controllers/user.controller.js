@@ -5,7 +5,7 @@ import { validationResult } from "express-validator";
 import { Project } from "../models/project.model.js";
 import { Work } from "../models/work.model.js";
 import { Like } from "../models/like.model.js";
-import { cloudinaryUpload } from "../utils/cloudinary.js";
+import { cloudinaryDelete, cloudinaryUpload } from "../utils/cloudinary.js";
 import { Connection } from "../models/connection.model.js";
 import { Notification } from "../models/notification.model.js";
 import { Conversation } from "../models/conversation.model.js";
@@ -562,11 +562,33 @@ const updatePicture = asyncHandler(async (req, res) => {
       );
   }
 
+  // First, fetch the current profilePicture of the user
+  const currentUser = await User.findById(req.user._id).select("profilePicture");
+
+  const oldPictureUrl = currentUser?.profilePicture;
+  const defaultPictureUrl = "https://res.cloudinary.com/dbzcsfi3e/image/upload/v1743434367/default_pfp_wngp1j.jpg";
+
+  // Update the profilePicture
   const user = await User.findByIdAndUpdate(
     req.user._id,
     { profilePicture: picture.url },
     { new: true }
   );
+
+  // If the old picture is not the default, delete it from cloudinary
+  if (oldPictureUrl && oldPictureUrl !== defaultPictureUrl) {
+    // Extract public_id from the URL
+    const matches = oldPictureUrl.match(/\/upload\/(?:v\d+\/)?([^\.\/]+)\./);
+    if (matches && matches[1]) {
+      const publicId = matches[1];
+      try {
+        await cloudinaryDelete(publicId);
+      } catch (err) {
+        // Log error but don't block response
+        console.error("Failed to delete old profile picture from cloudinary:", err);
+      }
+    }
+  }
 
   if (!user) {
     return res
