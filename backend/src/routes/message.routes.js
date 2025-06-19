@@ -6,14 +6,13 @@ import { fetchConversations, loadConversation, newMessage } from "../controllers
 const router = Router()
 
 router.route('/new-text').post([
-    body('userId').isString().notEmpty().withMessage('User ID is required'),
+    body('receiverId').isString().notEmpty().withMessage('User ID is required'),
+    body('conversationId').isString().notEmpty().withMessage('User ID is required'),
     body('text').isString().notEmpty().withMessage("Text can't be empty.")
 ], verifyUser, newMessage)
 
 router.route('/fetch-conversations').post(verifyUser, fetchConversations)
 
-router.route('/load-conversation').post([
-    body('userId').isString().notEmpty().withMessage("Userid is required")
-], verifyUser, loadConversation)
+router.route('/:load-conversation').get(verifyUser, loadConversation)
 
 export default router

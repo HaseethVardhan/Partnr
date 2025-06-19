@@ -7,7 +7,7 @@ import { Work } from "../models/work.model.js";
 import { Like } from "../models/like.model.js";
 import { cloudinaryUpload } from "../utils/cloudinary.js";
 import { Connection } from "../models/connection.model.js";
-import { Notification } from "../models/notification.model.js"
+import { Notification } from "../models/notification.model.js";
 import { Conversation } from "../models/conversation.model.js";
 
 const isUserNameAvailable = asyncHandler(async (req, res) => {
@@ -132,7 +132,7 @@ const registerUser = asyncHandler(async (req, res) => {
       );
   }
 
-  if(authtype === "google") {
+  if (authtype === "google") {
     const newUser = await User.create({
       email,
       username,
@@ -585,7 +585,10 @@ const updatePicture = asyncHandler(async (req, res) => {
     .json(
       new ApiResponse(
         200,
-        {pictureurl:picture.url,  msg: "Profile picture updated successfully" },
+        {
+          pictureurl: picture.url,
+          msg: "Profile picture updated successfully",
+        },
         "Profile picture updated successfully"
       )
     );
@@ -634,7 +637,7 @@ const updatePreferences = asyncHandler(async (req, res) => {
         "User preferences updated successfully"
       )
     );
-})
+});
 
 const getUserPicture = asyncHandler(async (req, res) => {
   const user = await User.findById(req.user._id).select("profilePicture");
@@ -651,17 +654,19 @@ const getUserPicture = asyncHandler(async (req, res) => {
       );
   }
 
-
   return res
     .status(200)
     .json(
       new ApiResponse(
         200,
-        { picture: user.profilePicture, msg: "Profile picture fetched successfully" },
+        {
+          picture: user.profilePicture,
+          msg: "Profile picture fetched successfully",
+        },
         "Profile picture fetched successfully"
       )
     );
-})
+});
 
 const findUserByEmail = asyncHandler(async (req, res) => {
   const { email } = req.body;
@@ -679,7 +684,6 @@ const findUserByEmail = asyncHandler(async (req, res) => {
       );
   }
 
-
   return res
     .status(200)
     .json(
@@ -689,7 +693,7 @@ const findUserByEmail = asyncHandler(async (req, res) => {
         "User fetched successfully"
       )
     );
-})
+});
 
 const login = asyncHandler(async (req, res) => {
   const errors = validationResult(req);
@@ -705,43 +709,59 @@ const login = asyncHandler(async (req, res) => {
       );
   }
 
-  const {email, password} = req.body
+  const { email, password } = req.body;
 
-  const user = await User.findOne({email})
+  const user = await User.findOne({ email });
 
-  if(!user){
+  if (!user) {
     return res
       .status(400)
-      .json(new ApiResponse(400, {msg: "Email do not exist"}, "Email do not exist."))
+      .json(
+        new ApiResponse(
+          400,
+          { msg: "Email do not exist" },
+          "Email do not exist."
+        )
+      );
   }
 
-  if(user.authtype !== 'local'){
+  if (user.authtype !== "local") {
     return res
       .status(400)
-      .json(new ApiResponse(400, {msg: 'Please login using your google or github.'}, 'Please login using your google or github.'))
+      .json(
+        new ApiResponse(
+          400,
+          { msg: "Please login using your google or github." },
+          "Please login using your google or github."
+        )
+      );
   }
 
-  const valid = await user.isPasswordCorrect(password)
+  const valid = await user.isPasswordCorrect(password);
 
-  if(valid){
+  if (valid) {
     const token = await user.generateAuthToken();
     return res
       .status(200)
-      .json(new ApiResponse(
-        200,
-        {user: user._id, token, msg: 'Succesful LogIn'},
-        'Successful LogIn'
-      ))
-  }else{
+      .json(
+        new ApiResponse(
+          200,
+          { user: user._id, token, msg: "Succesful LogIn" },
+          "Successful LogIn"
+        )
+      );
+  } else {
     return res
       .status(400)
-      .json(new ApiResponse(
-        400,
-        {msg: 'Incorrect Password'},
-        'Incorrect Password'
-      ))
+      .json(
+        new ApiResponse(
+          400,
+          { msg: "Incorrect Password" },
+          "Incorrect Password"
+        )
+      );
   }
-})
+});
 
 const suggestedUsers = asyncHandler(async (req, res) => {
   const user = await User.findById(req.user._id);
@@ -749,23 +769,22 @@ const suggestedUsers = asyncHandler(async (req, res) => {
   const halfSwipedLimit = Math.min(5, halfSwipedUsers.length);
 
   const halfSwipedResults = await User.find(
-    { 
-      _id: { $in: halfSwipedUsers.slice(0, halfSwipedLimit), $nin: user.SwipedArray }
+    {
+      _id: {
+        $in: halfSwipedUsers.slice(0, halfSwipedLimit),
+        $nin: user.SwipedArray,
+      },
     },
     {
       fullname: 1,
       profession: 1,
       skills: 1,
       profilePicture: 1,
-      _id: 1
+      _id: 1,
     }
   );
 
-  const excludedUsers = [
-    ...user.SwipedArray,
-    ...halfSwipedUsers,
-    user._id
-  ];
+  const excludedUsers = [...user.SwipedArray, ...halfSwipedUsers, user._id];
 
   const skillsLimit = 10 - halfSwipedResults.length;
 
@@ -774,14 +793,14 @@ const suggestedUsers = asyncHandler(async (req, res) => {
     skillsResults = await User.find(
       {
         _id: { $nin: excludedUsers },
-        skills: { $in: user.preferences }
+        skills: { $in: user.preferences },
       },
       {
         fullname: 1,
         profession: 1,
         skills: 1,
         profilePicture: 1,
-        _id: 1
+        _id: 1,
       }
     ).limit(skillsLimit);
   }
@@ -812,27 +831,22 @@ const suggestedUsers = asyncHandler(async (req, res) => {
 });
 
 const fetchUserDetailsForProfile = asyncHandler(async (req, res) => {
-  const {userId} = req.body;
-  
-  const user = await User.findById(userId)
-    .select("fullname username profession profilePicture connectionsArray likesArray about projectsArray workArray links");
+  const { userId } = req.body;
+
+  const user = await User.findById(userId).select(
+    "fullname username profession profilePicture connectionsArray likesArray about projectsArray workArray links"
+  );
 
   await user.populate([
     { path: "workArray", select: "company role from to experience" },
     { path: "projectsArray", select: "title details" },
-    { path: "connectionsArray", select: "first_connect second_connect status" }
+    { path: "connectionsArray", select: "first_connect second_connect status" },
   ]);
 
   if (!user) {
     return res
       .status(404)
-      .json(
-        new ApiResponse(
-          404,
-          { msg: "User not found" },
-          "User not found"
-        )
-      );
+      .json(new ApiResponse(404, { msg: "User not found" }, "User not found"));
   }
 
   // Determine connection status
@@ -854,8 +868,8 @@ const fetchUserDetailsForProfile = asyncHandler(async (req, res) => {
     const connection = await Connection.findOne({
       $or: [
         { first_connect: req.user._id, second_connect: user._id },
-        { first_connect: user._id, second_connect: req.user._id }
-      ]
+        { first_connect: user._id, second_connect: req.user._id },
+      ],
     });
 
     if (connection) {
@@ -870,10 +884,14 @@ const fetchUserDetailsForProfile = asyncHandler(async (req, res) => {
       }
     }
   }
-  
 
   const userDetails = {
-    fullname: user.fullname.firstname.charAt(0).toUpperCase() + user.fullname.firstname.slice(1).toLowerCase() + " " + user.fullname.lastname.charAt(0).toUpperCase() + user.fullname.lastname.slice(1).toLowerCase(),
+    fullname:
+      user.fullname.firstname.charAt(0).toUpperCase() +
+      user.fullname.firstname.slice(1).toLowerCase() +
+      " " +
+      user.fullname.lastname.charAt(0).toUpperCase() +
+      user.fullname.lastname.slice(1).toLowerCase(),
     username: user.username,
     profession: user.profession,
     profilePicture: user.profilePicture,
@@ -882,10 +900,11 @@ const fetchUserDetailsForProfile = asyncHandler(async (req, res) => {
     about: user.about,
     projectsArray: user.projectsArray,
     workArray: user.workArray,
-    ...(user.links && (user.links.xlink || user.links.linkedInlink || user.links.portfoliolink)
+    ...(user.links &&
+    (user.links.xlink || user.links.linkedInlink || user.links.portfoliolink)
       ? { links: user.links }
       : {}),
-    connectionStatus
+    connectionStatus,
   };
 
   return res
@@ -900,29 +919,28 @@ const fetchUserDetailsForProfile = asyncHandler(async (req, res) => {
 });
 
 const fetchSelfDetails = asyncHandler(async (req, res) => {
-  
-  const user = await User.findById(req.user._id)
-    .select("fullname username profession profilePicture connectionsArray likesArray about projectsArray workArray links");
+  const user = await User.findById(req.user._id).select(
+    "fullname username profession profilePicture connectionsArray likesArray about projectsArray workArray links"
+  );
 
   await user.populate([
     { path: "workArray", select: "company role from to experience" },
     { path: "projectsArray", select: "title details" },
-    ]);
+  ]);
 
   if (!user) {
     return res
       .status(404)
-      .json(
-        new ApiResponse(
-          404,
-          { msg: "User not found" },
-          "User not found"
-        )
-      );
+      .json(new ApiResponse(404, { msg: "User not found" }, "User not found"));
   }
 
   const userDetails = {
-    fullname: user.fullname.firstname.charAt(0).toUpperCase() + user.fullname.firstname.slice(1).toLowerCase() + " " + user.fullname.lastname.charAt(0).toUpperCase() + user.fullname.lastname.slice(1).toLowerCase(),
+    fullname:
+      user.fullname.firstname.charAt(0).toUpperCase() +
+      user.fullname.firstname.slice(1).toLowerCase() +
+      " " +
+      user.fullname.lastname.charAt(0).toUpperCase() +
+      user.fullname.lastname.slice(1).toLowerCase(),
     username: user.username,
     profession: user.profession,
     profilePicture: user.profilePicture,
@@ -931,7 +949,8 @@ const fetchSelfDetails = asyncHandler(async (req, res) => {
     about: user.about,
     projectsArray: user.projectsArray,
     workArray: user.workArray,
-    ...(user.links && (user.links.xlink || user.links.linkedInlink || user.links.portfoliolink)
+    ...(user.links &&
+    (user.links.xlink || user.links.linkedInlink || user.links.portfoliolink)
       ? { links: user.links }
       : {}),
   };
@@ -945,7 +964,7 @@ const fetchSelfDetails = asyncHandler(async (req, res) => {
         "User details fetched successfully"
       )
     );
-})
+});
 
 const newConnection = asyncHandler(async (req, res) => {
   const { userId } = req.body;
@@ -965,7 +984,7 @@ const newConnection = asyncHandler(async (req, res) => {
   const connection = await Connection.create({
     first_connect: req.user._id,
     second_connect: userId,
-    status: "pending"
+    status: "pending",
   });
 
   if (!connection) {
@@ -986,10 +1005,9 @@ const newConnection = asyncHandler(async (req, res) => {
     connection: connection._id,
   });
 
-  await User.findByIdAndUpdate(
-    userId,
-    { $addToSet: { notificationsArray: notification._id } }
-  );
+  await User.findByIdAndUpdate(userId, {
+    $addToSet: { notificationsArray: notification._id },
+  });
 
   return res
     .status(201)
@@ -1002,11 +1020,11 @@ const newConnection = asyncHandler(async (req, res) => {
     );
 });
 
-const acceptConnection = asyncHandler(async(req, res) => {
-  const {userId} = req.body;
+const acceptConnection = asyncHandler(async (req, res) => {
+  const { userId } = req.body;
   const connection = await Connection.findOneAndUpdate(
     { first_connect: userId, second_connect: req.user._id, status: "pending" },
-    { status: "accepted" },
+    { status: "accepted" }
   );
 
   if (!connection) {
@@ -1022,29 +1040,39 @@ const acceptConnection = asyncHandler(async(req, res) => {
   }
 
   // Push connection to both users' connectionsArray
-  await User.findByIdAndUpdate(req.user._id, { $addToSet: { connectionsArray: connection._id } });
-  await User.findByIdAndUpdate(userId, { $addToSet: { connectionsArray: connection._id } });
+  await User.findByIdAndUpdate(req.user._id, {
+    $addToSet: { connectionsArray: connection._id },
+  });
+  await User.findByIdAndUpdate(userId, {
+    $addToSet: { connectionsArray: connection._id },
+  });
 
   const notification = await Notification.findOneAndDelete({
     type: "connection",
     connection: connection._id,
-    user: userId
+    user: userId,
   });
 
   if (notification) {
-    await User.findByIdAndUpdate(
-      req.user._id,
-      { $pull: { notificationsArray: notification._id } }
-    );
+    await User.findByIdAndUpdate(req.user._id, {
+      $pull: { notificationsArray: notification._id },
+    });
   }
 
-  const conversation = await Conversation.create({
-    user1: userId,
-    user2: req.user._id
-  });
+  const participants = [userId, req.user._id].sort(); // ensure consistent order
 
-  await User.findByIdAndUpdate(req.user._id, { $addToSet: { conversationsArray: conversation._id } });
-  await User.findByIdAndUpdate(userId, { $addToSet: { conversationsArray: conversation._id } });
+  let conversation = await Conversation.findOne({ participants });
+
+  if (!conversation) {
+    conversation = await Conversation.create({ participants });
+  }
+
+  await User.findByIdAndUpdate(req.user._id, {
+    $addToSet: { conversationsArray: conversation._id },
+  });
+  await User.findByIdAndUpdate(userId, {
+    $addToSet: { conversationsArray: conversation._id },
+  });
 
   return res
     .status(200)
@@ -1055,25 +1083,26 @@ const acceptConnection = asyncHandler(async(req, res) => {
         "Connection accepted successfully"
       )
     );
-})
+});
 
-const rejectConnection = asyncHandler(async(req, res) => {
-  const {userId} = req.body;
-  const connection = await Connection.findOneAndDelete(
-    { first_connect: userId, second_connect: req.user._id, status: "pending" }
-  );
+const rejectConnection = asyncHandler(async (req, res) => {
+  const { userId } = req.body;
+  const connection = await Connection.findOneAndDelete({
+    first_connect: userId,
+    second_connect: req.user._id,
+    status: "pending",
+  });
 
   const notification = await Notification.findOneAndDelete({
     type: "connection",
     connection: connection._id,
-    user: userId
+    user: userId,
   });
 
   if (notification) {
-    await User.findByIdAndUpdate(
-      req.user._id,
-      { $pull: { notificationsArray: notification._id } }
-    );
+    await User.findByIdAndUpdate(req.user._id, {
+      $pull: { notificationsArray: notification._id },
+    });
   }
 
   return res
@@ -1085,15 +1114,15 @@ const rejectConnection = asyncHandler(async(req, res) => {
         "Connection rejected successfully"
       )
     );
-})
+});
 
 const disconnect = asyncHandler(async (req, res) => {
-  const {userId} = req.body;
+  const { userId } = req.body;
   const connection = await Connection.findOne({
     $or: [
       { first_connect: req.user._id, second_connect: userId },
-      { first_connect: userId, second_connect: req.user._id }
-    ]
+      { first_connect: userId, second_connect: req.user._id },
+    ],
   });
 
   if (!connection) {
@@ -1109,8 +1138,12 @@ const disconnect = asyncHandler(async (req, res) => {
   }
 
   // Remove connection reference from both users
-  await User.findByIdAndUpdate(req.user._id, { $pull: { connectionsArray: connection._id } });
-  await User.findByIdAndUpdate(userId, { $pull: { connectionsArray: connection._id } });
+  await User.findByIdAndUpdate(req.user._id, {
+    $pull: { connectionsArray: connection._id },
+  });
+  await User.findByIdAndUpdate(userId, {
+    $pull: { connectionsArray: connection._id },
+  });
 
   // Delete the connection itself
   await Connection.findByIdAndDelete(connection._id);
@@ -1124,25 +1157,34 @@ const disconnect = asyncHandler(async (req, res) => {
         "Disconnected successfully"
       )
     );
-})
+});
 
-const updateAllDetails = asyncHandler(async(req, res) => {
-  const user = await User.findById(req.user._id)
-    .select("fullname profession about projectsArray workArray links");
+const updateAllDetails = asyncHandler(async (req, res) => {
+  const user = await User.findById(req.user._id).select(
+    "fullname profession about projectsArray workArray links"
+  );
 
   await user.populate([
     { path: "workArray", select: "company role from to experience" },
     { path: "projectsArray", select: "title details" },
   ]);
 
-  const {firstname, lastname, profession, about, workArray, projectsArray, links} = req.body;
+  const {
+    firstname,
+    lastname,
+    profession,
+    about,
+    workArray,
+    projectsArray,
+    links,
+  } = req.body;
 
-  if(firstname !== user.fullname.firstname){
+  if (firstname !== user.fullname.firstname) {
     user.fullname.firstname = firstname;
     await user.save();
   }
 
-  if(lastname !== user.fullname.lastname){
+  if (lastname !== user.fullname.lastname) {
     user.fullname.lastname = lastname;
     await user.save();
   }
@@ -1158,61 +1200,60 @@ const updateAllDetails = asyncHandler(async(req, res) => {
   }
 
   // Update projectsArra
-    // Remove all existing projects (sequentially, no Promise.all)
-    for (const projectId of user.projectsArray) {
-      await Project.findByIdAndDelete(projectId);
-    }
-    // Add new projects
-    // Add new projects (sequentially, no Promise.all)
-    const newProjects = [];
-    for (const p of projectsArray) {
-      const project = await Project.create({
+  // Remove all existing projects (sequentially, no Promise.all)
+  for (const projectId of user.projectsArray) {
+    await Project.findByIdAndDelete(projectId);
+  }
+  // Add new projects
+  // Add new projects (sequentially, no Promise.all)
+  const newProjects = [];
+  for (const p of projectsArray) {
+    const project = await Project.create({
       title: p.title,
-      details: p.details
-      });
-      newProjects.push(project);
-    }
-    user.projectsArray = newProjects.map(p => p._id);
-    await user.save();
-    
+      details: p.details,
+    });
+    newProjects.push(project);
+  }
+  user.projectsArray = newProjects.map((p) => p._id);
+  await user.save();
 
-    // Update workArray
-    
-    // Remove all existing work experiences (sequentially)
-    for (const workId of user.workArray) {
-      await Work.findByIdAndDelete(workId);
-    }
-    // Add new work experiences (sequentially)
-    const newWorks = [];
-    for (const w of workArray) {
-      const work = await Work.create({
+  // Update workArray
+
+  // Remove all existing work experiences (sequentially)
+  for (const workId of user.workArray) {
+    await Work.findByIdAndDelete(workId);
+  }
+  // Add new work experiences (sequentially)
+  const newWorks = [];
+  for (const w of workArray) {
+    const work = await Work.create({
       company: w.company,
       role: w.role,
       from: w.from,
       to: w.to,
-      experience: w.experience
-      });
-      newWorks.push(work);
-    }
-    user.workArray = newWorks.map(w => w._id);
-    await user.save();
-    
+      experience: w.experience,
+    });
+    newWorks.push(work);
+  }
+  user.workArray = newWorks.map((w) => w._id);
+  await user.save();
 
-    // Update links
-    if (links && typeof links === "object") {
+  // Update links
+  if (links && typeof links === "object") {
     user.links = links;
     await user.save();
-    }
+  }
 
-    return res.status(200).json(
-    new ApiResponse(
-      200,
-      { msg: "User details updated successfully" },
-      "User details updated successfully"
-    )
+  return res
+    .status(200)
+    .json(
+      new ApiResponse(
+        200,
+        { msg: "User details updated successfully" },
+        "User details updated successfully"
+      )
     );
-   
-})
+});
 
 // const bookmark = asyncHandler(async (req, res) => {
 //   const {userId} = req.body;
@@ -1258,7 +1299,7 @@ const updateAllDetails = asyncHandler(async(req, res) => {
 // })
 
 const swipeRight = asyncHandler(async (req, res) => {
-  const {userId} = req.body;
+  const { userId } = req.body;
 
   if (!userId) {
     return res
@@ -1273,40 +1314,34 @@ const swipeRight = asyncHandler(async (req, res) => {
   }
 
   // Add req.user._id to userId's halfSwipedArray
-  await User.findByIdAndUpdate(
-    userId,
-    { $addToSet: { halfSwipedArray: req.user._id } }
-  );
+  await User.findByIdAndUpdate(userId, {
+    $addToSet: { halfSwipedArray: req.user._id },
+  });
 
   // Add userId to req.user._id's SwipedArray
-  await User.findByIdAndUpdate(
-    req.user._id,
-    { $addToSet: { SwipedArray: userId } }
-  );
+  await User.findByIdAndUpdate(req.user._id, {
+    $addToSet: { SwipedArray: userId },
+  });
 
   // Create a like object and add reference
   const like = await Like.create({
     liked_by: req.user._id,
-    liked_to: userId
+    liked_to: userId,
   });
 
   // Add like object to userId's likesArray
-  await User.findByIdAndUpdate(
-    userId,
-    { $addToSet: { likesArray: like._id } }
-  );
+  await User.findByIdAndUpdate(userId, { $addToSet: { likesArray: like._id } });
 
   const notification = await Notification.create({
     type: "like",
     user: req.user._id,
     like: like._id,
-    expire: Date.now() + 7 * 24 * 60 * 60 * 1000 // 7 days from now
+    expire: Date.now() + 7 * 24 * 60 * 60 * 1000, // 7 days from now
   });
 
-  await User.findByIdAndUpdate(
-    userId,
-    { $addToSet: { notificationsArray: notification._id } }
-  );
+  await User.findByIdAndUpdate(userId, {
+    $addToSet: { notificationsArray: notification._id },
+  });
 
   return res
     .status(200)
@@ -1317,10 +1352,10 @@ const swipeRight = asyncHandler(async (req, res) => {
         "Swiped right successfully"
       )
     );
-})
+});
 
 const swipeLeft = asyncHandler(async (req, res) => {
-  const {userId} = req.body;
+  const { userId } = req.body;
 
   if (!userId) {
     return res
@@ -1335,10 +1370,9 @@ const swipeLeft = asyncHandler(async (req, res) => {
   }
 
   // Add userId to req.user._id's SwipedArray
-  await User.findByIdAndUpdate(
-    req.user._id,
-    { $addToSet: { SwipedArray: userId } }
-  );
+  await User.findByIdAndUpdate(req.user._id, {
+    $addToSet: { SwipedArray: userId },
+  });
 
   return res
     .status(200)
@@ -1349,11 +1383,11 @@ const swipeLeft = asyncHandler(async (req, res) => {
         "Swiped right successfully"
       )
     );
-})
+});
 
 const updateSocketId = asyncHandler(async (req, res) => {
   const { socketId } = req.body;
-  
+
   if (!socketId) {
     return res
       .status(400)
@@ -1395,53 +1429,45 @@ const updateSocketId = asyncHandler(async (req, res) => {
     );
 });
 
-const fetchNotifications = asyncHandler(async(req, res) => {
+const fetchNotifications = asyncHandler(async (req, res) => {
   const user = await User.findById(req.user._id).select("notificationsArray");
 
   if (!user) {
     return res
       .status(404)
-      .json(
-        new ApiResponse(
-          404,
-          { msg: "User not found" },
-          "User not found"
-        )
-      );
+      .json(new ApiResponse(404, { msg: "User not found" }, "User not found"));
   }
 
   // Get the notificationsArray and fetch the latest 5 connection and 5 like notifications by timestamp
   // Step 1: Fetch the notification objects for all IDs in notificationsArray
   const notifications = await Notification.find({
-    _id: { $in: user.notificationsArray }
+    _id: { $in: user.notificationsArray },
   })
     .select("type createdAt")
     .sort({ createdAt: -1 }); // sort all notifications by createdAt desc
 
   // Step 2: Filter and get latest 5 connection and 5 like notification IDs
   const connectionIds = notifications
-    .filter(n => n.type === "connection")
+    .filter((n) => n.type === "connection")
     .slice(0, 5)
-    .map(n => n._id);
+    .map((n) => n._id);
 
   const likeIds = notifications
-    .filter(n => n.type === "like")
+    .filter((n) => n.type === "like")
     .slice(0, 5)
-    .map(n => n._id);
+    .map((n) => n._id);
 
   // Step 3: Populate the latest 5 connection notifications
-  const connectionNotifications = await Notification.find({ _id: { $in: connectionIds } })
+  const connectionNotifications = await Notification.find({
+    _id: { $in: connectionIds },
+  })
     .sort({ createdAt: -1 })
-    .populate([
-      { path: "user", select: "username profilePicture _id" }
-    ]);
+    .populate([{ path: "user", select: "username profilePicture _id" }]);
 
   // Step 4: Populate the latest 5 like notifications
   const likeNotifications = await Notification.find({ _id: { $in: likeIds } })
     .sort({ createdAt: -1 })
-    .populate([
-      { path: "user", select: "username profilePicture _id" }
-    ]);
+    .populate([{ path: "user", select: "username profilePicture _id" }]);
 
   return res.status(200).json(
     new ApiResponse(
@@ -1449,79 +1475,91 @@ const fetchNotifications = asyncHandler(async(req, res) => {
       {
         connectionNotifications,
         likeNotifications,
-        msg: "Notifications fetched successfully"
+        msg: "Notifications fetched successfully",
       },
       "Notifications fetched successfully"
     )
   );
-}) 
+});
 
-const viewConnections = asyncHandler(async (req,res) => {
+const viewConnections = asyncHandler(async (req, res) => {
   const user = await User.findById(req.user._id).select("connectionsArray");
   if (!user) {
-    return res.status(404).json(
-      new ApiResponse(
-        404,
-        { msg: "User not found" },
-        "User not found"
-      )
-    );
+    return res
+      .status(404)
+      .json(new ApiResponse(404, { msg: "User not found" }, "User not found"));
   }
 
   // Fetch all connections and populate both users
-  const connections = await Connection.find({ _id: { $in: user.connectionsArray } })
-    .populate([
-      { path: "first_connect", select: "_id username profilePicture" },
-      { path: "second_connect", select: "_id username profilePicture" }
-    ]);
+  const connections = await Connection.find({
+    _id: { $in: user.connectionsArray },
+  }).populate([
+    { path: "first_connect", select: "_id username profilePicture" },
+    { path: "second_connect", select: "_id username profilePicture" },
+  ]);
 
   // For each connection, pick the user that is NOT req.user._id
-  const connectedUsers = connections.map(conn => {
-    let otherUser;
-    if (conn.first_connect && conn.first_connect._id.toString() !== req.user._id.toString()) {
-      otherUser = conn.first_connect;
-    } else if (conn.second_connect && conn.second_connect._id.toString() !== req.user._id.toString()) {
-      otherUser = conn.second_connect;
-    }
-    return otherUser ? {
-      _id: otherUser._id,
-      username: otherUser.username,
-      profilePicture: otherUser.profilePicture
-    } : null;
-  }).filter(Boolean);
+  const connectedUsers = connections
+    .map((conn) => {
+      let otherUser;
+      if (
+        conn.first_connect &&
+        conn.first_connect._id.toString() !== req.user._id.toString()
+      ) {
+        otherUser = conn.first_connect;
+      } else if (
+        conn.second_connect &&
+        conn.second_connect._id.toString() !== req.user._id.toString()
+      ) {
+        otherUser = conn.second_connect;
+      }
+      return otherUser
+        ? {
+            _id: otherUser._id,
+            username: otherUser.username,
+            profilePicture: otherUser.profilePicture,
+          }
+        : null;
+    })
+    .filter(Boolean);
 
-  return res.status(200).json(
-    new ApiResponse(
-      200,
-      { connections: connectedUsers, msg: "Connections fetched successfully" },
-      "Connections fetched successfully"
-    )
-  );
-})
+  return res
+    .status(200)
+    .json(
+      new ApiResponse(
+        200,
+        {
+          connections: connectedUsers,
+          msg: "Connections fetched successfully",
+        },
+        "Connections fetched successfully"
+      )
+    );
+});
 
 const viewLikes = asyncHandler(async (req, res) => {
   const user = await User.findById(req.user._id).select("likesArray");
   if (!user) {
-    return res.status(404).json(
-      new ApiResponse(
-        404,
-        { msg: "User not found" },
-        "User not found"
-      )
-    );
+    return res
+      .status(404)
+      .json(new ApiResponse(404, { msg: "User not found" }, "User not found"));
   }
 
-  const likes = await Like.find({ _id: { $in: user.likesArray } })
-    .populate({ path: "liked_by", select: "_id username profilePicture" });
+  const likes = await Like.find({ _id: { $in: user.likesArray } }).populate({
+    path: "liked_by",
+    select: "_id username profilePicture",
+  });
 
-  return res.status(200).json(
-    new ApiResponse(
-      200,
-      { likes, msg: "Likes fetched successfully" },
-      "Likes fetched successfully"
-    )
-  );
-})
+  return res
+    .status(200)
+    .json(
+      new ApiResponse(
+        200,
+        { likes, msg: "Likes fetched successfully" },
+        "Likes fetched successfully"
+      )
+    );
+});
 
 export {
   isUserNameAvailable,
@@ -1539,7 +1577,7 @@ export {
   getUserPicture,
   findUserByEmail,
   login,
-  suggestedUsers, 
+  suggestedUsers,
   fetchUserDetailsForProfile,
   newConnection,
   fetchSelfDetails,
@@ -1553,5 +1591,5 @@ export {
   updateSocketId,
   fetchNotifications,
   viewConnections,
-  viewLikes
+  viewLikes,
 };

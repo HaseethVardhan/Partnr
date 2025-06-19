@@ -1,19 +1,23 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { UserDataContext } from "../context/UserContext";
 
 const MessagesPage = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
+  // const [error, setError] = useState(null);
   const [search, setSearch] = useState("");
-
   const [conversations, setConversations] = useState([]);
   const [originalConversations, setOriginalConversations] = useState([]);
 
+  const {user} = useContext(UserDataContext)
+  const currentUserId = user._id;
+
+
   useEffect(() => {
-    setLoading(true);
     const fetchConversations = async () => {
+      setLoading(true);
       try {
         const response = await axios.post(
           `${import.meta.env.VITE_BASE_URL}/message/fetch-conversations`,
@@ -37,10 +41,13 @@ const MessagesPage = () => {
 
   const filteredConversations = search.trim()
     ? [...conversations].filter((conv) => {
+        const otherUser = conv.participants.find(
+          (user) => user._id !== currentUserId
+        );
         const fullName =
-          conv.otherUser.fullname.firstname.toLowerCase() +
+          otherUser?.fullname?.firstname.toLowerCase() +
           " " +
-          conv.otherUser.fullname.lastname.toLowerCase();
+          otherUser?.fullname?.lastname.toLowerCase();
         return fullName.includes(search.trim().toLowerCase());
       })
     : originalConversations;
@@ -158,57 +165,59 @@ const MessagesPage = () => {
             </div>
           </div>
         ))} */}
-        {filteredConversations?.map((conv, idx) => (
-          <div
-            key={idx}
-            onClick={() => {
-              navigate(`/conversation?userId=${conv.otherUser._id}`);
-            }}
-            className="flex flex-row items-center"
-            style={{
-              overflow: "hidden",
-              whiteSpace: "nowrap",
-              textOverflow: "ellipsis",
-            }}
-          >
-            <div className="flex flex-row items-center justify-start w-[20%]">
-              <img
-                className="h-13 w-13 rounded-full object-cover"
-                src={conv.otherUser.profilePicture}
-              />
-            </div>
-            <div className="flex flex-col items-start justify-between py-2 w-[80%] overflow-hidden">
-              <div className="flex flex-row items-center justify-start w-full gap-1">
-                <div className="font-inter font-[500] text-base tracking-[0.5px] text-white truncate max-w-[60%]">
-                  {conv.otherUser.fullname.firstname.charAt(0).toUpperCase() +
-                    conv.otherUser.fullname.firstname.slice(1).toLowerCase() +
-                    " " +
-                    conv.otherUser.fullname.lastname.charAt(0).toUpperCase() +
-                    conv.otherUser.fullname.lastname.slice(1).toLowerCase()}
-                </div>
-                <div className="font-inter font-[400] text-sm tracking-[1px] text-[#838383] truncate max-w-[40%]">
-                  {(() => {
-                    const createdAt = new Date(conv.latestChat.createdAt);
-                    const now = new Date();
-                    const diffMs = now - createdAt;
-                    const diffSec = Math.floor(diffMs / 1000);
-                    const diffMin = Math.floor(diffSec / 60);
-                    const diffHr = Math.floor(diffMin / 60);
-                    const diffDay = Math.floor(diffHr / 24);
+        {filteredConversations.map((conv, idx) => {
+          const otherUser = conv.otherUser
 
-                    if (diffMin < 1) return "now";
-                    if (diffMin < 60) return `${diffMin}m`;
-                    if (diffHr < 24) return `${diffHr}h`;
-                    return `${diffDay}d`;
-                  })()}
+          const createdAt = new Date(conv.lastMessage?.createdAt || conv.updatedAt);
+          const now = new Date();
+          const diffMs = now - createdAt;
+          const diffMin = Math.floor(diffMs / (1000 * 60));
+          const diffHr = Math.floor(diffMin / 60);
+          const diffDay = Math.floor(diffHr / 24);
+
+          let timeDisplay = "now";
+          if (diffMin >= 1 && diffMin < 60) timeDisplay = `${diffMin}m`;
+          else if (diffHr < 24) timeDisplay = `${diffHr}h`;
+          else if (diffDay >= 1) timeDisplay = `${diffDay}d`;
+
+          return (
+            <div
+              key={idx}
+              onClick={() => navigate(`/conversation?conv=${conv.conversationId}`)}
+              className="flex flex-row items-center cursor-pointer"
+              style={{
+                overflow: "hidden",
+                whiteSpace: "nowrap",
+                textOverflow: "ellipsis",
+              }}
+            >
+              <div className="flex flex-row items-center justify-start w-[20%]">
+                <img
+                  className="h-13 w-13 rounded-full object-cover"
+                  src={otherUser?.profilePicture}
+                  alt="Profile"
+                />
+              </div>
+              <div className="flex flex-col items-start justify-between py-2 w-[80%] overflow-hidden">
+                <div className="flex flex-row items-center justify-start w-full gap-1">
+                  <div className="font-inter font-[500] text-base tracking-[0.5px] text-white truncate max-w-[60%]">
+                    {otherUser?.fullname?.firstname.charAt(0).toUpperCase() +
+                      otherUser?.fullname?.firstname.slice(1).toLowerCase() +
+                      " " +
+                      otherUser?.fullname?.lastname.charAt(0).toUpperCase() +
+                      otherUser?.fullname?.lastname.slice(1).toLowerCase()}
+                  </div>
+                  <div className="font-inter font-[400] text-sm tracking-[1px] text-[#838383] truncate max-w-[40%]">
+                    {timeDisplay}
+                  </div>
+                </div>
+                <div className="font-inter font-[300] text-sm tracking-[1px] text-[#f4f4f4] truncate w-full">
+                  {conv.lastMessage?.text || ""}
                 </div>
               </div>
-              <div className="font-inter font-[300] text-sm tracking-[1px] text-[#f4f4f4] truncate w-full">
-                {conv.latestChat.text}
-              </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );

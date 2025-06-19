@@ -7,144 +7,126 @@ import { Conversation } from "../models/conversation.model.js";
 import { Chat } from "../models/chat.model.js";
 
 const newMessage = asyncHandler(async (req, res) => {
+  try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-        return res.status(400).json(new ApiResponse(400, null, errors.array()));
+      return res.status(400).json(new ApiResponse(400, null, errors.array()));
     }
 
-    const {userId, text} = req.body;
-    if (!userId) {
-        return res.status(400).json(new ApiResponse(400, null, "userId is required"));
-    }
+    const { conversationId, receiverId, text } = req.body;
+    const senderId = req.user._id;
 
-    // Check if a conversation exists between the two users using conversationsArray of req.user
-    const user = await User.findById(req.user._id).populate('conversationsArray');
-    if (!user) {
-        return res.status(404).json(new ApiResponse(404, null, "User not found"));
-    }
-    const existConversation = user.conversationsArray.find(conv =>
-        (conv.user1.equals(req.user._id) && conv.user2.equals(userId)) ||
-        (conv.user1.equals(userId) && conv.user2.equals(req.user._id))
-    );
-
-    if (!existConversation) {
-        return res.status(404).json(new ApiResponse(404, null, "Users are not connected"));
-    }
-
-    const existingConversation = await Conversation.findById(existConversation._id);
-
-    const chat = await Chat.create({
-        senderId: req.user._id,
-        receiverId: userId,
-        text
+    const connection = await Connection.findOne({
+      $or: [
+        { first_connect: senderId, second_connect: receiverId },
+        { first_connect: receiverId, second_connect: senderId },
+      ],
     });
 
-    if (!existingConversation.active) {
-        existingConversation.active = true;
+    if (!connection) {
+      return res
+        .status(403)
+        .json(new ApiResponse(403, null, "Users are not connected"));
     }
 
-    existingConversation.chats.push(chat._id);
-    await existingConversation.save();
-
-    return res.status(201).json(new ApiResponse(201, chat, "Message sent successfully"));
-
-})
-
-const fetchConversations = asyncHandler (async (req, res) => {
-    const user = await User.findById(req.user._id).populate({
-        path: 'conversationsArray',
-        match: { active: true }
+    const message = await Chat.create({
+      conversationId,
+      senderId,
+      receiverId,
+      text,
     });
 
-    if (!user) {
-        return res.status(404).json(new ApiResponse(404, null, "User not found"));
-    }
-
-    const activeConversations = user.conversationsArray;
-
-    const conversationsWithDetails = await Promise.all(
-        activeConversations.map(async (conv) => {
-            // Populate latest chat
-            const populatedConv = await Conversation.findById(conv._id)
-                .populate({
-                    path: 'chats',
-                    options: { sort: { createdAt: -1 }, limit: 1 },
-                    model: 'Chat'
-                })
-                .populate([
-                    { path: 'user1', select: '_id fullname profilePicture' },
-                    { path: 'user2', select: '_id fullname profilePicture' }
-                ]);
-
-            // Determine the other user
-            const otherUser = populatedConv.user1._id.equals(req.user._id)
-                ? populatedConv.user2
-                : populatedConv.user1;
-
-            return {
-                conversationId: populatedConv._id,
-                otherUser,
-                latestChat: populatedConv.chats[0] || null
-            };
-        })
-    );
-
-    return res.status(200).json(new ApiResponse(200, conversationsWithDetails, "Active conversations fetched successfully"));
-})
-
-const loadConversation = asyncHandler (async (req, res) => {
-    const {userId} = req.body;
-
-    if (!userId) {
-        return res.status(400).json(new ApiResponse(400, null, "userId is required"));
-    }
-
-    // Find the conversation in req.user._id's conversationArray
-    const user = await User.findById(req.user._id).populate({
-        path: 'conversationsArray',
-        match: {
-            $or: [
-                { user1: req.user._id, user2: userId },
-                { user1: userId, user2: req.user._id }
-            ]
-        }
+    const conversation = await Conversation.findByIdAndUpdate(conversationId, {
+      lastMessage: text,
+      updatedAt: new Date(),
+      active: true,
     });
 
-    if (!user || !user.conversationsArray || user.conversationsArray.length === 0) {
-        return res.status(404).json(new ApiResponse(404, null, "Conversation not found"));
-    }
+    conversation.lastMessage = {
+      text: message.text,
+      createdAt: message.createdAt,
+    };
 
-    // There should be only one conversation between two users
-    let conversation = user.conversationsArray[0];
+    await conversation.save();
 
-    // Populate the chats and the other user (not req.user._id)
-    conversation = await Conversation.populate(conversation, [
-        { path: 'chats', model: 'Chat' },
-        { 
-            path: 'user1 user2', 
-            select: '_id fullname profilePicture'
-        }
-    ]);
+    const response = new ApiResponse(201, message, "Message sent successfully");
+    return res.status(201).json(response);
+  } catch (error) {
+    console.error("Error sending message:", error);
+    const response = new ApiResponse(500, null, "Failed to send message");
+    return res.status(500).json(response);
+  }
+});
 
-    const otherUser = conversation.user1._id.equals(req.user._id) ? conversation.user2 : conversation.user1;
+const fetchConversations = asyncHandler(async (req, res) => {
+  const user = await User.findById(req.user._id).populate({
+    path: "conversationsArray",
+    // match: { active: true },
+    populate: {
+      path: "participants",
+      select: "_id fullname profilePicture"
+    },
+    options: { sort: { updatedAt: -1 } }
+  });
 
-    // Check if userId is in req.user._id's connectionsArray
-    const userWithConnections = await User.findById(req.user._id).populate('connectionsArray');
-    const isConnected = userWithConnections.connectionsArray.some(conn =>
-        conn.first_connect.equals(userId) || conn.second_connect.equals(userId)
+  if (!user) {
+    return res.status(404).json(new ApiResponse(404, null, "User not found"));
+  }
+
+  const formattedConversations = user.conversationsArray.map((conv) => {
+    const otherUser = conv.participants.find(
+      (p) => !p._id.equals(req.user._id)
     );
 
-    return res.status(200).json(new ApiResponse(200, {
-        conversation: {
-            ...conversation.toObject(),
-            otherUser
-        },
-        isConnected
-    }, "Conversation loaded successfully"));
-})
+    return {
+      conversationId: conv._id,
+      otherUser,
+      latestChat: conv.lastMessage
+        ? {
+            text: conv.lastMessage,
+            createdAt: conv.lastMessage.createdAt
+          }
+        : null
+    };
+  });
 
-export {
-    newMessage,
-    fetchConversations,
-    loadConversation
-}
+
+  return res.status(200).json(
+    new ApiResponse(200, formattedConversations, "Conversations fetched")
+  );
+});
+
+const loadConversation = asyncHandler(async (req, res) => {
+  try {
+    const { conversationId } = req.params;
+    const userId = req.user._id; // assuming you're using auth middleware
+
+    const conversation = await Conversation.findById(conversationId);
+
+    if (!conversation || !conversation.participants.includes(userId)) {
+      return res
+        .status(403)
+        .json(new ApiResponse(403, null, "Access denied to this conversation"));
+    }
+
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 20;
+    const skip = (page - 1) * limit;
+
+    const messages = await Chat.find({ conversationId })
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit);
+
+    return res
+      .status(200)
+      .json(new ApiResponse(200, messages.reverse(), "Messages fetched"));
+  } catch (error) {
+    console.error("Error fetching messages:", error);
+    return res
+      .status(500)
+      .json(new ApiResponse(500, null, "Failed to fetch messages"));
+  }
+});
+
+export { newMessage, fetchConversations, loadConversation };
