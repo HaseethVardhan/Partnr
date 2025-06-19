@@ -2,6 +2,7 @@ import React, { useState, useEffect, useContext } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { UserDataContext } from "../context/UserContext";
+import { SocketContext } from "../context/SocketContext";
 
 const MessagesPage = () => {
   const navigate = useNavigate();
@@ -11,9 +12,10 @@ const MessagesPage = () => {
   const [conversations, setConversations] = useState([]);
   const [originalConversations, setOriginalConversations] = useState([]);
 
-  const {user} = useContext(UserDataContext)
+  const { user } = useContext(UserDataContext);
   const currentUserId = user._id;
 
+  const { incomingMessage } = useContext(SocketContext);
 
   useEffect(() => {
     const fetchConversations = async () => {
@@ -39,18 +41,47 @@ const MessagesPage = () => {
     fetchConversations();
   }, []);
 
-  const filteredConversations = search.trim()
-    ? [...conversations].filter((conv) => {
-        const otherUser = conv.participants.find(
-          (user) => user._id !== currentUserId
-        );
-        const fullName =
-          otherUser?.fullname?.firstname.toLowerCase() +
-          " " +
-          otherUser?.fullname?.lastname.toLowerCase();
-        return fullName.includes(search.trim().toLowerCase());
+  useEffect(() => {
+    if (!incomingMessage) return;
+
+    // Update the relevant conversation with the new message
+    setConversations((prevConversations) =>
+      prevConversations.map((conv) => {
+        if (conv.conversationId === incomingMessage.conversationId) {
+          return {
+            ...conv,
+            latestChat: {
+              text: { text: incomingMessage.text },
+              createdAt: incomingMessage.createdAt,
+            },
+          };
+        }
+        return conv;
       })
-    : originalConversations;
+    );
+
+  }, [incomingMessage]);
+
+  const [filteredConversations, setFilteredConversations] = useState([]);
+
+  useEffect(() => {
+    if (search.trim()) {
+      setFilteredConversations(
+        conversations.filter((conv) => {
+          const otherUser = conv.participants
+            ? conv.participants.find((user) => user._id !== currentUserId)
+            : conv.otherUser;
+          const fullName =
+            otherUser?.fullname?.firstname.toLowerCase() +
+            " " +
+            otherUser?.fullname?.lastname.toLowerCase();
+          return fullName.includes(search.trim().toLowerCase());
+        })
+      );
+    } else {
+      setFilteredConversations(conversations);
+    }
+  }, [search, conversations, currentUserId]);
 
   return (
     <div className="flex flex-col">
@@ -166,7 +197,7 @@ const MessagesPage = () => {
           </div>
         ))} */}
         {filteredConversations.map((conv, idx) => {
-          const otherUser = conv.otherUser
+          const otherUser = conv.otherUser;
 
           const createdAt = new Date(conv.latestChat?.createdAt);
           const now = new Date();
@@ -183,7 +214,9 @@ const MessagesPage = () => {
           return (
             <div
               key={idx}
-              onClick={() => navigate(`/conversation?conversationId=${conv.conversationId}`)}
+              onClick={() =>
+                navigate(`/conversation?conversationId=${conv.conversationId}`)
+              }
               className="flex flex-row items-center cursor-pointer"
               style={{
                 overflow: "hidden",

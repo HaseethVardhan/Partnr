@@ -1,13 +1,16 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useContext } from "react";
 import axios from "axios";
 import { Trefoil } from "ldrs/react";
 import "ldrs/react/Trefoil.css";
 import { useNavigate, useSearchParams } from "react-router-dom";
+import { SocketContext } from "../context/SocketContext";
 
 const Conversation = () => {
   const [searchParams] = useSearchParams();
   const conversationId = searchParams.get("conversationId");
   const navigate = useNavigate();
+
+  const { socket } = useContext(SocketContext);
 
   const [messages, setMessages] = useState([]);
   const [text, setText] = useState("");
@@ -39,6 +42,7 @@ const Conversation = () => {
       setOtherUser(res.data.data.otherUser);
       setCurrentUser(res.data.data.currentUser);
       setConnected(res.data.data.connected);
+
     } catch (err) {
       console.error("Meta fetch failed", err);
     }
@@ -94,7 +98,17 @@ const Conversation = () => {
         }
       );
 
-      setMessages((prev) => [...prev, response.data.data]);
+      // setMessages((prev) => [...prev, response.data.data]);
+
+      if(socket){
+        socket.emit("send_message", {
+        conversationId,
+        senderId: currentUser._id,
+        receiverId: otherUser._id,
+        text,
+      });
+      }
+
       setText("");
       textareaRef.current.style.height = "auto";
     } catch (err) {
@@ -144,6 +158,24 @@ const Conversation = () => {
       container.scrollTop = newScrollHeight - prevScrollHeight.current;
     }
   }, [messages]);
+
+  useEffect(() => {
+    if (!socket || !conversationId) return;
+
+    socket.emit("join_conversation", conversationId);
+
+    const handleReceiveMessage = (message) => {
+      if (message.conversationId === conversationId) {
+      setMessages((prev) => [...prev, message]);
+    }
+    };
+
+    socket.on("receive_message", handleReceiveMessage);
+
+    return () => {
+      socket.off("receive_message", handleReceiveMessage);
+    };
+  }, [socket, conversationId]);
 
   return (
     <div className="flex flex-col h-screen bg-[#1a1a1a] overflow-auto">

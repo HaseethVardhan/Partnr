@@ -1,60 +1,43 @@
-import React, { createContext, useEffect } from "react";
+import React, { createContext, useEffect, useRef, useState, useContext } from "react";
 import { io } from "socket.io-client";
 import axios from "axios";
+import { UserDataContext } from "./UserContext";
 
 export const SocketContext = createContext();
 
 const SocketProvider = ({ children }) => {
-  let socket = io(`${import.meta.env.VITE_BASE_URL}`, {
-        autoConnect: false,
-        reconnection: true,
-      });
-  
 
-  const connectSocket = async () => {
-    const token = localStorage.getItem("token");
+  const [socket, setSocket] = useState(null);
+  const [incomingMessage, setIncomingMessage] = useState(null);
+  const {user} = useContext(UserDataContext)
+
+  useEffect(() => {
+
+    const socketInstance = io(import.meta.env.VITE_BASE_URL, {
+      autoConnect: true,
+    });
     
-    if (!token) {
-      return;
-    }
+    socketInstance.emit("setup", user._id);
+    
 
-    if (!socket.connected) {
-      socket.connect();
-      
-      socket.on("connect", async () => {
-        try {
-          const response = await axios.post(
-            `${import.meta.env.VITE_BASE_URL}/user/update-socket-id`,
-            { socketId: socket.id },
-            {
-              headers: {
-                Authorization: `Bearer ${token}`,
-              },
-            }
-          );
-        } catch (error) {
-          console.error("Error updating socket ID:", error);
-        }
-      });
-    }
-  };
+    // socketInstance.on("connect", () => {
+    //   console.log("Socket connected:", socketInstance.id);
+    // });
 
-  const disconnectSocket = () => {
-    if (socket.connected) {
-      socket.disconnect();
-    }
-  };
+    socketInstance.on("receive_message", (message) => {
+      setIncomingMessage(message);
+    });
 
-   useEffect(() => {
+    setSocket(socketInstance);
+
+    // Clean up on unmount
     return () => {
-      socket.off("connect");
-      socket.off("disconnect");
-      socket.close();
+      socketInstance.disconnect();
     };
-  }, []);
+  }, [user._id]);
 
   return (
-    <SocketContext.Provider value={{ socket, connectSocket, disconnectSocket }}>
+    <SocketContext.Provider value={{ socket, incomingMessage }}>
       {children}
     </SocketContext.Provider>
   );
