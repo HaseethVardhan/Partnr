@@ -168,7 +168,7 @@ const MessagesPage = () => {
         {filteredConversations.map((conv, idx) => {
           const otherUser = conv.otherUser
 
-          const createdAt = new Date(conv.lastMessage?.createdAt || conv.updatedAt);
+          const createdAt = new Date(conv.latestChat?.createdAt);
           const now = new Date();
           const diffMs = now - createdAt;
           const diffMin = Math.floor(diffMs / (1000 * 60));
@@ -183,7 +183,7 @@ const MessagesPage = () => {
           return (
             <div
               key={idx}
-              onClick={() => navigate(`/conversation?conv=${conv.conversationId}`)}
+              onClick={() => navigate(`/conversation?conversationId=${conv.conversationId}`)}
               className="flex flex-row items-center cursor-pointer"
               style={{
                 overflow: "hidden",
@@ -212,7 +212,7 @@ const MessagesPage = () => {
                   </div>
                 </div>
                 <div className="font-inter font-[300] text-sm tracking-[1px] text-[#f4f4f4] truncate w-full">
-                  {conv.lastMessage?.text || ""}
+                  {conv.latestChat?.text.text || ""}
                 </div>
               </div>
             </div>

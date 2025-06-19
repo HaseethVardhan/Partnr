@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { body } from "express-validator";
 import { verifyUser } from "../middlewares/auth.middleware.js";
-import { fetchConversations, loadConversation, newMessage } from "../controllers/message.controllers.js";
+import { fetchConversations, loadConversation, loadConversationMeta, newMessage } from "../controllers/message.controllers.js";
 
 const router = Router()
 
@@ -13,6 +13,8 @@ router.route('/new-text').post([
 
 router.route('/fetch-conversations').post(verifyUser, fetchConversations)
 
-router.route('/:load-conversation').get(verifyUser, loadConversation)
+router.route('/load-conversation/:conversationId').get(verifyUser, loadConversation)
+
+router.route('/conversation-meta/:conversationId').get(verifyUser, loadConversationMeta)
 
 export default router

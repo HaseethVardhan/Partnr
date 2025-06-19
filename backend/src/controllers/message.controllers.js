@@ -129,4 +129,41 @@ const loadConversation = asyncHandler(async (req, res) => {
   }
 });
 
-export { newMessage, fetchConversations, loadConversation };
+const loadConversationMeta = asyncHandler(async (req, res) => {
+    const { conversationId } = req.params;
+    const userId = req.user._id;
+
+    const conversation = await Conversation.findById(conversationId).populate({
+        path: "participants",
+        select: "_id fullname profilePicture"
+    });
+
+    if (!conversation) {
+        return res.status(404).json(new ApiResponse(404, null, "Conversation not found"));
+    }
+
+    const currentUser = conversation.participants.find(
+        (p) => p._id.equals(userId)
+    );
+
+    const otherUser = conversation.participants.find(
+        (p) => !p._id.equals(userId)
+    );
+
+    let connected = false;
+    if (currentUser && otherUser) {
+        const connection = await Connection.findOne({
+            $or: [
+                { first_connect: currentUser._id, second_connect: otherUser._id },
+                { first_connect: otherUser._id, second_connect: currentUser._id }
+            ]
+        });
+        connected = !!connection;
+    }
+
+    return res.status(200).json(
+        new ApiResponse(200, { currentUser, otherUser, connected }, "Conversation meta fetched")
+    );
+})
+
+export { newMessage, fetchConversations, loadConversation, loadConversationMeta };
