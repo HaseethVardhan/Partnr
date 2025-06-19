@@ -177,8 +177,8 @@ const MessagesPage = () => {
 
           let timeDisplay = "now";
           if (diffMin >= 1 && diffMin < 60) timeDisplay = `${diffMin}m`;
-          else if (diffHr < 24) timeDisplay = `${diffHr}h`;
-          else if (diffDay >= 1) timeDisplay = `${diffDay}d`;
+          else if (diffHr != 0 && diffHr < 24) timeDisplay = `${diffHr}h`;
+          else if (diffDay != 0 && diffDay >= 1) timeDisplay = `${diffDay}d`;
 
           return (
             <div

@@ -21,6 +21,7 @@ const Conversation = () => {
   const textareaRef = useRef(null);
   const messageEndRef = useRef(null);
   const containerRef = useRef(null);
+  const prevScrollHeight = useRef(0);
 
   const fetchConversationMeta = async () => {
     try {
@@ -46,6 +47,9 @@ const Conversation = () => {
   const fetchMessages = async () => {
     if (!hasMore || loading) return;
     setLoading(true);
+
+    const container = containerRef.current;
+    prevScrollHeight.current = container.scrollHeight;
 
     try {
       const response = await axios.get(
@@ -114,11 +118,32 @@ const Conversation = () => {
   }, []);
 
   useEffect(() => {
-    if (messageEndRef.current && messages) {
-      messageEndRef.current.scrollIntoView({ behavior: "smooth" });
+    const container = containerRef.current;
+
+    const handleScroll = () => {
+      if (container.scrollTop === 0 && hasMore && !loading) {
+        fetchMessages();
+      }
+    };
+
+    if (container) {
+      container.addEventListener("scroll", handleScroll);
+    }
+
+    return () => {
+      if (container) {
+        container.removeEventListener("scroll", handleScroll);
+      }
+    };
+  }, [hasMore, page]);
+
+  useEffect(() => {
+    const container = containerRef.current;
+    if (container && page > 1) {
+      const newScrollHeight = container.scrollHeight;
+      container.scrollTop = newScrollHeight - prevScrollHeight.current;
     }
   }, [messages]);
-
 
   return (
     <div className="flex flex-col h-screen bg-[#1a1a1a] overflow-auto">
@@ -172,15 +197,18 @@ const Conversation = () => {
           </div>
         </div>
       </div>
-      <div ref={containerRef} className="flex-1 flex-col overflow-y-auto space-y-4">
+      <div
+        ref={containerRef}
+        className="flex-1 flex-col overflow-y-auto space-y-4"
+      >
         {messages.length === 0 && (
           <p className="text-center text-[#aaaaaa] mt-10">No messages yet.</p>
         )}
         {messages.map((message, idx) => (
           <div
             key={message._id + idx}
-           ref={idx === messages.length - 1 ? messageEndRef : null}
-            className={`flex items-end mb-2 px-4 ${
+            ref={idx === messages.length - 1 ? messageEndRef : null}
+            className={`fade-in-message flex items-end mb-2 px-4 ${
               message.senderId === otherUser?._id
                 ? "justify-start"
                 : "justify-end"
