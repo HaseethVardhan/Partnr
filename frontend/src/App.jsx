@@ -21,6 +21,7 @@ import EditProfilePicture from "./pages/EditProfilePicture.jsx";
 import Conversation from "./pages/Conversation.jsx";
 import ViewConnections from "./pages/ViewConnections.jsx";
 import ViewLikes from "./pages/viewLikes.jsx";
+import SettingsPage from "./pages/SettingsPage.jsx";
 
 function App() {
   return (
@@ -169,6 +170,14 @@ function App() {
           element={
             <UserProtectedWrapper>
               <ViewLikes />
+            </UserProtectedWrapper>
+          }
+        />
+        <Route
+          path="/settings"
+          element={
+            <UserProtectedWrapper>
+              <SettingsPage />
             </UserProtectedWrapper>
           }
         />

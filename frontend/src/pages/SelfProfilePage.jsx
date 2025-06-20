@@ -2,7 +2,7 @@ import axios from "axios";
 import { Trefoil } from "ldrs/react";
 import "ldrs/react/Trefoil.css";
 import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 
 const SelfProfilePage = () => {
     const [openSection, setOpenSection] = useState(null);
@@ -18,6 +18,14 @@ const SelfProfilePage = () => {
     const handleToggle = (key) => {
         setOpenSection(openSection === key ? null : key);
     };
+
+    const formatUrl = (url) => {
+  if (!url) return "";
+  return url.startsWith("http://") || url.startsWith("https://")
+    ? url
+    : `http://${url}`;
+};
+
 
     useEffect(() => {
         setLoading(true);
@@ -123,9 +131,9 @@ const SelfProfilePage = () => {
                     <div className="flex flex-col gap-4">
                         {response.data.data.user.links ? (
                             <div className="flex flex-col gap-3">
-                                {response.data.data.user.links.linkedinlink && (
+                                {response.data.data.user.links.linkedInlink && (
                                     <a
-                                        href={response.data.data.user.links.linkedInlink}
+                                        href={formatUrl(response.data.data.user.links.linkedInlink)}
                                         target="_blank"
                                         rel="noopener noreferrer"
                                         className="flex items-center gap-3 px-4 py-2 rounded-lg"
@@ -135,12 +143,12 @@ const SelfProfilePage = () => {
                                             alt="LinkedIn"
                                             className="w-6 h-6 brightness-0 invert-100"
                                         />
-                                        <span className="text-white text-base font-inter font-semibold">{response.data.data.user.links.linkedInlink}</span>
+                                        <span className="text-white text-base font-inter font-semibold overflow-scroll scrollbar-hidden">{response.data.data.user.links.linkedInlink}</span>
                                     </a>
                                 )}
                                 {response.data.data.user.links.xlink && (
                                     <a
-                                        href={response.data.data.user.links.xlink}
+                                        href={formatUrl(response.data.data.user.links.xlink)}
                                         target="_blank"
                                         rel="noopener noreferrer"
                                         className="flex items-center gap-3 px-4 py-2 rounded-lg"
@@ -155,7 +163,7 @@ const SelfProfilePage = () => {
                                 )}
                                 {response.data.data.user.links.portfoliolink && (
                                     <a
-                                        href={response.data.data.user.links.portfoliolink}
+                                        href={formatUrl(response.data.data.user.links.portfoliolink)}
                                         target="_blank"
                                         rel="noopener noreferrer"
                                         className="flex items-center gap-3 px-4 py-2 rounded-lg "
@@ -228,6 +236,7 @@ const SelfProfilePage = () => {
                 </div>
                 <div className="flex flex-row items-center gap-2 px-2">
                     <img
+                        onClick={()=>{navigate('/settings')}}
                         className="h-7 w-6 object-contain"
                         src="https://res.cloudinary.com/dbzcsfi3e/image/upload/v1748781439/Group_dpokwd.png"
                     />

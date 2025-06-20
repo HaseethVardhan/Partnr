@@ -131,6 +131,7 @@ const MessagesPage = () => {
         </div>
         <div className="flex flex-row items-center gap-2 px-2">
           <img
+            onClick={()=>{navigate('/settings')}}
             className="h-7 w-6 object-contain"
             src="https://res.cloudinary.com/dbzcsfi3e/image/upload/v1748781439/Group_dpokwd.png"
           />

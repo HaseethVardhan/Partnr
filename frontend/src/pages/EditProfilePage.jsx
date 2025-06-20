@@ -73,11 +73,6 @@ const EditProfilePage = () => {
       setLoading(false);
       return;
     }
-    if (!about.trim()) {
-      setError1("About section cannot be empty.");
-      setLoading(false);
-      return;
-    }
     if(!profession.trim()){
         setError1("Profession cannot be empty.");
         setLoading(false);
