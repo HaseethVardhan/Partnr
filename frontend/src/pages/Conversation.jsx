@@ -20,6 +20,8 @@ const Conversation = () => {
   const [otherUser, setOtherUser] = useState(null);
   const [currentUser, setCurrentUser] = useState(null);
   const [connected, setConnected] = useState(false);
+  const [isPaginating, setIsPaginating] = useState(false);
+
 
   const textareaRef = useRef(null);
   const messageEndRef = useRef(null);
@@ -42,7 +44,6 @@ const Conversation = () => {
       setOtherUser(res.data.data.otherUser);
       setCurrentUser(res.data.data.currentUser);
       setConnected(res.data.data.connected);
-
     } catch (err) {
       console.error("Meta fetch failed", err);
     }
@@ -53,6 +54,7 @@ const Conversation = () => {
     setLoading(true);
 
     const container = containerRef.current;
+    setIsPaginating(true);
     prevScrollHeight.current = container.scrollHeight;
 
     try {
@@ -100,13 +102,13 @@ const Conversation = () => {
 
       // setMessages((prev) => [...prev, response.data.data]);
 
-      if(socket){
+      if (socket) {
         socket.emit("send_message", {
-        conversationId,
-        senderId: currentUser._id,
-        receiverId: otherUser._id,
-        text,
-      });
+          conversationId,
+          senderId: currentUser._id,
+          receiverId: otherUser._id,
+          text,
+        });
       }
 
       setText("");
@@ -114,6 +116,9 @@ const Conversation = () => {
     } catch (err) {
       console.error(err);
     } finally {
+      // setTimeout(() => {
+      //   messageEndRef.current?.scrollIntoView({ behavior: "smooth" });
+      // }, 0);
       setLoading(false);
     }
   };
@@ -153,10 +158,14 @@ const Conversation = () => {
 
   useEffect(() => {
     const container = containerRef.current;
-    if (container && page > 1) {
-      const newScrollHeight = container.scrollHeight;
-      container.scrollTop = newScrollHeight - prevScrollHeight.current;
-    }
+     if (isPaginating && container && page > 1) {
+    const newScrollHeight = container.scrollHeight;
+    container.scrollTop = newScrollHeight - prevScrollHeight.current;
+    setIsPaginating(false); // ✅ Reset after done
+  } else {
+    // Scroll to bottom for normal new message case
+    messageEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }
   }, [messages]);
 
   useEffect(() => {
@@ -166,8 +175,8 @@ const Conversation = () => {
 
     const handleReceiveMessage = (message) => {
       if (message.conversationId === conversationId) {
-      setMessages((prev) => [...prev, message]);
-    }
+        setMessages((prev) => [...prev, message]);
+      }
     };
 
     socket.on("receive_message", handleReceiveMessage);
