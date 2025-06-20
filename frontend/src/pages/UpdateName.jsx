@@ -21,31 +21,34 @@ const UpdateName = () => {
         
         if (!firstName || !lastName) {
             setError('Please fill all the fields.')
+            setLoading(false)
             return
         }
         
         if (!/^[a-zA-Z]+$/.test(firstName) || !/^[a-zA-Z]+$/.test(lastName)) {
             setError('Names can only contain letters.')
+            setLoading(false)
             return
         }
 
-        const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/user/register-user`,{
-            email: user.email,
-            username: user.username,
-            authtype: user.authtype,
-            firstname: firstName,
-            lastname: lastName,
-            password: user.password
-        })
-
-        if(response.status >= 400) {
+        try {
+            const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/user/register-user`,{
+                email: user.email,
+                username: user.username,
+                authtype: user.authtype,
+                firstname: firstName,
+                lastname: lastName,
+                password: user.password
+            })
+                setError('')
+                setuser(response.data.data.user)
+                localStorage.setItem('token', response.data.data.token)
+                navigate('/update-profession')
+        } catch (error) {
             setError(response.data.message)
             navigate('/authentication')
-        } else {
-            setError('')
-            setuser(response.data.data.user)
-            localStorage.setItem('token', response.data.data.token)
-            navigate('/update-profession')
+        }finally{
+            setLoading(false);
         }
 
         setLoading(false)

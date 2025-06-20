@@ -92,8 +92,10 @@ const UpdatePreferences = () => {
                     </div>
                 ))}
         </div>
-        <div className="w-[90%] h-screen flex flex-col items-center justify-end mb-18 gap-5" onClick={()=>{handleSave()}}>
-        <Button text="Save" />
+        <div className="w-[90%] h-screen flex flex-col items-center justify-end mb-18 gap-5" >
+        <div className="w-full" onClick={()=>{handleSave()}}>
+          <Button text="Save" />
+        </div>
       </div>
     </div>
   );

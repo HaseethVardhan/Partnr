@@ -447,7 +447,7 @@ const UserProfilePage = () => {
               </div>
             </div>
             {openSection === section.key && (
-              <div className="w-[90%] mx-auto bg-[#222] rounded-b-lg mb-2">
+              <div className="max-w-100 w-[90%] mx-auto bg-[#222] rounded-b-lg mb-2">
                 {section.content}
               </div>
             )}
