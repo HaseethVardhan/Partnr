@@ -17,6 +17,14 @@ const MessagesPage = () => {
 
   const { incomingMessage } = useContext(SocketContext);
 
+  const sortConversations = (list) => {
+  return [...list].sort((a, b) => {
+    const dateA = new Date(a.latestChat?.createdAt || a.createdAt);
+    const dateB = new Date(b.latestChat?.createdAt || b.createdAt);
+    return dateB - dateA;
+  });
+};
+
   useEffect(() => {
     const fetchConversations = async () => {
       setLoading(true);
@@ -30,8 +38,8 @@ const MessagesPage = () => {
             },
           }
         );
-        setConversations(response.data.data);
-        setOriginalConversations(response.data.data);
+        setConversations(sortConversations(response.data.data));
+        setOriginalConversations(sortConversations(response.data.data));
       } catch (error) {
         console.log(error);
       } finally {
@@ -44,21 +52,44 @@ const MessagesPage = () => {
   useEffect(() => {
     if (!incomingMessage) return;
 
-    // Update the relevant conversation with the new message
-    setConversations((prevConversations) =>
-      prevConversations.map((conv) => {
-        if (conv.conversationId === incomingMessage.conversationId) {
-          return {
-            ...conv,
-            latestChat: {
-              text: { text: incomingMessage.text },
-              createdAt: incomingMessage.createdAt,
-            },
-          };
-        }
-        return conv;
-      })
-    );
+    setConversations((prevConversations) => {
+  const existing = prevConversations.find(
+    (conv) => conv.conversationId === incomingMessage.conversationId
+  );
+
+  let updated;
+
+  if (existing) {
+    updated = prevConversations.map((conv) => {
+      if (conv.conversationId === incomingMessage.conversationId) {
+        return {
+          ...conv,
+          latestChat: {
+            text: { text: incomingMessage.text },
+            createdAt: incomingMessage.createdAt,
+          },
+        };
+      }
+      return conv;
+    });
+  } else {
+    updated = [
+      ...prevConversations,
+      {
+        conversationId: incomingMessage.conversationId,
+        otherUser: incomingMessage.sender, // assume you get it in incomingMessage
+        latestChat: {
+          text: { text: incomingMessage.text },
+          createdAt: incomingMessage.createdAt,
+        },
+      },
+    ];
+  }
+
+  return sortConversations(updated);
+});
+
+
 
   }, [incomingMessage]);
 
