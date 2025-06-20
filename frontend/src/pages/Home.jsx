@@ -81,7 +81,7 @@ const Home = () => {
           <p className="text-[#aaaaaa] font-inter font-[500] text-lg">{error}</p>
         </div>
       )}
-      <div className="flex flex-row items-center justify-between px-6 py-10">
+      <div className="flex flex-row items-center justify-between px-6 mt-6">
         <div className="font-poppins font-[700] text-3xl text-white">
           Partnr
         </div>
@@ -92,7 +92,8 @@ const Home = () => {
           <img src="https://res.cloudinary.com/dbzcsfi3e/image/upload/v1748694120/Vector_1_qwnwxs.png" />
         </div>
       </div>
-      <div className="grid h-[500px] py-6 w-full place-items-center">
+      <div className="flex flex-col h-[75%] w-full items-center justify-between">
+        <div className="grid h-full w-[80%] place-content-center">
         {cards.map((card) => {
           return (
             <ProfileCard
@@ -103,6 +104,7 @@ const Home = () => {
             />
           );
         })}
+      </div>
       </div>
       <BottomNavbar current="home" />
     </div>

@@ -13,7 +13,7 @@ const BottomNavbar = ({ current }) => {
     };
     
     return (
-    <div className='w-full h-[56px] flex flex-col items-center justify-center fixed bottom-20 z-999'>
+    <div className='w-full h-[56px] flex flex-col items-center justify-center fixed bottom-10 z-999 '>
         <div className='flex flex-row items-center justify-between max-w-54 px-2 w-full h-full border-[4px] border-[#333333] rounded-md'>
             <div onClick={()=>{navigate('/')}} className={`h-[32px] w-[32px] flex items-center ${divStyles.home} justify-center rounded-lg`}><img className='h-8 w-8 object-contain brightness-0 invert-100' src="https://res.cloudinary.com/dbzcsfi3e/image/upload/v1748697872/20250531_185229_rc95eb.png" alt="" /></div>
             <div onClick={()=>{navigate('/messages')}} className={`h-[32px] w-[32px] flex items-center ${divStyles.search} justify-center rounded-lg`}><img className='h-5 w-5 object-contain brightness-0 invert-100' src="https://res.cloudinary.com/dbzcsfi3e/image/upload/v1749285716/mail-add-01_njiiam.png" alt="" /></div>

@@ -231,7 +231,7 @@ const Conversation = () => {
       </div>
       <div
         ref={containerRef}
-        className="flex-1 flex-col overflow-y-auto space-y-4"
+        className="flex-1 flex-col overflow-y-auto space-y-4 scrollbar-hidden"
       >
         {messages.length === 0 && (
           <p className="text-center text-[#aaaaaa] mt-10">No messages yet.</p>

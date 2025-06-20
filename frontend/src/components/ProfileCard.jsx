@@ -105,7 +105,7 @@ const ProfileCard = ({
 
   return (
     <motion.div
-      className="h-130 w-88 origin-bottom rounded-lg bg-[#333333] hover:cursor-grab active:cursor-grabbing px-3"
+      className="max-h-[70vh] max-w-[280px] w-auto sm:max-w-[800px] lg:max-w-[1000px] aspect-[2/3] origin-bottom rounded-lg bg-[#333333] hover:cursor-grab active:cursor-grabbing px-3"
       style={{
         gridRow: 1,
         gridColumn: 1,
@@ -129,11 +129,11 @@ const ProfileCard = ({
       onDragEnd={handleDragEnd}
     >
       <Link to={`/user-profile?userid=${_id}`}>
-        <div className="h-60 w-full mt-3">
+        <div className="aspect-[5/4] w-full mt-3">
           <img
             src={profilePicture}
             alt="Placeholder alt"
-            className="h-full w-full object-cover rounded-lg"
+            className="w-full h-full object-cover rounded-lg"
           />
         </div>
         <div className="flex flex-row items-center justify-between px-1 py-2">
@@ -159,7 +159,7 @@ const ProfileCard = ({
             }`}</div>
           </div>
         </div>
-        <div className="flex flex-col items-start gap-2 justify-between px-1 ">
+        <div className="flex flex-col items-start gap-2 justify-between px-1 max-h-[100px] overflow-y-auto pr-1 scrollbar-thin scrollbar-thumb-gray-500 scrollbar-track-transparent">
           <div className="font-inter font-[500] text-sm text-[#aaaaaa]">
             Key Skills :
           </div>
@@ -175,7 +175,7 @@ const ProfileCard = ({
           </div>
         </div>
       </Link>
-      <div className="flex flex-row items-center justify-end px-1 gap-3">
+      <div className="flex flex-row items-center justify-end px-1 py-2 gap-3">
         <img
           onClick={animateSwipeRight}
           className="h-[32px] w-[32px] object-contain"

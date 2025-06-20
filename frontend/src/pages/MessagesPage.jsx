@@ -217,14 +217,14 @@ const MessagesPage = () => {
               onClick={() =>
                 navigate(`/conversation?conversationId=${conv.conversationId}`)
               }
-              className="flex flex-row items-center cursor-pointer"
+              className="flex flex-row items-center cursor-pointer gap-4"
               style={{
                 overflow: "hidden",
                 whiteSpace: "nowrap",
                 textOverflow: "ellipsis",
               }}
             >
-              <div className="flex flex-row items-center justify-start w-[20%]">
+              <div className="flex flex-row items-center justify-start w-[20%] max-w-13">
                 <img
                   className="h-13 w-13 rounded-full object-cover"
                   src={otherUser?.profilePicture}
