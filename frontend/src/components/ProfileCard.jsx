@@ -25,7 +25,6 @@ const ProfileCard = ({
   const isFront = _id === cards[cards.length - 1]?._id;
 
   const animateSwipeRight = () => {
-    swipedRight();
     x.stop();
     x.set(0);
     animate(x, 200, {
@@ -35,15 +34,16 @@ const ProfileCard = ({
       onUpdate: (latest) => {
         if (latest > 100) {
           x.stop();
+          swipedRight();
         }
       },
     });
   };
 
   const handleDragEnd = () => {
-    if (x.get() > 100) {
+    if (x.get() > 80) {
       swipedRight();
-    } else if (x.get() < -100) {
+    } else if (x.get() < -80) {
       swipedLeft();
     }
   };
@@ -123,7 +123,7 @@ const ProfileCard = ({
         x,
         opacity,
         rotate,
-        transition: "0.125s transform",
+        transition: "transform",
         boxShadow: isFront
           ? "0 20px 25px -5px rgb(0 0 0 / 0.5), 0 8px 10px -6px rgb(0 0 0 / 0.5)"
           : undefined,

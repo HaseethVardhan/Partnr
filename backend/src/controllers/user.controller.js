@@ -1576,6 +1576,13 @@ const getPreferences = asyncHandler(async (req, res) => {
   return res.status(200).json(new ApiResponse(200, preferences, "Preferences fetched successfully"));
 });
 
+const getUserSkills = asyncHandler(async (req, res) => {
+  const skills = await User.findById(req.user._id).select("skills");
+  if (!skills) {
+    return res.status(404).json(new ApiResponse(404, { message: "User not found" }, "User not found"));
+  }
+  return res.status(200).json(new ApiResponse(200, skills, "Skills fetched successfully"));
+})
 
 export {
   isUserNameAvailable,
@@ -1608,5 +1615,6 @@ export {
   fetchNotifications,
   viewConnections,
   viewLikes,
-  getPreferences
+  getPreferences,
+  getUserSkills
 };

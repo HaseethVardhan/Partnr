@@ -6,7 +6,7 @@ import { useNavigate } from "react-router-dom";
 
 const EditProfilePage = () => {
   const [loading, setLoading] = useState(false);
-  
+
   const [error, setError] = useState(null);
   const [error1, setError1] = useState(null);
   const navigate = useNavigate();
@@ -73,10 +73,10 @@ const EditProfilePage = () => {
       setLoading(false);
       return;
     }
-    if(!profession.trim()){
-        setError1("Profession cannot be empty.");
-        setLoading(false);
-        return;
+    if (!profession.trim()) {
+      setError1("Profession cannot be empty.");
+      setLoading(false);
+      return;
     }
     for (let i = 0; i < workArray.length; i++) {
       const w = workArray[i];
@@ -107,39 +107,40 @@ const EditProfilePage = () => {
         return;
       }
     }
-    setLoading(true)
+    setLoading(true);
     const userData = {
-        firstname,
-        lastname,
-        profession,
-        about,
-        workArray,
-        projectsArray,
-        links
-    }
+      firstname,
+      lastname,
+      profession,
+      about,
+      workArray,
+      projectsArray,
+      links,
+    };
 
     const update = async () => {
-        try {
-            const response = await axios.post( `${import.meta.env.VITE_BASE_URL}/user/update-all-details`,
+      try {
+        const response = await axios.post(
+          `${import.meta.env.VITE_BASE_URL}/user/update-all-details`,
           userData,
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("token")}`,
             },
-          })
-          if(response.status === 200){
-            navigate('/profile');
-            setLoading(false);
           }
-        } catch (error) {
-            setError(error);
-            setLoading(false);
-            console.log(error);
+        );
+        if (response.status === 200) {
+          navigate("/profile");
+          setLoading(false);
         }
-    }
+      } catch (error) {
+        setError(error);
+        setLoading(false);
+        console.log(error);
+      }
+    };
 
     update();
-  
   };
 
   useEffect(() => {
@@ -202,7 +203,7 @@ const EditProfilePage = () => {
         </div>
       )}
       {error !== null && (
-        <div className="absolute top-0 left-0 w-full h-full flex items-center justify-center z-50 px-10 ">
+        <div className="w-full flex items-center justify-center z-50 px-10 py-2 bg-[#2a2a2a] rounded mb-2">
           <p className="text-[#aaaaaa] font-inter font-[500] text-lg">
             {error}
           </p>
@@ -210,7 +211,7 @@ const EditProfilePage = () => {
       )}
       <div className="flex items-center justify-between">
         <img
-          onClick={() => navigate(-1)}
+          onClick={() => navigate('/profile')}
           className="h-5 w-6 object-contain"
           src="https://res.cloudinary.com/dbzcsfi3e/image/upload/v1748781336/Vector_5_labewm.png"
         />
@@ -222,10 +223,9 @@ const EditProfilePage = () => {
           Save
         </button>
       </div>
-
       {error1 !== null && (
         <div className="w-full flex flex-row items-center justify-center font-inter text-[#ff857f] text-sm font-[400]">
-            {error1}
+          {error1}
         </div>
       )}
 
@@ -249,17 +249,23 @@ const EditProfilePage = () => {
           onChange={(e) => setProfession(e.target.value)}
         />
         <div>
-        <textarea
-          className="p-2 bg-[#333333] rounded font-inter w-full"
-          placeholder="About"
-          value={about}
-          maxLength={500}
-          onChange={(e) => setAbout(e.target.value)}
+          <textarea
+            className="p-2 bg-[#333333] rounded font-inter w-full"
+            placeholder="About"
+            value={about}
+            maxLength={500}
+            onChange={(e) => setAbout(e.target.value)}
           />
           <p className="flex w-full text-[#aaaaaa] text-xs font-inter font-[400] tracking-[0.5px] px-2 justify-end">
             {about?.length || 0}/500
           </p>
-          </div>
+        </div>
+        <button
+          onClick={() => navigate("/update-skills?type=edit")}
+          className="bg-[#333] text-[#8b5cf6] px-4 py-2 rounded-lg w-full font-inter font-semibold self-end"
+        >
+          Update Skills
+        </button>
       </div>
 
       <div>
@@ -325,8 +331,8 @@ const EditProfilePage = () => {
               }}
             />
             <p className="flex w-full text-[#aaaaaa] text-xs font-inter font-[400] tracking-[0.5px] px-2 justify-end">
-            {work.experience?.length || 0}/200
-          </p>
+              {work.experience?.length || 0}/200
+            </p>
             <button
               onClick={() => handleRemoveWork(i)}
               className="text-red-400 text-left"
@@ -361,22 +367,21 @@ const EditProfilePage = () => {
               }}
             />
             <div>
-
-            <textarea
-              className="p-2 bg-[#333] rounded w-full"
-              placeholder="Project Details"
-              value={proj.details}
-              maxLength={400}
-              onChange={(e) => {
+              <textarea
+                className="p-2 bg-[#333] rounded w-full"
+                placeholder="Project Details"
+                value={proj.details}
+                maxLength={400}
+                onChange={(e) => {
                   const updated = [...projectsArray];
                   updated[i].details = e.target.value;
                   setProjectsArray(updated);
                 }}
-                />
-                <p className="flex w-full text-[#aaaaaa] text-xs font-inter font-[400] tracking-[0.5px] px-2 justify-end">
-            {proj.details?.length || 0}/400
-          </p>
-                </div>
+              />
+              <p className="flex w-full text-[#aaaaaa] text-xs font-inter font-[400] tracking-[0.5px] px-2 justify-end">
+                {proj.details?.length || 0}/400
+              </p>
+            </div>
             <button
               onClick={() => handleRemoveProject(i)}
               className="text-red-400 text-left"

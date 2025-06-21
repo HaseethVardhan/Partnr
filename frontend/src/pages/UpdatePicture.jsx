@@ -120,8 +120,12 @@ const UpdatePicture = () => {
           Change Picture
         </button>
       </div>
-      <div className="w-[90%] h-screen flex flex-col items-center justify-end mb-18 gap-5" onClick={()=>{navigate("/update-preferences")}}>
-        <Button text="Next" />
+      <div className="w-[90%] h-screen flex flex-col items-center justify-end mb-18 gap-5">
+        <div 
+        onClick={()=>{navigate("/update-preferences")}}
+        className="w-full">
+          <Button text="Next" />
+        </div>
       </div>
     </div>
   );
