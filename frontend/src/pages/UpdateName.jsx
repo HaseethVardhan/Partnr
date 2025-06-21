@@ -38,7 +38,7 @@ const UpdateName = () => {
                 authtype: user.authtype,
                 firstname: firstName,
                 lastname: lastName,
-                password: user.password
+                password: user.password || ""
             })
                 setError('')
                 setuser(response.data.data.user)
