@@ -58,7 +58,7 @@ const Authentication = () => {
       document.cookie = name + "=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/";
     });
     window.open(
-      `${import.meta.env.VITE_BASE_URL}/auth/github`,
+      `https://${import.meta.env.VITE_BASE_URL.replace(/^https?:\/\//, '')}/auth/github`,
       "_self"
     );
     setLoading(false);
