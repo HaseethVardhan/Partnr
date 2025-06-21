@@ -92,8 +92,12 @@ const UpdateSkills = () => {
         <div className='flex flex-col w-[90%] gap-2 mt-5'>
             {error && <p className='flex w-full text-[#ff857f] text-[11px] font-inter font-[400] tracking-[0.5px] px-2'>{error}</p>}
         </div>
-        <div className='w-[90%] flex flex-col items-center justify-end mb-18 gap-5' onClick={(e)=>{handleNext(e)}}>
-            <Button text="Next" />
+        <div className='w-[90%] h-screen flex flex-col items-center justify-end mb-18 gap-5'>
+            <div 
+            onClick={(e)=>{handleNext(e)}}
+            className='w-full'>
+                <Button text="Next" />
+            </div>
         </div>
     </div>
   )

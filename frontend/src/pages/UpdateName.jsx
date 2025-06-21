@@ -98,8 +98,12 @@ const UpdateName = () => {
                 </div>
                 {error && <p className='flex w-full text-[#ff857f] text-[11px] font-inter font-[400] tracking-[0.5px] px-2'>{error}</p>}
             </div>
-            <div className='w-[90%] flex flex-col items-center justify-end mb-18' onClick={handleSaveName}>
-                <Button text="Next" />
+            <div className='w-[90%] h-screen flex flex-col items-center justify-end mb-18' onClick={handleSaveName}>
+                <div 
+                onClick={handleSaveName}
+                className='w-full'>
+                    <Button text="Next" />
+                </div>
             </div>
         </div>
     )
