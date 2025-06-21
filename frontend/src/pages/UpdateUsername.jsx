@@ -1,6 +1,6 @@
 import React, { useContext } from "react";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import Button from "../components/Button";
 import { UserDataContext } from "../context/UserContext";
 import { Trefoil } from "ldrs/react";
@@ -10,57 +10,55 @@ const UpdateUsername = () => {
   const { user, setuser } = useContext(UserDataContext);
   const navigate = useNavigate();
 
+  const location = useLocation();
+
   const [username, setUsername] = React.useState("");
   const [error, setError] = React.useState("");
 
   const [loading, setLoading] = React.useState(false);
 
   React.useEffect(() => {
-    setLoading(true);
-    const cookies = document.cookie.split(";").reduce((acc, cookie) => {
-      const [key, value] = cookie.trim().split("=");
-      acc[key] = decodeURIComponent(value);
-      return acc;
-    }, {});
+    
+    const query = new URLSearchParams(location.search);
+    const email = query.get("email");
+    const authtype = query.get("auth") || "google";
+    
+    if (!email) return;
+    
+      const fetchUser = async () => {
+      setLoading(true);
+      try {
+        const response = await axios.post(
+          `${import.meta.env.VITE_BASE_URL}/user/find-user-by-email`,
+          { email }
+        );
 
-    if (cookies?.email) {
-      const func = async () => {
-        try {
-          const response = await axios.post(
-            `${import.meta.env.VITE_BASE_URL}/user/find-user-by-email`,
-            {
-              email: cookies.email,
-            }
+        if (response.data?.data?.userId) {
+          // User already exists, generate token and redirect
+          setuser(response.data.data.userId);
+
+          const tokenResponse = await axios.post(
+            `${import.meta.env.VITE_BASE_URL}/auth/get-token`,
+            { user: response.data.data.userId }
           );
 
-          if(response.data.data.userId) {
-            setuser(response.data.data.userId);
-            const tokenResponse = await axios.post(
-              `${import.meta.env.VITE_BASE_URL}/auth/get-token`, 
-              {
-                user: response.data.data.userId,
-              }
-            );
-            localStorage.removeItem('user');
-            localStorage.setItem('token', tokenResponse.data.data.token);
-            document.cookie.split(";").forEach(function(c) { 
-              document.cookie = c.trim().split("=")[0] + "=;" + "expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/";
-            });
-            navigate("/");
-          }
-        } catch (error) {
-          setuser({
-            email: cookies.email,
-            authtype: "google",
-          });
+          localStorage.removeItem("user");
+          localStorage.setItem("token", tokenResponse.data.data.token);
+          navigate("/");
         }
-      };
+      } catch (err) {
+        // New user, allow them to create a username
+        setuser({ email, authtype });
+      } finally {
+        setLoading(false);
+      }
+    };
 
-      func();
-    }
+    fetchUser();
+
 
     setLoading(false);
-  }, [])
+  }, [location.search])
 
   const handleCreateUsername = async (e) => {
     setLoading(true);
