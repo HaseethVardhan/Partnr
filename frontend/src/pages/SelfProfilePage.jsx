@@ -60,7 +60,7 @@ const SelfProfilePage = () => {
                   icon: "https://res.cloudinary.com/dbzcsfi3e/image/upload/v1749043298/Vector_6_drfg5u.png",
                   label: "About me",
                   content: (
-                    <div className="px-7 py-3 overflow-scroll text-white text-sm max-w-100">
+                    <div className="px-7 py-3 overflow-scroll text-white text-sm max-w-100 scrollbar-hidden">
                       { response.data.data.user.about || "No about available."}
                     </div>
                   ),
@@ -86,7 +86,7 @@ const SelfProfilePage = () => {
                                         <span className="text-sm font-semibold text-[#aaaaaa] py-2">
                                             {formatDate(exp.from)} to {exp.to ? formatDate(exp.to) : "Present"}
                                         </span>
-                                        <span className="text-base text-[#ffffff] font-semibold overflow-scroll">
+                                        <span className="text-base text-[#ffffff] font-semibold overflow-scroll scrollbar-hidden">
                                             {exp.experience}
                                         </span>
                                     </div>
@@ -111,7 +111,7 @@ const SelfProfilePage = () => {
             
                                     <div className="flex flex-col gap-1">
                                         <span className="text-xl font-poppins font-bold text-[#ffffff]">{project.title}</span>
-                                        <span className="text-base text-[#ffffff] font-semibold overflow-scroll">{project.details}</span>
+                                        <span className="text-base text-[#ffffff] font-semibold overflow-scroll scrollbar-hidden">{project.details}</span>
                                     </div>
                                 
                             ))}
@@ -158,7 +158,7 @@ const SelfProfilePage = () => {
                                             alt="X"
                                             className="w-6 h-6"
                                         />
-                                        <span className="text-white text-base font-inter font-semibold">{response.data.data.user.links.xlink}</span>
+                                        <span className="text-white text-base font-inter font-semibold overflow-scroll scrollbar-hidden">{response.data.data.user.links.xlink}</span>
                                     </a>
                                 )}
                                 {response.data.data.user.links.portfoliolink && (
@@ -173,7 +173,7 @@ const SelfProfilePage = () => {
                                             alt="Portfolio"
                                             className="w-6 h-6"
                                         />
-                                        <span className="text-white text-base font-inter font-semibold">{response.data.data.user.links.portfoliolink}</span>
+                                        <span className="text-white text-base font-inter font-semibold overflow-scroll scrollbar-hidden">{response.data.data.user.links.portfoliolink}</span>
                                     </a>
                                 )}
                             </div>

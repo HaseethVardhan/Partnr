@@ -140,7 +140,7 @@ const UserProfilePage = () => {
               icon: "https://res.cloudinary.com/dbzcsfi3e/image/upload/v1749043298/Vector_6_drfg5u.png",
               label: "About me",
               content: (
-                <div className="px-7 py-3 overflow-scroll text-white text-sm">
+                <div className="px-7 py-3 overflow-scroll text-white text-sm scrollbar-hidden">
                   {response.data.data.user.about || "No about available."}
                 </div>
               ),
@@ -172,7 +172,7 @@ const UserProfilePage = () => {
                               {formatDate(exp.from)} to{" "}
                               {exp.to ? formatDate(exp.to) : "Present"}
                             </span>
-                            <span className="text-base text-[#ffffff] font-semibold overflow-scroll">
+                            <span className="text-base text-[#ffffff] font-semibold overflow-scroll scrollbar-hidden">
                               {exp.experience}
                             </span>
                           </div>
@@ -192,17 +192,17 @@ const UserProfilePage = () => {
               icon: "https://res.cloudinary.com/dbzcsfi3e/image/upload/v1749043298/Vector_8_g8govl.png",
               label: "Projects",
               content: (
-                <div className="px-7 py-3 text-white text-sm">
+                <div className="px-7 py-3 text-white text-sm scrollbar-hidden">
                   {response.data.data.user.projectsArray &&
                   response.data.data.user.projectsArray.length > 0 ? (
-                    <div className="flex flex-col gap-4 w-[90%]">
+                    <div className="flex flex-col gap-4 w-[90%] scrollbar-hidden">
                       {response.data.data.user.projectsArray.map(
                         (project, idx) => (
                           <div className="flex flex-col gap-1">
                             <span className="text-xl font-poppins font-bold text-[#ffffff]">
                               {project.title}
                             </span>
-                            <span className="text-base text-[#ffffff] font-semibold overflow-scroll">
+                            <span className="text-base text-[#ffffff] font-semibold overflow-scroll scrollbar-hidden">
                               {project.details}
                             </span>
                           </div>
@@ -220,11 +220,11 @@ const UserProfilePage = () => {
               icon: "https://res.cloudinary.com/dbzcsfi3e/image/upload/v1749043298/prime_link_hq2avd.png",
               label: "Links",
               content: (
-                <div className="px-7 py-3 text-white text-sm">
+                <div className="px-7 py-3 text-white text-sm scrollbar-hidden">
                   <div className="flex flex-col gap-4">
                     {response.data.data.user.links ? (
                       <div className="flex flex-col gap-3">
-                        {response.data.data.user.links.linkedinlink && (
+                        {response.data.data.user.links.linkedInlink && (
                           <a
                             href={response.data.data.user.links.linkedInlink}
                             target="_blank"
@@ -236,7 +236,7 @@ const UserProfilePage = () => {
                               alt="LinkedIn"
                               className="w-6 h-6 brightness-0 invert-100"
                             />
-                            <span className="text-white text-base font-inter font-semibold">
+                            <span className="text-white text-base font-inter font-semibold overflow-scroll scrollbar-hidden">
                               {response.data.data.user.links.linkedInlink}
                             </span>
                           </a>
@@ -253,7 +253,7 @@ const UserProfilePage = () => {
                               alt="X"
                               className="w-6 h-6"
                             />
-                            <span className="text-white text-base font-inter font-semibold">
+                            <span className="text-white text-base font-inter font-semibold overflow-scroll scrollbar-hidden">
                               {response.data.data.user.links.xlink}
                             </span>
                           </a>
@@ -270,7 +270,7 @@ const UserProfilePage = () => {
                               alt="Portfolio"
                               className="w-6 h-6"
                             />
-                            <span className="text-white text-base font-inter font-semibold">
+                            <span className="text-white text-base font-inter font-semibold overflow-scroll scrollbar-hidden">
                               {response.data.data.user.links.portfoliolink}
                             </span>
                           </a>
@@ -408,7 +408,7 @@ const UserProfilePage = () => {
               Disconnect
             </div>
             <div
-            onClick={()=>{navigate(`/conversation?userId=${searchParams.get("userid")}`)}}
+            onClick={()=>{navigate(`/conversation?conversationId=${user.conversationId}`)}}
             className="flex flex-row items-center justify-center max-w-50 w-full py-3 bg-[#333333] rounded-lg font-inter font-[500] text-base tracking-[0.5px] text-white">
               Message
             </div>
@@ -419,7 +419,7 @@ const UserProfilePage = () => {
         {sections.map((section) => (
           <React.Fragment key={section.key}>
             <div
-              className="flex flex-row align- items-center justify-between px-5 max-w-100 w-[90%] py-5 bg-[#333333] rounded-lg font-inter font-[500] text-sm tracking-[1px] text-white cursor-pointer"
+              className="flex flex-row align- items-center justify-between px-5 max-w-100 w-[90%] py-5 bg-[#333333] rounded-lg font-inter font-[500] text-sm tracking-[1px] text-white cursor-pointer scrollbar-hidden"
               onClick={() => handleToggle(section.key)}
             >
               <div className="flex flex-row items-center gap-3">
@@ -441,7 +441,7 @@ const UserProfilePage = () => {
               </div>
             </div>
             {openSection === section.key && (
-              <div className="max-w-100 w-[90%] mx-auto bg-[#222] rounded-b-lg mb-2">
+              <div className="max-w-100 w-[90%] mx-auto bg-[#222] rounded-b-lg mb-2 scrollbar-hidden">
                 {section.content}
               </div>
             )}

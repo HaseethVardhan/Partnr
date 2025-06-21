@@ -1,7 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import axios from "axios";
 import { useNavigate, Link } from "react-router-dom";
 import { animate, motion, useMotionValue, useTransform } from "framer-motion";
+import { UserDataContext } from "../context/UserContext";
 
 const ProfileCard = ({
   _id,
@@ -18,7 +19,10 @@ const ProfileCard = ({
   const opacity = useTransform(x, [-150, 0, 150], [0.7, 1, 0.7]);
   const rotate = rotateRaw;
 
-  const isFront = _id === cards[cards.length - 1]._id;
+  const { tempExcludedIds, setTempExcludedIds } = useContext(UserDataContext);
+
+
+  const isFront = _id === cards[cards.length - 1]?._id;
 
   const animateSwipeRight = () => {
     swipedRight();
@@ -46,6 +50,7 @@ const ProfileCard = ({
 
   const swipedRight = async () => {
     setCards((pv) => pv.filter((v) => v._id !== _id));
+    setTempExcludedIds((prev) => [...prev, _id]);
     try {
       const response = await axios.post(
         `${import.meta.env.VITE_BASE_URL}/user/swipe-right`,
@@ -59,11 +64,15 @@ const ProfileCard = ({
       
     } catch (error) {
       console.log(error);
+    } finally {
+      setTempExcludedIds((prev) => prev.filter((id) => id !== _id));
     }
   };
 
   const swipedLeft = async () => {
     setCards((pv) => pv.filter((v) => v._id !== _id));
+    setTempExcludedIds((prev) => [...prev, _id]);
+
     try {
       const response = await axios.post(
         `${import.meta.env.VITE_BASE_URL}/user/swipe-left`,
@@ -77,6 +86,8 @@ const ProfileCard = ({
       console.log(response);
     } catch (error) {
       console.log(error);
+    } finally {
+      setTempExcludedIds((prev) => prev.filter((id) => id !== _id));
     }
   };
 
@@ -159,7 +170,7 @@ const ProfileCard = ({
             }`}</div>
           </div>
         </div>
-        <div className="flex flex-col items-start gap-2 justify-between px-1 max-h-[100px] overflow-y-auto pr-1 scrollbar-thin scrollbar-thumb-gray-500 scrollbar-track-transparent">
+        <div className="flex flex-col items-start gap-2 justify-between px-1 max-h-[100px] overflow-y-auto pr-1 scrollbar-hidden">
           <div className="font-inter font-[500] text-sm text-[#aaaaaa]">
             Key Skills :
           </div>

@@ -787,69 +787,43 @@ const login = asyncHandler(async (req, res) => {
 
 const suggestedUsers = asyncHandler(async (req, res) => {
   const user = await User.findById(req.user._id);
-  const halfSwipedUsers = user.halfSwipedArray || [];
-  const halfSwipedLimit = Math.min(5, halfSwipedUsers.length);
+  const { SwipedArray, halfSwipedArray, preferences, _id } = user;
 
-  const halfSwipedResults = await User.find(
-    {
-      _id: {
-        $in: halfSwipedUsers.slice(0, halfSwipedLimit),
-        $nin: user.SwipedArray,
-      },
+  const excludedUsers = [...SwipedArray, ...halfSwipedArray, _id];
+  const halfSwipedLimit = 5;
+
+  const halfSwipedResults = await User.find({
+    _id: {
+      $in: halfSwipedArray,
+      $nin: SwipedArray,
     },
-    {
-      fullname: 1,
-      profession: 1,
-      skills: 1,
-      profilePicture: 1,
-      _id: 1,
-    }
-  );
-
-  const excludedUsers = [...user.SwipedArray, ...halfSwipedUsers, user._id];
+  })
+    .select("fullname profession skills profilePicture _id")
+    .limit(halfSwipedLimit);
 
   const skillsLimit = 10 - halfSwipedResults.length;
 
   let skillsResults = [];
   if (skillsLimit > 0) {
-    skillsResults = await User.find(
-      {
-        _id: { $nin: excludedUsers },
-        skills: { $in: user.preferences },
-      },
-      {
-        fullname: 1,
-        profession: 1,
-        skills: 1,
-        profilePicture: 1,
-        _id: 1,
-      }
-    ).limit(skillsLimit);
+    skillsResults = await User.find({
+      _id: { $nin: excludedUsers },
+      skills: { $in: preferences },
+    })
+      .select("fullname profession skills profilePicture _id")
+      .limit(skillsLimit);
   }
 
   const recommended = [...halfSwipedResults, ...skillsResults];
 
-  if (recommended.length === 0) {
-    return res
-      .status(200)
-      .json(
-        new ApiResponse(
-          200,
-          { msg: "No recommended users found" },
-          "No recommended users found"
-        )
-      );
-  }
-
-  return res
-    .status(201)
-    .json(
-      new ApiResponse(
-        201,
-        { users: recommended, msg: "Recommended users fetched successfully" },
-        "Recommended users fetched successfully"
-      )
-    );
+  return res.status(200).json(
+    new ApiResponse(200, {
+      users: recommended,
+      msg:
+        recommended.length === 0
+          ? "No recommended users found"
+          : "Recommended users fetched successfully",
+    })
+  );
 });
 
 const fetchUserDetailsForProfile = asyncHandler(async (req, res) => {
@@ -906,6 +880,15 @@ const fetchUserDetailsForProfile = asyncHandler(async (req, res) => {
       }
     }
   }
+  
+  let conversationId = "";
+  if (connectionStatus === "connected") {
+    const participants = [req.user._id, user._id].sort();
+    const conversation = await Conversation.findOne({ participants });
+    if (conversation) {
+      conversationId = conversation._id;
+    }
+  }
 
   const userDetails = {
     fullname:
@@ -927,7 +910,9 @@ const fetchUserDetailsForProfile = asyncHandler(async (req, res) => {
       ? { links: user.links }
       : {}),
     connectionStatus,
+    conversationId
   };
+
 
   return res
     .status(200)
@@ -1583,6 +1568,15 @@ const viewLikes = asyncHandler(async (req, res) => {
     );
 });
 
+const getPreferences = asyncHandler(async (req, res) => {
+  const preferences = await User.findById(req.user._id).select("preferences");
+  if (!preferences) {
+    return res.status(404).json(new ApiResponse(404, { message: "User not found" }, "User not found"));
+  }
+  return res.status(200).json(new ApiResponse(200, preferences, "Preferences fetched successfully"));
+});
+
+
 export {
   isUserNameAvailable,
   isMailExists,
@@ -1614,4 +1608,5 @@ export {
   fetchNotifications,
   viewConnections,
   viewLikes,
+  getPreferences
 };

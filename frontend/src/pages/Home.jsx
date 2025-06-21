@@ -8,59 +8,54 @@ import { UserDataContext } from "../context/UserContext";
 import { useNavigate } from "react-router-dom";
 
 const Home = () => {
-
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
-  const [limit, setLimit] = useState(5);
-
-  // const [cards, setCards] = useState([]);
-  const { cards, setCards } = useContext(UserDataContext);
-  let reload = cards.length > 0 ? false: true;
+  const { cards, setCards, shouldRefetch, setShouldRefetch, tempExcludedIds } =
+    useContext(UserDataContext);
 
   useEffect(() => {
-    setLoading(true);
-    if (cards.length < limit && reload) {
-      const fetchCards = async () => {
-        try {
-          const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/user/suggested-users`,{},{
-                headers: {
-                    Authorization : `Bearer ${localStorage.getItem('token')}`
-                }
-            });
-          if(response.status === 201){
-            if(response.data.data.users.length < 5){
-              setLimit(0);
-            }
-            setCards((prevCards) => [...prevCards, ...response.data.data.users]);
-            setError(null);
-            setLoading(false)
-            
-          }else{
-
-            setLimit(0);
-            setError("No relevant users found. Please change your preferences or try again later.");
-            setLoading(false)
+    const fetchCards = async () => {
+      setLoading(true);
+      try {
+        const response = await axios.post(
+          `${import.meta.env.VITE_BASE_URL}/user/suggested-users`,
+          {},
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
           }
-        } catch (error) {
-          console.error("Error fetching cards:", error);
-          setLoading(false);
-        } finally {
-          setLoading(false);
+        );
+
+        const fetchedUsers = response.data.data.users || [];
+
+        if (fetchedUsers.length > 0) {
+          const filteredUsers = fetchedUsers.filter(
+            (user) => !tempExcludedIds.includes(user._id)
+          );
+          setCards((prev) => [...prev, ...filteredUsers]);
+          setError(null);
+        } else if (cards.length === 0) {
+          setError(
+            "No relevant users found. Please change your preferences or try again later."
+          );
         }
-      };
-      fetchCards();
-      }else{
+      } catch (err) {
+        console.error("Error fetching cards:", err);
+        setError("Something went wrong. Please try again later.");
+      } finally {
         setLoading(false);
+        setShouldRefetch(false); // disable refetch until explicitly needed
       }
-      if(cards.length === 0){
-          setError("No relevant users found. Please change your preferences or try again later.");
-          setLoading(false)
-      }
-      
-  }, [cards]);  
+    };
+
+    if ((cards.length < 3 && shouldRefetch) || cards.length === 0) {
+      fetchCards();
+    }
+  }, [cards, shouldRefetch]);
 
   return (
     <div className="flex flex-col relative h-screen">
@@ -78,7 +73,9 @@ const Home = () => {
       )}
       {error !== null && (
         <div className="absolute top-0 left-0 w-full h-full flex items-center justify-center z-50 px-10 ">
-          <p className="text-[#aaaaaa] font-inter font-[500] text-lg">{error}</p>
+          <p className="text-[#aaaaaa] font-inter font-[500] text-lg">
+            {error}
+          </p>
         </div>
       )}
       <div className="flex flex-row items-center justify-between px-6 mt-6">
@@ -86,30 +83,31 @@ const Home = () => {
           Partnr
         </div>
         <div
-        onClick={()=>{navigate('/update-preferences')}} 
-        className="z-999"
+          onClick={() => {
+            navigate("/update-preferences");
+          }}
+          className="z-999"
         >
           <img src="https://res.cloudinary.com/dbzcsfi3e/image/upload/v1748694120/Vector_1_qwnwxs.png" />
         </div>
       </div>
       <div className="flex flex-col h-[75%] w-full items-center justify-between">
         <div className="grid h-full w-[80%] place-content-center">
-        {cards.map((card) => {
-          return (
-            <ProfileCard
-              key={card._id}
-              cards={cards}
-              setCards={setCards}
-              {...card}
-            />
-          );
-        })}
-      </div>
+          {cards.map((card) => {
+            return (
+              <ProfileCard
+                key={card._id}
+                cards={cards}
+                setCards={setCards}
+                {...card}
+              />
+            );
+          })}
+        </div>
       </div>
       <BottomNavbar current="home" />
     </div>
   );
 };
-   
+
 export default Home;
- 

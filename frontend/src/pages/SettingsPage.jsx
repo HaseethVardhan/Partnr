@@ -5,12 +5,14 @@ import { SocketContext } from "../context/SocketContext"
 
 const SettingsPage = () => {
   const navigate = useNavigate();
-  const {setuser} = useContext(UserDataContext)
+  const {setuser, setShouldRefetch, setTempExcludedIds} = useContext(UserDataContext)
   const {socket} = useContext(SocketContext)
 
     const logout = () => {
         localStorage.clear();
         setuser({})
+        setShouldRefetch(true);
+        setTempExcludedIds([])
         if (socket) {
             socket.disconnect();
         }

@@ -128,7 +128,7 @@ const NotificationPage = () => {
         <div className="flex flex-row font-inter font-[500] text-sm text-white px-4 mb-3 tracking-[0.5px]">
           Connection Requests
         </div>
-        <div className="flex flex-col">
+        <div className="flex flex-col w-full">
           {connectionNotifications.length === 0 ? (
             <div className="text-[#aaaaaa] font-inter font-[400] text-sm px-4 py-2">
               No connection requests.
@@ -137,22 +137,22 @@ const NotificationPage = () => {
             connectionNotifications.map((notification, idx) => (
               <div
                 key={idx}
-                className="flex flex-row items-center justify-between h-20"
+                className="flex flex-row items-center justify-between w-full h-20"
               >
                 <div
                 onClick={()=>{navigate(`/user-profile?userid=${notification.user._id}`)}}
-                className="flex flex-row items-center w-[50%]">
-                  <div className="flex flex-row items-center justify-center w-full h-full">
+                className="flex flex-row justify-start items-center">
+                  <div className="flex flex-row items-center justify-start px-3 w-30">
                     <img
                       className="h-15 w-15 rounded-full object-cover"
                       src={notification.user.profilePicture}
                     />
                   </div>
-                  <div className="font-inter font-[300] text-xs text-[#f4f4f4] tracking-[0.5px] leading-4.4">
+                  <div className="font-inter font-[300] text-xs text-[#f4f4f4] tracking-[0.5px] leading-4.4 w-full">
                     @{notification.user.username} made a connection request.
                   </div>
                 </div>
-                <div className="flex flex-row items-center justify-end gap-2 w-[50%]">
+                <div className="flex flex-row items-center justify-end px-2 gap-2">
                   <button
                     onClick={() => {
                       acceptConnection(notification.user._id, idx);
@@ -171,6 +171,7 @@ const NotificationPage = () => {
                   </button>
                 </div>
               </div>
+              
             ))
           )}
         </div>

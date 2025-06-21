@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { body } from "express-validator";
-import { isMailExists, isUserNameAvailable, getProfile, registerUser, updateProfession, updateSkills, updateBio, updateLinks, updateProjects, updateWork, updatePicture, getUserPicture, updatePreferences, findUserByEmail, login, suggestedUsers, fetchUserDetailsForProfile, newConnection, fetchSelfDetails, updateAllDetails, acceptConnection, rejectConnection, disconnect, swipeRight, swipeLeft, updateSocketId, fetchNotifications, viewConnections, viewLikes } from "../controllers/user.controller.js";
+import { isMailExists, isUserNameAvailable, getProfile, registerUser, updateProfession, updateSkills, updateBio, updateLinks, updateProjects, updateWork, updatePicture, getUserPicture, updatePreferences, findUserByEmail, login, suggestedUsers, fetchUserDetailsForProfile, newConnection, fetchSelfDetails, updateAllDetails, acceptConnection, rejectConnection, disconnect, swipeRight, swipeLeft, updateSocketId, fetchNotifications, viewConnections, viewLikes, getPreferences } from "../controllers/user.controller.js";
 import { verifyUser } from "../middlewares/auth.middleware.js";
 import { upload } from "../middlewares/multer.middleware.js";
 
@@ -117,5 +117,7 @@ router.route('/fetch-notifications').post(verifyUser, fetchNotifications)
 router.route('/view-connections').post(verifyUser, viewConnections)
 
 router.route('/view-likes').post(verifyUser, viewLikes)
+
+router.route('/get-preferences').post(verifyUser, getPreferences)
 
 export default router
