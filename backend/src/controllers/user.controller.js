@@ -103,7 +103,6 @@ const getProfile = asyncHandler(async (req, res) => {
 });
 
 const registerUser = asyncHandler(async (req, res) => {
-  console.log(req.body);
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res
@@ -133,7 +132,7 @@ const registerUser = asyncHandler(async (req, res) => {
       );
   }
 
-  if (authtype === "google") {
+  if (authtype === "google" || authtype === 'github') {
     const newUser = await User.create({
       email,
       username,

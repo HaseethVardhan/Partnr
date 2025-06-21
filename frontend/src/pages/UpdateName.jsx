@@ -32,7 +32,6 @@ const UpdateName = () => {
         }
 
         try {
-            console.log(user.email, user.username, user.authtype, firstName, lastName, user.password)
             const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/user/register-user`,{
                 email: user.email,
                 username: user.username,
