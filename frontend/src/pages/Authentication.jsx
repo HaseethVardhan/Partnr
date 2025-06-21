@@ -142,8 +142,8 @@ const Authentication = () => {
       } catch (error) {
         setError(error.response.data.message);
       }
-      setLoading(false);
     }
+    setLoading(false);
   };
 
   return (
