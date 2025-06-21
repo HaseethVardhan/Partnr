@@ -7,93 +7,93 @@ import { Trefoil } from "ldrs/react";
 import "ldrs/react/Trefoil.css";
 
 const UpdateUsername = () => {
-  const { user, setuser } = useContext(UserDataContext);
-  const navigate = useNavigate();
+  // const { user, setuser } = useContext(UserDataContext);
+  // const navigate = useNavigate();
 
-  const location = useLocation();
+  // const location = useLocation();
 
   const [username, setUsername] = React.useState("");
   const [error, setError] = React.useState("");
 
   const [loading, setLoading] = React.useState(false);
 
-  React.useEffect(() => {
-    console.log('hi')
-    const query = new URLSearchParams(location.search);
-    const email = query.get("email");
-    const authtype = query.get("auth") || "google";
+  // React.useEffect(() => {
+  //   console.log('hi')
+  //   const query = new URLSearchParams(location.search);
+  //   const email = query.get("email");
+  //   const authtype = query.get("auth") || "google";
     
-    if (!email) return;
+  //   if (!email) return;
     
-      const fetchUser = async () => {
-      setLoading(true);
-      try {
-        const response = await axios.post(
-          `${import.meta.env.VITE_BASE_URL}/user/find-user-by-email`,
-          { email }
-        );
+  //     const fetchUser = async () => {
+  //     setLoading(true);
+  //     try {
+  //       const response = await axios.post(
+  //         `${import.meta.env.VITE_BASE_URL}/user/find-user-by-email`,
+  //         { email }
+  //       );
 
-        if (response.data?.data?.userId) {
-          // User already exists, generate token and redirect
-          setuser(response.data.data.userId);
+  //       if (response.data?.data?.userId) {
+  //         // User already exists, generate token and redirect
+  //         setuser(response.data.data.userId);
 
-          const tokenResponse = await axios.post(
-            `${import.meta.env.VITE_BASE_URL}/auth/get-token`,
-            { user: response.data.data.userId }
-          );
+  //         const tokenResponse = await axios.post(
+  //           `${import.meta.env.VITE_BASE_URL}/auth/get-token`,
+  //           { user: response.data.data.userId }
+  //         );
 
-          localStorage.removeItem("user");
-          localStorage.setItem("token", tokenResponse.data.data.token);
-          navigate("/");
-        }
-      } catch (err) {
-        // New user, allow them to create a username
-        setuser({ email, authtype });
-      } finally {
-        setLoading(false);
-      }
-    };
+  //         localStorage.removeItem("user");
+  //         localStorage.setItem("token", tokenResponse.data.data.token);
+  //         navigate("/");
+  //       }
+  //     } catch (err) {
+  //       // New user, allow them to create a username
+  //       setuser({ email, authtype });
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   };
 
-    fetchUser();
+  //   fetchUser();
 
 
-    setLoading(false);
-  }, [location.search])
+  //   setLoading(false);
+  // }, [location.search])
 
-  const handleCreateUsername = async (e) => {
-    setLoading(true);
-    e.preventDefault();
+  // const handleCreateUsername = async (e) => {
+  //   setLoading(true);
+  //   e.preventDefault();
 
-    if (!username) {
-      setError("Please fill all the fields.");
-    } else if (username.length < 6) {
-      setError("Username must be at least 6 characters long.");
-    } else if (username.length > 20) {
-      setError("Username must be at most 20 characters long.");
-    } else if (/[^a-zA-Z0-9_]/.test(username)) {
-      setError("Username can only contain a-z, A-Z, 0-9 and _.");
-    } else {
-      const response = await axios.post(
-        `${import.meta.env.VITE_BASE_URL}/user/isUserNameAvailable`,
-        {
-          username,
-        }
-      );
+  //   if (!username) {
+  //     setError("Please fill all the fields.");
+  //   } else if (username.length < 6) {
+  //     setError("Username must be at least 6 characters long.");
+  //   } else if (username.length > 20) {
+  //     setError("Username must be at most 20 characters long.");
+  //   } else if (/[^a-zA-Z0-9_]/.test(username)) {
+  //     setError("Username can only contain a-z, A-Z, 0-9 and _.");
+  //   } else {
+  //     const response = await axios.post(
+  //       `${import.meta.env.VITE_BASE_URL}/user/isUserNameAvailable`,
+  //       {
+  //         username,
+  //       }
+  //     );
 
-      if (response.status >= 400) {
-        setError(response.data.message);
-      } else {
-        setError("");
-        setuser({
-          ...user,
-          username: username,
-        });
-        navigate("/update-name");
-      }
-    }
+  //     if (response.status >= 400) {
+  //       setError(response.data.message);
+  //     } else {
+  //       setError("");
+  //       setuser({
+  //         ...user,
+  //         username: username,
+  //       });
+  //       navigate("/update-name");
+  //     }
+  //   }
 
-    setLoading(false);
-  };
+  //   setLoading(false);
+  // };
   return (
     <div className="w-full h-full bg-[#1a1a1a] flex flex-col items-center">
       {loading && (
