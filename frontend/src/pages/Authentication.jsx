@@ -28,6 +28,11 @@ const Authentication = () => {
 
   const isValidEmail = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/g;
 
+  const isStrongPassword = (str) => {
+    // At least 8 chars, 1 uppercase, 1 lowercase, 1 number, 1 special char
+    return /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/.test(str);
+  };
+
   const validateEmail = (mail) => {
     if (mail.match(isValidEmail)) {
       return true;
@@ -111,7 +116,9 @@ const Authentication = () => {
     } else if (!validateEmail(email)) {
       setError("Please enter a valid email address.");
     } else if (password.length < 8) {
-      setError("Password must be at least 8 characters long.");
+      setError("Password must be at least 8 chars, 1 uppercase, 1 lowercase, 1 number, 1 special char.");
+    } else if(!isStrongPassword(password)){
+      setError("Password must be at least 8 chars, 1 uppercase, 1 lowercase, 1 number, 1 special char.");
     } else {
       try {
         const response = await axios.post(
