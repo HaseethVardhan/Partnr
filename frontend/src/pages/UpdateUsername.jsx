@@ -18,7 +18,7 @@ const UpdateUsername = () => {
   const [loading, setLoading] = React.useState(false);
 
   React.useEffect(() => {
-    
+    console.log('hi')
     const query = new URLSearchParams(location.search);
     const email = query.get("email");
     const authtype = query.get("auth") || "google";
