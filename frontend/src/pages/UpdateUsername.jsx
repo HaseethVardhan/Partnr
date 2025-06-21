@@ -137,7 +137,7 @@ const UpdateUsername = () => {
         )}
       </div>
       <div
-        className="w-[90%] h-screen flex flex-col items-center justify-end mb-18"
+        className="w-[90%] flex flex-col items-center justify-end mb-18"
         onClick={(e) => {
           handleCreateUsername(e);
         }}
