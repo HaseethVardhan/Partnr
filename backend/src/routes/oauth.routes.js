@@ -31,7 +31,7 @@ router.get('/github', passport.authenticate('github', {
 }));
 
 router.get('/google/callback', passport.authenticate('google', {
-    failureRedirect: 'http://localhost:5173/authentication',
+    failureRedirect: 'https://partnr.onrender.com/authentication',
     session: false
 }),
 (req,res) => {
@@ -42,15 +42,15 @@ router.get('/google/callback', passport.authenticate('google', {
             sameSite: 'lax',
             maxAge: 5 * 60 * 1000 
           });
-        res.redirect('http://localhost:5173/update-username')
+        res.redirect('https://partnr.onrender.com/update-username')
     } catch (error) {
         console.log(error);
-        res.redirect('http://localhost:5173/authentication')
+        res.redirect('https://partnr.onrender.com/authentication')
     }
 });
 
 router.get('/github/callback', passport.authenticate('github', {
-    failureRedirect: 'http://localhost:5173/authentication',
+    failureRedirect: 'https://partnr.onrender.com/authentication',
     session: false
 }),
 (req,res) => {
@@ -61,10 +61,10 @@ router.get('/github/callback', passport.authenticate('github', {
             sameSite: 'lax',
             maxAge: 5 * 60 * 1000 
           });
-        res.redirect('http://localhost:5173/update-username')
+        res.redirect('https://partnr.onrender.com/update-username')
     } catch (error) {
         console.log(error);
-        res.redirect('http://localhost:5173/authentication')
+        res.redirect('https://partnr.onrender.com/authentication')
     }
 });
 
