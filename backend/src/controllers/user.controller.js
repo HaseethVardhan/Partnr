@@ -787,6 +787,13 @@ const login = asyncHandler(async (req, res) => {
 
 const suggestedUsers = asyncHandler(async (req, res) => {
   const user = await User.findById(req.user._id);
+
+  if (!user.swipeResetAt || (Date.now() - new Date(user.swipeResetAt).getTime()) > 24 * 60 * 60 * 1000) {
+    user.SwipedArray = [];
+    user.swipeResetAt = Date.now();
+    await user.save();
+  }
+
   const { SwipedArray, halfSwipedArray, preferences, _id } = user;
 
   const excludedUsers = [...SwipedArray, ...halfSwipedArray, _id];
@@ -814,6 +821,17 @@ const suggestedUsers = asyncHandler(async (req, res) => {
   }
 
   const recommended = [...halfSwipedResults, ...skillsResults];
+
+  if (recommended.length < 10) {
+    const additionalLimit = 10 - recommended.length;
+    const alreadyIncludedIds = recommended.map(u => u._id.toString());
+    const moreUsers = await User.find({
+      _id: { $nin: [...excludedUsers, ...alreadyIncludedIds] }
+    })
+      .select("fullname profession skills profilePicture _id")
+      .limit(additionalLimit);
+    recommended.push(...moreUsers);
+  }
 
   return res.status(200).json(
     new ApiResponse(200, {
@@ -1331,24 +1349,29 @@ const swipeRight = asyncHandler(async (req, res) => {
   });
 
   // Create a like object and add reference
-  const like = await Like.create({
+  // Check if a like already exists
+  let like = await Like.findOne({
     liked_by: req.user._id,
     liked_to: userId,
   });
 
-  // Add like object to userId's likesArray
-  await User.findByIdAndUpdate(userId, { $addToSet: { likesArray: like._id } });
-
-  const notification = await Notification.create({
-    type: "like",
-    user: req.user._id,
-    like: like._id,
-    expire: Date.now() + 7 * 24 * 60 * 60 * 1000, // 7 days from now
-  });
-
-  await User.findByIdAndUpdate(userId, {
-    $addToSet: { notificationsArray: notification._id },
-  });
+  if (!like) {
+    like = await Like.create({
+      liked_by: req.user._id,
+      liked_to: userId,
+    });
+    await User.findByIdAndUpdate(userId, { $addToSet: { likesArray: like._id } });
+    const notification = await Notification.create({
+      type: "like",
+      user: req.user._id,
+      like: like._id,
+      expire: Date.now() + 7 * 24 * 60 * 60 * 1000, // 7 days from now
+    });
+  
+    await User.findByIdAndUpdate(userId, {
+      $addToSet: { notificationsArray: notification._id },
+    });
+  }
 
   return res
     .status(200)
