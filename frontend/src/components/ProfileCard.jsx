@@ -187,11 +187,11 @@ const ProfileCard = ({
         </div>
       </Link>
       <div className="flex flex-row items-center justify-end px-1 py-2 gap-3">
-        <img
+        {/* <img
           onClick={animateSwipeRight}
           className="h-[32px] w-[32px] object-contain"
           src="https://res.cloudinary.com/dbzcsfi3e/image/upload/v1748710879/iconamoon_heart-light_jililb.png"
-        />
+        /> */}
         {/* <img onClick={bookmark} className='h-[22px] w-[22px] object-contain' src="https://res.cloudinary.com/dbzcsfi3e/image/upload/v1748710879/Vector_4_kq2v16.png"/> */}
       </div>
     </motion.div>
