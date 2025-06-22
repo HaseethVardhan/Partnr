@@ -256,7 +256,7 @@ const Conversation = () => {
           </p>
         </div>
       )} */}
-      <div className="flex flex-row items-center justify-between px-4 py-2">
+      <div className="flex flex-row items-center justify-between px-4 py-4">
         <div className="flex flex-row items-center gap-3">
           <img
             onClick={() => navigate(-1)}
