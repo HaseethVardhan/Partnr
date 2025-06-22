@@ -2,8 +2,8 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import Button from "../components/Button";
-import { Trefoil } from 'ldrs/react'
-import 'ldrs/react/Trefoil.css'
+import { Trefoil } from "ldrs/react";
+import "ldrs/react/Trefoil.css";
 
 const UpdatePicture = () => {
   const [error, setError] = React.useState(null);
@@ -29,7 +29,7 @@ const UpdatePicture = () => {
             },
           }
         );
-  
+
         setImage(response.data.data.picture);
       } catch (error) {
         console.error("Error fetching user data:", error);
@@ -42,16 +42,14 @@ const UpdatePicture = () => {
   const handleFileSelect = async (event) => {
     const file = event.target.files[0];
     if (file && file.size <= 1024 * 1024) {
-
       setSelectedFile(file);
       const formData = new FormData();
       formData.append("picture", file);
-    
+
       setLoading(true);
       setError(null);
 
       try {
- 
         const response = await axios.post(
           `${import.meta.env.VITE_BASE_URL}/user/update-user-picture`,
           formData,
@@ -61,7 +59,7 @@ const UpdatePicture = () => {
             },
           }
         );
-        
+
         setImage(response.data.data.pictureurl);
       } catch (err) {
         setError("Failed to upload image");
@@ -76,20 +74,21 @@ const UpdatePicture = () => {
   const triggerFileInput = () => {
     fileInputRef.current.click();
   };
-  
 
   return (
     <div className="w-full h-full bg-[#1a1a1a] flex flex-col items-center">
-      {loading && <div className="absolute top-0 left-0 w-full h-full flex items-center backdrop-blur-3xl justify-center z-50">
-        <Trefoil
-  size="40"
-  stroke="4"
-  strokeLength="0.15"
-  bgOpacity="0.3"
-  speed="1.4"
-  color="#8b5cf6" 
-/>
-        </div>}
+      {loading && (
+        <div className="absolute top-0 left-0 w-full h-full flex items-center backdrop-blur-3xl justify-center z-50">
+          <Trefoil
+            size="40"
+            stroke="4"
+            strokeLength="0.15"
+            bgOpacity="0.3"
+            speed="1.4"
+            color="#8b5cf6"
+          />
+        </div>
+      )}
       <div className="flex flex-col items-center justify-center w-[90%] gap-1 py-10">
         <div className="text-left w-full">
           <h1 className="font-poppins font-[500] text-3xl tracking-[-0.5px] text-white">
@@ -109,21 +108,32 @@ const UpdatePicture = () => {
         />
       </div>
       <div className="w-full h-full flex flex-col items-center py-8">
-        <button className="flex flex-row w-[90%] items-center justify-center h-12 rounded-lg text-white font-inter font-[500] text-base tracking-[0.5px] border-1 border-[#ffffff5d]" onClick={triggerFileInput}>
-        <input
-    type="file"
-    ref={fileInputRef}
-    onChange={handleFileSelect}
-    accept="image/*"
-    style={{ display: 'none' }}
-  />
+        <button
+          className="flex flex-row w-[90%] items-center justify-center h-12 rounded-lg text-white font-inter font-[500] text-base tracking-[0.5px] border-1 border-[#ffffff5d]"
+          onClick={triggerFileInput}
+        >
+          <input
+            type="file"
+            ref={fileInputRef}
+            onChange={handleFileSelect}
+            accept="image/*"
+            style={{ display: "none" }}
+          />
           Change Picture
         </button>
+        {error && (
+          <p className="flex w-[90%] text-[#ff857f] text-[11px] font-inter font-[400] tracking-[0.5px] px-2">
+            {error}
+          </p>
+        )}
       </div>
       <div className="w-[90%] h-screen flex flex-col items-center justify-end mb-18 gap-5">
-        <div 
-        onClick={()=>{navigate("/update-preferences")}}
-        className="w-full">
+        <div
+          onClick={() => {
+            navigate("/update-preferences");
+          }}
+          className="w-full"
+        >
           <Button text="Next" />
         </div>
       </div>
