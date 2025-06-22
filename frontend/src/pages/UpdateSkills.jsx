@@ -19,9 +19,18 @@ const UpdateSkills = () => {
     "Cloud Computing",
     "UI/UX Design",
     "Data Science",
+    "Data Analysis",
     "Web Development",
     "Frontend Development",
     "Game Development",
+    "Prompt Engineering",
+    "Low-code/No-code Dev",
+    "Ethical Hacking",
+    "Blockchain Technologies",
+    "Competitive Programming",
+    "Product Design",
+    "Testing/QA",
+    "DSA"
   ];
 
   const navigate = useNavigate();
@@ -113,7 +122,7 @@ const UpdateSkills = () => {
           />
         </div>
       )}
-      <div className="flex flex-col items-center justify-center w-[90%] gap-1 py-10">
+      <div className="flex flex-col items-center justify-center w-[90%] gap-1 py-4">
         <div className="text-left w-full">
           <h1 className="font-poppins font-[500] text-3xl tracking-[-0.5px] text-white">
             Pick a Skill
