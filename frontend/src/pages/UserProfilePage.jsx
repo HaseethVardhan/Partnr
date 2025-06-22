@@ -172,7 +172,7 @@ const UserProfilePage = () => {
                               {formatDate(exp.from)} to{" "}
                               {exp.to ? formatDate(exp.to) : "Present"}
                             </span>
-                            <span className="text-base text-[#ffffff] font-semibold overflow-scroll scrollbar-hidden">
+                            <span className=" text-[#ffffff] text-sm overflow-scroll scrollbar-hidden">
                               {exp.experience}
                             </span>
                           </div>
@@ -202,7 +202,7 @@ const UserProfilePage = () => {
                             <span className="text-xl font-poppins font-bold text-[#ffffff]">
                               {project.title}
                             </span>
-                            <span className="text-base text-[#ffffff] font-semibold overflow-scroll scrollbar-hidden">
+                            <span className="text-sm text-[#ffffff] overflow-scroll scrollbar-hidden">
                               {project.details}
                             </span>
                           </div>

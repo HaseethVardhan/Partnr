@@ -86,7 +86,7 @@ const SelfProfilePage = () => {
                                         <span className="text-sm font-semibold text-[#aaaaaa] py-2">
                                             {formatDate(exp.from)} to {exp.to ? formatDate(exp.to) : "Present"}
                                         </span>
-                                        <span className="text-base text-[#ffffff] font-semibold overflow-scroll scrollbar-hidden">
+                                        <span className="text-sm text-[#ffffff] overflow-scroll scrollbar-hidden">
                                             {exp.experience}
                                         </span>
                                     </div>
@@ -111,7 +111,7 @@ const SelfProfilePage = () => {
             
                                     <div className="flex flex-col gap-1">
                                         <span className="text-xl font-poppins font-bold text-[#ffffff]">{project.title}</span>
-                                        <span className="text-base text-[#ffffff] font-semibold overflow-scroll scrollbar-hidden">{project.details}</span>
+                                        <span className="text-sm text-[#ffffff] overflow-scroll scrollbar-hidden">{project.details}</span>
                                     </div>
                                 
                             ))}
