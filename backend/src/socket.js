@@ -47,13 +47,21 @@ io.on("connection", (socket) => {
       const receiverSocketId = userSocketMap.get(receiverId);
       if (receiverSocketId) {
         io.to(receiverSocketId).emit("receive_message", {
-        conversationId,
-        senderId,
-        text,
-        createdAt: new Date(),
-      });
+          conversationId,
+          senderId,
+          text,
+          createdAt: new Date(),
+        });
       }
     }
+  });
+
+  socket.on("typing", ({ conversationId, senderId }) => {
+    socket.to(conversationId).emit("typing", { conversationId, senderId });
+  });
+
+  socket.on("stop_typing", ({ conversationId, senderId }) => {
+    socket.to(conversationId).emit("stop_typing", { conversationId, senderId });
   });
 
   socket.on("disconnect", () => {

@@ -21,7 +21,9 @@ const Conversation = () => {
   const [currentUser, setCurrentUser] = useState(null);
   const [connected, setConnected] = useState(false);
   const [isPaginating, setIsPaginating] = useState(false);
-
+  const [isTyping, setIsTyping] = useState(false);
+  const [typingUsers, setTypingUsers] = useState({});
+  
 
   const textareaRef = useRef(null);
   const messageEndRef = useRef(null);
@@ -131,6 +133,27 @@ const Conversation = () => {
     });
   };
 
+  const onInputChange = (e) => {
+    setText(e.target.value);
+    if (textareaRef.current) {
+      textareaRef.current.style.height = "auto";
+      textareaRef.current.style.height =
+        textareaRef.current.scrollHeight + "px";
+    }
+
+    if (!isTyping) {
+      setIsTyping(true);
+      socket.emit("typing", { conversationId, senderId: currentUser._id });
+    }
+
+    // Debounce stop_typing
+    clearTimeout(window.typingTimeout);
+    window.typingTimeout = setTimeout(() => {
+      socket.emit("stop_typing", { conversationId, senderId: currentUser._id });
+      setIsTyping(false);
+    }, 1500);
+  };
+
   useEffect(() => {
     fetchConversationMeta();
     fetchMessages();
@@ -158,14 +181,14 @@ const Conversation = () => {
 
   useEffect(() => {
     const container = containerRef.current;
-     if (isPaginating && container && page > 1) {
-    const newScrollHeight = container.scrollHeight;
-    container.scrollTop = newScrollHeight - prevScrollHeight.current;
-    setIsPaginating(false); // ✅ Reset after done
-  } else {
-    // Scroll to bottom for normal new message case
-    messageEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }
+    if (isPaginating && container && page > 1) {
+      const newScrollHeight = container.scrollHeight;
+      container.scrollTop = newScrollHeight - prevScrollHeight.current;
+      setIsPaginating(false); // ✅ Reset after done
+    } else {
+      // Scroll to bottom for normal new message case
+      messageEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    }
   }, [messages]);
 
   useEffect(() => {
@@ -185,6 +208,32 @@ const Conversation = () => {
       socket.off("receive_message", handleReceiveMessage);
     };
   }, [socket, conversationId]);
+
+  useEffect(() => {
+    if (!socket || !conversationId || !otherUser?._id) return;
+
+    const handleTyping = ({ senderId }) => {
+      if (senderId !== currentUser._id) {
+        setTypingUsers((prev) => ({ ...prev, [senderId]: true }));
+      }
+    };
+
+    const handleStopTyping = ({ senderId }) => {
+      setTypingUsers((prev) => {
+        const updated = { ...prev };
+        delete updated[senderId];
+        return updated;
+      });
+    };
+
+    socket.on("typing", handleTyping);
+    socket.on("stop_typing", handleStopTyping);
+
+    return () => {
+      socket.off("typing", handleTyping);
+      socket.off("stop_typing", handleStopTyping);
+    };
+  }, [socket, conversationId, currentUser?._id, otherUser]);
 
   return (
     <div className="flex flex-col h-screen bg-[#1a1a1a] overflow-auto">
@@ -288,6 +337,14 @@ const Conversation = () => {
           </div>
         ))}
       </div>
+      {typingUsers[otherUser?._id] && (
+        <div className="flex items-center gap-1 px-4 pb-2 h-6">
+          <span className="w-2 h-2 rounded-full bg-gray-400 animate-[bounce_1.2s_ease-in-out_infinite] [animation-delay:0s]"></span>
+          <span className="w-2 h-2 rounded-full bg-gray-400 animate-[bounce_1.2s_ease-in-out_infinite] [animation-delay:0.2s]"></span>
+          <span className="w-2 h-2 rounded-full bg-gray-400 animate-[bounce_1.2s_ease-in-out_infinite] [animation-delay:0.4s]"></span>
+        </div>
+      )}
+
       <div className="p-4 mb-3 w-full">
         {connected === true ? (
           <form
@@ -304,12 +361,7 @@ const Conversation = () => {
                 rows={1}
                 value={text}
                 onChange={(e) => {
-                  setText(e.target.value);
-                  if (textareaRef.current) {
-                    textareaRef.current.style.height = "auto";
-                    textareaRef.current.style.height =
-                      textareaRef.current.scrollHeight + "px";
-                  }
+                  onInputChange(e);
                 }}
               />
             </div>
