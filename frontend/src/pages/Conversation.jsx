@@ -236,7 +236,7 @@ const Conversation = () => {
   }, [socket, conversationId, currentUser?._id, otherUser]);
 
   return (
-    <div className="flex flex-col h-screen bg-[#1a1a1a] overflow-auto">
+    <div className="flex flex-col h-screen bg-[#1a1a1a] overflow-auto select-none">
       {loading && (
         <div className="absolute top-0 left-0 w-full h-full flex items-center backdrop-blur-3xl justify-center z-50">
           <Trefoil
@@ -256,7 +256,7 @@ const Conversation = () => {
           </p>
         </div>
       )} */}
-      <div className="flex flex-row items-center justify-between px-4 py-4">
+      <div className="flex flex-row items-center justify-between px-4 py-2">
         <div className="flex flex-row items-center gap-3">
           <img
             onClick={() => navigate(-1)}
@@ -317,7 +317,9 @@ const Conversation = () => {
             )}
             <div className={`max-w-xs md:max-w-md break-words`}>
               <div
-                className={`rounded-2xl px-4 py-2 shadow-md ${
+                className={`rounded-2xl px-4 py-2 shadow-md 
+                  "select-none"
+                  ${
                   message.senderId === otherUser?._id
                     ? "bg-violet-600 text-white rounded-br-none"
                     : "bg-[#232323] text-[#eaeaea] rounded-bl-none"
@@ -388,7 +390,7 @@ const Conversation = () => {
               )}
               <textarea
                 ref={textareaRef}
-                className="w-full text-white rounded-lg focus:outline-none resize-none overflow-hidden font-inter max-h-[150px]"
+                className="w-full text-white rounded-lg focus:outline-none resize-none overflow-hidden font-inter max-h-[150px] select-all"
                 placeholder="Type a message..."
                 rows={1}
                 value={text}

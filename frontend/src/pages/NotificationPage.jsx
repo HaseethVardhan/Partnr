@@ -90,7 +90,7 @@ const NotificationPage = () => {
   };
 
   return (
-    <div className="flex flex-col h-screen bg-[#1a1a1a]">
+    <div className="flex flex-col h-screen bg-[#1a1a1a] select-none">
       {loading && (
         <div className="absolute top-0 left-0 w-full h-full flex items-center backdrop-blur-3xl justify-center z-50">
           <Trefoil

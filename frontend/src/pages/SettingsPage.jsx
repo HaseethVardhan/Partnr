@@ -20,7 +20,7 @@ const SettingsPage = () => {
     }
 
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col select-none">
       <div className="flex flex-row items-center justify-between px-4 py-5">
         <div className="flex flex-row items-center gap-3">
           <img

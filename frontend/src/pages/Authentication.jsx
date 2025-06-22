@@ -3,8 +3,8 @@ import { Link, useNavigate } from "react-router-dom";
 import Button from "../components/Button";
 import axios from "axios";
 import { UserDataContext } from "../context/UserContext";
-import { Trefoil } from 'ldrs/react'
-import 'ldrs/react/Trefoil.css'
+import { Trefoil } from "ldrs/react";
+import "ldrs/react/Trefoil.css";
 
 const Authentication = () => {
   const navigate = useNavigate();
@@ -15,8 +15,7 @@ const Authentication = () => {
 
   useEffect(() => {
     if (user._id) {
-      navigate('/'
-        );
+      navigate("/");
     }
   }, []);
 
@@ -48,12 +47,9 @@ const Authentication = () => {
       const name = eqPos > -1 ? cookie.substr(0, eqPos) : cookie;
       document.cookie = name + "=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/";
     });
-    window.open(
-      `${import.meta.env.VITE_BASE_URL}/auth/google`,
-      "_self"
-    );
+    window.open(`${import.meta.env.VITE_BASE_URL}/auth/google`, "_self");
     setLoading(false);
-  }  
+  };
 
   const githubAuth = async () => {
     setLoading(true);
@@ -62,13 +58,9 @@ const Authentication = () => {
       const name = eqPos > -1 ? cookie.substr(0, eqPos) : cookie;
       document.cookie = name + "=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/";
     });
-    window.open(
-      `${import.meta.env.VITE_BASE_URL}/auth/github`,
-      "_self"
-    );
+    window.open(`${import.meta.env.VITE_BASE_URL}/auth/github`, "_self");
     setLoading(false);
-  } 
-
+  };
 
   const handleLogIn = async (e) => {
     setLoading(true);
@@ -80,16 +72,14 @@ const Authentication = () => {
     } else if (password.length < 8) {
       setError("Password must be at least 8 characters long.");
     } else {
-
       try {
         const response = await axios.post(
           `${import.meta.env.VITE_BASE_URL}/user/login`,
           {
             email,
-            password
+            password,
           }
         );
-
 
         if (response.status >= 400) {
           setError(response.data.message);
@@ -99,14 +89,13 @@ const Authentication = () => {
           localStorage.setItem("token", response.data.data.token);
           navigate("/");
         }
-
       } catch (error) {
         setError(error.response.data.message);
       }
 
       setLoading(false);
     }
-  }  
+  };
 
   const handleCreateAccount = async (e) => {
     setLoading(true);
@@ -116,9 +105,13 @@ const Authentication = () => {
     } else if (!validateEmail(email)) {
       setError("Please enter a valid email address.");
     } else if (password.length < 8) {
-      setError("Password must be at least 8 chars, 1 uppercase, 1 lowercase, 1 number, 1 special char.");
-    } else if(!isStrongPassword(password)){
-      setError("Password must be at least 8 chars, 1 uppercase, 1 lowercase, 1 number, 1 special char.");
+      setError(
+        "Password must be at least 8 chars, 1 uppercase, 1 lowercase, 1 number, 1 special char."
+      );
+    } else if (!isStrongPassword(password)) {
+      setError(
+        "Password must be at least 8 chars, 1 uppercase, 1 lowercase, 1 number, 1 special char."
+      );
     } else {
       try {
         const response = await axios.post(
@@ -127,7 +120,7 @@ const Authentication = () => {
             email,
           }
         );
-  
+
         if (response.status >= 400) {
           setError(response.data.message);
         } else {
@@ -147,17 +140,19 @@ const Authentication = () => {
   };
 
   return (
-    <div className="flex flex-col items-center w-screen bg-[#1a1a1a]">
-      {loading && <div className="absolute top-0 left-0 w-full h-full flex items-center backdrop-blur-3xl justify-center z-50">
-        <Trefoil
-  size="40"
-  stroke="4"
-  strokeLength="0.15"
-  bgOpacity="0.3"
-  speed="1.4"
-  color="#8b5cf6" 
-/>
-        </div>}
+    <div className="flex flex-col items-center w-screen bg-[#1a1a1a] select-none">
+      {loading && (
+        <div className="absolute top-0 left-0 w-full h-full flex items-center backdrop-blur-3xl justify-center z-50">
+          <Trefoil
+            size="40"
+            stroke="4"
+            strokeLength="0.15"
+            bgOpacity="0.3"
+            speed="1.4"
+            color="#8b5cf6"
+          />
+        </div>
+      )}
       <div className="mt-10">
         <img
           src={import.meta.env.VITE_app_logo}
@@ -165,28 +160,31 @@ const Authentication = () => {
         />
       </div>
       <div className="flex flex-col items-center justify-center py-6 w-[90%]">
-      {!login ? (
-            <>
+        {!login ? (
+          <>
             <p className="text-white font-poppins font-semibold text-3xl py-2">
-          Sign up Account
-        </p>
-        <p className="text-[#aaaaaa] font-inter font-[400] text-base tracking-[0.8px] text-center">
-          Enter information to create your account
-        </p>
-            </>
-          ) : (
-            <>
-              <p className="text-white font-poppins font-semibold text-3xl py-2">
-          Log in Account
-        </p>
-        <p className="text-[#aaaaaa] font-inter font-[400] text-base tracking-[0.8px] text-center">
-          Enter your credentials to access your account
-        </p>
-            </>
-          )}
+              Sign up Account
+            </p>
+            <p className="text-[#aaaaaa] font-inter font-[400] text-base tracking-[0.8px] text-center">
+              Enter information to create your account
+            </p>
+          </>
+        ) : (
+          <>
+            <p className="text-white font-poppins font-semibold text-3xl py-2">
+              Log in Account
+            </p>
+            <p className="text-[#aaaaaa] font-inter font-[400] text-base tracking-[0.8px] text-center">
+              Enter your credentials to access your account
+            </p>
+          </>
+        )}
       </div>
       <div className="flex flex-col items-center gap-4 text-white font-inter font-[400] text-base w-full tracking-[0.8px] py-4">
-        <button className="flex flex-row w-[90%] bg-[#333333] h-10 rounded-lg gap-3 items-center justify-center" onClick={googleAuth}>
+        <button
+          className="flex flex-row w-[90%] bg-[#333333] h-10 rounded-lg gap-3 items-center justify-center"
+          onClick={googleAuth}
+        >
           <div className="flex items-center justify-end ">
             <img
               className="w-4 "
@@ -197,7 +195,10 @@ const Authentication = () => {
             Continue with Google
           </div>
         </button>
-        <button className="flex flex-row w-[90%] bg-[#333333] h-10 rounded-lg gap-3 items-center justify-center" onClick={githubAuth}>
+        <button
+          className="flex flex-row w-[90%] bg-[#333333] h-10 rounded-lg gap-3 items-center justify-center"
+          onClick={githubAuth}
+        >
           <div className="flex items-center justify-end ">
             <img
               className="w-6 mix-blend-lighten"
@@ -227,7 +228,7 @@ const Authentication = () => {
           Email
         </div>
         <input
-          className="flex flex-row w-[90%] text-white bg-[#333333] h-9 rounded-lg gap-3 placeholder-[#b3b3b3] font-inter font-[400] text-sm px-2"
+          className="flex flex-row w-[90%] text-white bg-[#333333] h-9 rounded-lg gap-3 placeholder-[#b3b3b3] font-inter font-[400] text-sm px-2 select-all"
           type="email"
           placeholder="you@youremail.com"
           value={email}
@@ -241,7 +242,7 @@ const Authentication = () => {
           Password
         </div>
         <input
-          className="flex flex-row w-[90%] text-white bg-[#333333] h-9 rounded-lg gap-3 placeholder-[#b3b3b3] font-inter font-[400] text-sm px-2"
+          className="flex flex-row w-[90%] text-white bg-[#333333] h-9 rounded-lg gap-3 placeholder-[#b3b3b3] font-inter font-[400] text-sm px-2 select-all"
           type="password"
           placeholder="At least 8 characters."
           value={password}
@@ -256,7 +257,7 @@ const Authentication = () => {
         )}
       </div>
       {login ? (
-          <div
+        <div
           className="w-[90%] flex flex-col items-center"
           onClick={(e) => {
             handleLogIn(e);
@@ -264,8 +265,8 @@ const Authentication = () => {
         >
           <Button text="Log In" />
         </div>
-        ) : (
-          <div
+      ) : (
+        <div
           className="w-[90%] flex flex-col items-center"
           onClick={(e) => {
             handleCreateAccount(e);
@@ -273,7 +274,7 @@ const Authentication = () => {
         >
           <Button text="Create Account" />
         </div>
-        )}
+      )}
       <div className="flex flex-col items-center text-center w-full py-6">
         <p className="font-inter font-[500] text-xs tracking-[0.5px] w-[90%] text-[#aaaaaa]">
           By Clicking “Create Account” you agree to our code of conduct, terms
@@ -285,12 +286,22 @@ const Authentication = () => {
           {!login ? (
             <>
               <span>Already have an account?</span>&nbsp;
-              <span className="text-white font-[500]" onClick={()=>setLogin(!login)}>Log In</span>
+              <span
+                className="text-white font-[500]"
+                onClick={() => setLogin(!login)}
+              >
+                Log In
+              </span>
             </>
           ) : (
             <>
               <span>Don't have an account yet?</span>&nbsp;
-              <span className="text-white font-[500]" onClick={()=>setLogin(!login)}>Sign Up</span>
+              <span
+                className="text-white font-[500]"
+                onClick={() => setLogin(!login)}
+              >
+                Sign Up
+              </span>
             </>
           )}
         </p>

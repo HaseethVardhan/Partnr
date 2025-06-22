@@ -40,7 +40,7 @@ const UpdateBio = () => {
     
 
   return (
-    <div className='w-full h-full bg-[#1a1a1a] flex flex-col items-center'>
+    <div className='w-full h-full bg-[#1a1a1a] flex flex-col items-center select-none'>
         {loading && <div className="absolute top-0 left-0 w-full h-full flex items-center backdrop-blur-3xl justify-center z-50">
         <Trefoil
   size="40"
@@ -60,7 +60,7 @@ const UpdateBio = () => {
             </div>
         </div>
         <div className='flex flex-col w-[90%] gap-2'>
-            <textarea className='flex flex-row w-full bg-[#333333] h-70 rounded-xl placeholder-[#aaaaaa] font-inter font-[400] text-sm px-6 py-3 text-white' type="text" maxLength={500} placeholder='Tell us about yourself!' value={bio} onChange={(e)=>setBio(e.target.value)}/>
+            <textarea className='flex flex-row w-full bg-[#333333] h-70 rounded-xl placeholder-[#aaaaaa] font-inter font-[400] text-sm px-6 py-3 text-white select-all'  type="text" maxLength={500} placeholder='Tell us about yourself!' value={bio} onChange={(e)=>setBio(e.target.value)}/>
             <p className='flex w-full text-[#aaaaaa] text-[11px] font-inter font-[400] tracking-[0.5px] px-2 justify-end'>{bio.length}/500</p>
             {error && <p className='flex w-full text-[#ff857f] text-[11px] font-inter font-[400] tracking-[0.5px] px-2'>{error}</p>}
         </div>

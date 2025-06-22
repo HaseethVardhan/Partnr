@@ -189,7 +189,7 @@ const EditProfilePage = () => {
   }, []);
 
   return (
-    <div className="flex flex-col p-5 bg-[#1a1a1a]  text-white gap-6">
+    <div className="flex flex-col p-5 bg-[#1a1a1a]  text-white gap-6 select-none">
       {loading && (
         <div className="absolute top-0 left-0 w-full h-screen flex items-center backdrop-blur-3xl justify-center z-50">
           <Trefoil

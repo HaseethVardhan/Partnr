@@ -58,7 +58,7 @@ const Home = () => {
   }, [cards, shouldRefetch]);
 
   return (
-    <div className="flex flex-col relative h-screen">
+    <div className="flex flex-col relative h-screen select-none">
       {loading && (
         <div className="absolute top-0 left-0 w-full h-full flex flex-col items-center gap-2 backdrop-blur-3xl justify-center z-9999">
           <Trefoil

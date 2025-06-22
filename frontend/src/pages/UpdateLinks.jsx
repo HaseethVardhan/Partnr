@@ -44,7 +44,7 @@ const UpdateLinks = () => {
     }
 
   return (
-    <div className='w-full h-full bg-[#1a1a1a] flex flex-col items-center'>
+    <div className='w-full h-full bg-[#1a1a1a] flex flex-col items-center select-none'>
         {loading && <div className="absolute top-0 left-0 w-full h-full flex items-center backdrop-blur-3xl justify-center z-50">
         <Trefoil
   size="40"
@@ -65,16 +65,16 @@ const UpdateLinks = () => {
         </div>
         <div className='flex flex-col w-[90%] gap-2'>
             <p className='text-white font-inter font-[500] text-base tracking-[0.5px] px-1 text-left'>Portfolio</p>
-            <input className='flex flex-row w-full bg-[#333333] h-14 rounded-xl placeholder-[#aaaaaa] font-inter font-[400] text-sm px-6 text-white' type="text" placeholder='you.com' value={portfolio} onChange={(e) => {setPortfolio(e.target.value)}}/>
+            <input className='flex flex-row w-full bg-[#333333] h-14 rounded-xl placeholder-[#aaaaaa] font-inter font-[400] text-sm px-6 text-white select-all' type="text" placeholder='you.com' value={portfolio} onChange={(e) => {setPortfolio(e.target.value)}}/>
         </div>
         <div className='flex flex-row items-center justify-between w-[90%] py-8 gap-4'>
             <div className='flex flex-col w-[90%] gap-2'>
                 <p className='text-white font-inter font-[500] text-base tracking-[0.5px] px-1 text-left'>X</p>
-                <input className='flex flex-row w-full bg-[#333333] h-14 rounded-xl placeholder-[#aaaaaa] font-inter font-[400] text-sm px-6 text-white' type="text" placeholder='X.com/you' value={xlink} onChange={(e) => {setXlink(e.target.value)}}/>
+                <input className='flex flex-row w-full bg-[#333333] h-14 rounded-xl placeholder-[#aaaaaa] font-inter font-[400] text-sm px-6 text-white select-all' type="text" placeholder='X.com/you' value={xlink} onChange={(e) => {setXlink(e.target.value)}}/>
             </div>
             <div className='flex flex-col w-[90%] gap-2'>
                 <p className='text-white font-inter font-[500] text-base tracking-[0.5px] px-1 text-left'>Linkedin</p>
-                <input className='flex flex-row w-full bg-[#333333] h-14 rounded-xl placeholder-[#aaaaaa] font-inter font-[400] text-sm px-6 text-white' type="text" placeholder='Linkedin.com/you' value={linkedin} onChange={(e) => {setLinkedin(e.target.value)}}/>
+                <input className='flex flex-row w-full bg-[#333333] h-14 rounded-xl placeholder-[#aaaaaa] font-inter font-[400] text-sm px-6 text-white select-all' type="text" placeholder='Linkedin.com/you' value={linkedin} onChange={(e) => {setLinkedin(e.target.value)}}/>
             </div>
         </div>
         <div className='flex flex-col w-[90%] gap-2'>

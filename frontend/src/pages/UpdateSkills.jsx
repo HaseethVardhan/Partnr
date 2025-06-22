@@ -100,7 +100,7 @@ const UpdateSkills = () => {
   };
 
   return (
-    <div className="w-full h-full bg-[#1a1a1a] flex flex-col items-center">
+    <div className="w-full h-full bg-[#1a1a1a] flex flex-col items-center select-none">
       {loading && (
         <div className="absolute top-0 left-0 w-full h-full flex items-center backdrop-blur-3xl justify-center z-50">
           <Trefoil

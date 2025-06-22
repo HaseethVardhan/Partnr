@@ -115,7 +115,7 @@ const MessagesPage = () => {
   }, [search, conversations, currentUserId]);
 
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col select-none">
       <div className="flex flex-row items-center justify-between px-4 py-5">
         <div className="flex flex-row items-center gap-3">
           <img
@@ -150,7 +150,7 @@ const MessagesPage = () => {
               setSearch(e.target.value);
             }}
             placeholder="Search Messages"
-            className="font-inter font-[400] text-lg tracking-[0.5px] text-[#aaaaaa] focus:outline-none"
+            className="font-inter font-[400] text-lg tracking-[0.5px] text-[#aaaaaa] select-all focus:outline-none"
           />
         </div>
       </div>
