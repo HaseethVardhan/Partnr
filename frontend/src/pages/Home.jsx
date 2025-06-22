@@ -60,7 +60,7 @@ const Home = () => {
   return (
     <div className="flex flex-col relative h-screen">
       {loading && (
-        <div className="absolute top-0 left-0 w-full h-full flex items-center backdrop-blur-3xl justify-center z-50">
+        <div className="absolute top-0 left-0 w-full h-full flex flex-col items-center gap-2 backdrop-blur-3xl justify-center z-9999">
           <Trefoil
             size="40"
             stroke="4"
@@ -69,6 +69,9 @@ const Home = () => {
             speed="1.4"
             color="#8b5cf6"
           />
+          <p className="font-inter text-[#aaaaaa] px-3">
+            This might take up to 1 minute. Please be patient.
+          </p>
         </div>
       )}
       {error !== null && (
