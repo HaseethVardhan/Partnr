@@ -1,6 +1,7 @@
 import { Server } from "socket.io";
 import http from "http";
 import { app } from "./app.js";
+import { Chat } from "./models/chat.model.js";
 
 const server = http.createServer(app);
 
@@ -28,15 +29,25 @@ io.on("connection", (socket) => {
 
   // Handle sending a message
   socket.on("send_message", async (data) => {
-    const { conversationId, senderId, receiverId, text } = data;
+    const { conversationId, senderId, receiverId, text, replyTo, _id } = data;
 
-    // Emit to everyone in that conversation room (including receiver)
-    io.to(conversationId).emit("receive_message", {
+    let replyMessage = null;
+    if (replyTo) {
+      const replyToId = typeof replyTo === "object" ? replyTo._id : replyTo;
+      replyMessage = await Chat.findById(replyToId).select("text senderId");
+    }
+
+    const messagePayload = {
       conversationId,
+      _id,
       senderId,
       text,
       createdAt: new Date(),
-    });
+      ...(replyMessage && { replyTo: replyMessage }),
+    };
+
+    // Emit to everyone in that conversation room (including receiver)
+    io.to(conversationId).emit("receive_message", messagePayload);
 
     const socketsInRoom = await io.in(conversationId).fetchSockets();
 
@@ -46,12 +57,7 @@ io.on("connection", (socket) => {
     if (!receiverIsInRoom) {
       const receiverSocketId = userSocketMap.get(receiverId);
       if (receiverSocketId) {
-        io.to(receiverSocketId).emit("receive_message", {
-          conversationId,
-          senderId,
-          text,
-          createdAt: new Date(),
-        });
+        io.to(receiverSocketId).emit("receive_message", messagePayload);
       }
     }
   });

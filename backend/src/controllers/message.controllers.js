@@ -13,7 +13,7 @@ const newMessage = asyncHandler(async (req, res) => {
       return res.status(400).json(new ApiResponse(400, null, errors.array()));
     }
 
-    const { conversationId, receiverId, text } = req.body;
+    const { conversationId, receiverId, text, replyTo } = req.body;
     const senderId = req.user._id;
 
     const connection = await Connection.findOne({
@@ -34,7 +34,10 @@ const newMessage = asyncHandler(async (req, res) => {
       senderId,
       receiverId,
       text,
+      replyTo
     });
+
+    await message.populate({ path: "replyTo", select: "text senderId" });
 
     const conversation = await Conversation.findByIdAndUpdate(conversationId, {
       lastMessage: text,
@@ -116,7 +119,11 @@ const loadConversation = asyncHandler(async (req, res) => {
     const messages = await Chat.find({ conversationId })
       .sort({ createdAt: -1 })
       .skip(skip)
-      .limit(limit);
+      .limit(limit)
+      .populate({
+        path: "replyTo",
+        select: "text senderId createdAt",
+      });
 
     return res
       .status(200)

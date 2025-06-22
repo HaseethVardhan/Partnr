@@ -38,7 +38,13 @@ const chatSchema = new mongoose.Schema({
   text: {
     type: String,
     required: true
-  }
+  },
+  replyTo: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Chat",
+    default: null,
+    index: true
+  },
 }, { timestamps: true });
 
 export const Chat = mongoose.model("Chat", chatSchema);

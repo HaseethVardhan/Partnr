@@ -23,7 +23,7 @@ const Conversation = () => {
   const [isPaginating, setIsPaginating] = useState(false);
   const [isTyping, setIsTyping] = useState(false);
   const [typingUsers, setTypingUsers] = useState({});
-  
+  const [replyTo, setReplyTo] = useState(null);
 
   const textareaRef = useRef(null);
   const messageEndRef = useRef(null);
@@ -94,6 +94,7 @@ const Conversation = () => {
           text,
           conversationId,
           receiverId: otherUser._id,
+          replyTo: replyTo?._id || null,
         },
         {
           headers: {
@@ -102,18 +103,16 @@ const Conversation = () => {
         }
       );
 
-      // setMessages((prev) => [...prev, response.data.data]);
-
+      
+      const savedMessage = response.data.data;
+      
       if (socket) {
-        socket.emit("send_message", {
-          conversationId,
-          senderId: currentUser._id,
-          receiverId: otherUser._id,
-          text,
-        });
+        socket.emit("send_message", savedMessage);
       }
+      // setMessages((prev) => [...prev, savedMessage]);
 
       setText("");
+      setReplyTo(null);
       textareaRef.current.style.height = "auto";
     } catch (err) {
       console.error(err);
@@ -197,9 +196,10 @@ const Conversation = () => {
     socket.emit("join_conversation", conversationId);
 
     const handleReceiveMessage = (message) => {
-      if (message.conversationId === conversationId) {
-        setMessages((prev) => [...prev, message]);
-      }
+      const exists = messages.some((msg) => msg._id === message._id);
+    if (message.conversationId === conversationId && !exists) {
+      setMessages((prev) => [...prev, message]);
+    }
     };
 
     socket.on("receive_message", handleReceiveMessage);
@@ -298,6 +298,10 @@ const Conversation = () => {
           <div
             key={message._id + idx}
             ref={idx === messages.length - 1 ? messageEndRef : null}
+            onContextMenu={(e) => {
+              e.preventDefault();
+              setReplyTo(message);
+            }}
             className={`fade-in-message flex items-end mb-2 px-4 ${
               message.senderId === otherUser?._id
                 ? "justify-start"
@@ -319,6 +323,14 @@ const Conversation = () => {
                     : "bg-[#232323] text-[#eaeaea] rounded-bl-none"
                 }`}
               >
+                {message.replyTo && (
+                  <div className="text-sm text-gray-400 border-l-2 border-gray-600 pl-2 mb-1">
+                    {message.replyTo.senderId === currentUser?._id
+                      ? "You"
+                      : otherUser?.fullname.firstname}
+                    : {message.replyTo.text}
+                  </div>
+                )}
                 <span className="block font-inter text-base">
                   {message.text}
                 </span>
@@ -354,6 +366,26 @@ const Conversation = () => {
             className="flex items-center gap-2 min-h-10 border-1 border-[#aaaaaa] rounded-xl px-2 py-2"
           >
             <div className="flex-1 flex gap-2">
+              {replyTo && (
+                <div className="flex justify-between items-center px-2 py-1 bg-[#2a2a2a] border-l-4 border-violet-500 rounded-md mb-2 text-sm text-gray-300">
+                  <div className="flex flex-col">
+                    <span className="font-medium text-white">
+                      {replyTo.senderId === currentUser._id
+                        ? "You"
+                        : otherUser?.fullname.firstname}
+                    </span>
+                    <span className="truncate max-w-[200px]">
+                      {replyTo.text}
+                    </span>
+                  </div>
+                  <button
+                    onClick={() => setReplyTo(null)}
+                    className="text-gray-400 hover:text-red-400 text-xl ml-3"
+                  >
+                    &times;
+                  </button>
+                </div>
+              )}
               <textarea
                 ref={textareaRef}
                 className="w-full text-white rounded-lg focus:outline-none resize-none overflow-hidden font-inter max-h-[150px]"
