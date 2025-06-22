@@ -110,7 +110,7 @@ const NotificationPage = () => {
           </p>
         </div>
       )}
-      <div className="flex flex-row items-center justify-between px-4 py-10">
+      <div className="flex flex-row items-center justify-between px-4 py-5">
         <div className="flex flex-row items-center gap-3">
           <img
             onClick={() => {

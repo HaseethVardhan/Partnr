@@ -84,7 +84,7 @@ const Conversation = () => {
     e.preventDefault();
     if (!text.trim()) return;
 
-    setLoading(true);
+    // setLoading(true);
     try {
       const response = await axios.post(
         `${import.meta.env.VITE_BASE_URL}/message/new-text`,
@@ -119,7 +119,7 @@ const Conversation = () => {
       // setTimeout(() => {
       //   messageEndRef.current?.scrollIntoView({ behavior: "smooth" });
       // }, 0);
-      setLoading(false);
+      // setLoading(false);
     }
   };
 
@@ -207,7 +207,7 @@ const Conversation = () => {
           </p>
         </div>
       )} */}
-      <div className="flex flex-row items-center justify-between px-4 py-8">
+      <div className="flex flex-row items-center justify-between px-4 py-4">
         <div className="flex flex-row items-center gap-3">
           <img
             onClick={() => navigate(-1)}
