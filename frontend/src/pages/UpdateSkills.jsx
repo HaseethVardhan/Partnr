@@ -109,7 +109,9 @@ const UpdateSkills = () => {
   };
 
   return (
-    <div className="w-full h-full bg-[#1a1a1a] flex flex-col items-center select-none">
+    <div className="w-full min-h-screen bg-[#1a1a1a] flex flex-col items-center select-none  pb-24"
+        style={{ paddingBottom: "env(safe-area-inset-bottom, 24px)" }}
+    >
       {loading && (
         <div className="absolute top-0 left-0 w-full h-full flex items-center backdrop-blur-3xl justify-center z-50">
           <Trefoil
@@ -156,7 +158,7 @@ const UpdateSkills = () => {
           </p>
         )}
       </div>
-      <div className="w-[90%] h-screen flex flex-col items-center justify-end mb-18 gap-5">
+      <div className="w-[90%] h-full flex flex-col items-center justify-end mb-18 gap-5">
         <div
           onClick={(e) => {
             handleNext(e);
