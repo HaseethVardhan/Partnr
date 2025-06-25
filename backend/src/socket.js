@@ -43,7 +43,7 @@ io.on("connection", (socket) => {
       senderId,
       text,
       createdAt: new Date(),
-      clientSentAt,
+      // clientSentAt,
       ...(replyMessage && { replyTo: replyMessage }),
     };
 

@@ -108,7 +108,7 @@ const Conversation = () => {
       if (socket) {
         socket.emit("send_message", {
           ...savedMessage,
-          clientSentAt: Date.now(),
+          // clientSentAt: Date.now(),
         });
       }
       // setMessages((prev) => [...prev, savedMessage]);
@@ -198,8 +198,8 @@ const Conversation = () => {
     socket.emit("join_conversation", conversationId);
 
     const handleReceiveMessage = (message) => {
-      const total = Date.now() - message.clientSentAt;
-      console.log(total);
+      // const total = Date.now() - message.clientSentAt;
+      // console.log(total);
 
       const exists = messages.some((msg) => msg._id === message._id);
       if (message.conversationId === conversationId && !exists) {
