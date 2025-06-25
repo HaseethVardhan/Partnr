@@ -45,7 +45,7 @@ io.on("connection", (socket) => {
       text,
       createdAt: new Date(),
       clientSentAt,
-      serverReceivedAt: now,
+      serverReceivedAt: Date.now(),
       ...(replyMessage && { replyTo: replyMessage }),
     };
 
