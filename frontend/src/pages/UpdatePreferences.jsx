@@ -51,9 +51,18 @@ const UpdatePreferences = () => {
     "Cloud Computing",
     "UI/UX Design",
     "Data Science",
+    "Data Analysis",
     "Web Development",
     "Frontend Development",
     "Game Development",
+    "Prompt Engineering",
+    "Low-code/No-code Dev",
+    "Ethical Hacking",
+    "Blockchain Technologies",
+    "Competitive Programming",
+    "Product Design",
+    "Testing/QA",
+    "DSA"
   ];
 
   const [selectedPreferences, setSelectedPreferences] = React.useState([]);
