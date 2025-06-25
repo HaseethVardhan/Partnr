@@ -198,17 +198,8 @@ const Conversation = () => {
     socket.emit("join_conversation", conversationId);
 
     const handleReceiveMessage = (message) => {
-      // Latency measurement (use only server times)
-      if (message.serverReceivedAt && message.serverDeliveredAt) {
-        const serverProcessing =
-          message.serverDeliveredAt - message.serverReceivedAt;
-        console.log("Server processing time (ms):", serverProcessing);
-      }
-      // Optionally, you can log client-to-server and server-to-client if you want, but beware of clock skew.
-      const clientToServer = message.serverReceivedAt - message.clientSentAt;
-      const serverToClient = Date.now() - message.serverDeliveredAt;
       const total = Date.now() - message.clientSentAt;
-      console.log({ clientToServer, serverToClient, total });
+      console.log(total);
 
       const exists = messages.some((msg) => msg._id === message._id);
       if (message.conversationId === conversationId && !exists) {

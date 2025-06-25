@@ -29,8 +29,7 @@ io.on("connection", (socket) => {
 
   // Handle sending a message
   socket.on("send_message", async (data) => {
-    const { conversationId, senderId, receiverId, text, replyTo, _id, clientSentAt } =
-      data;
+    const { conversationId, senderId, receiverId, text, replyTo, _id, clientSentAt } = data;
 
     let replyMessage = null;
     if (replyTo) {
@@ -45,17 +44,11 @@ io.on("connection", (socket) => {
       text,
       createdAt: new Date(),
       clientSentAt,
-      serverReceivedAt: Date.now(),
       ...(replyMessage && { replyTo: replyMessage }),
     };
 
-    const payloadWithDelivery = {
-      ...messagePayload,
-      serverDeliveredAt: Date.now(), // right before emit
-    };
-
     // Emit to everyone in that conversation room (including receiver)
-    io.to(conversationId).emit("receive_message", payloadWithDelivery);
+    io.to(conversationId).emit("receive_message", messagePayload);
 
     const socketsInRoom = await io.in(conversationId).fetchSockets();
 
@@ -65,10 +58,7 @@ io.on("connection", (socket) => {
     if (!receiverIsInRoom) {
       const receiverSocketId = userSocketMap.get(receiverId);
       if (receiverSocketId) {
-        io.to(receiverSocketId).emit("receive_message", {
-        ...messagePayload,
-        serverDeliveredAt: Date.now(),
-      });
+        io.to(receiverSocketId).emit("receive_message", messagePayload);
       }
     }
   });
