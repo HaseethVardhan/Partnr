@@ -29,7 +29,8 @@ io.on("connection", (socket) => {
 
   // Handle sending a message
   socket.on("send_message", async (data) => {
-    const { conversationId, senderId, receiverId, text, replyTo, _id } = data;
+    const { conversationId, senderId, receiverId, text, replyTo, _id, sentAt } =
+      data;
 
     let replyMessage = null;
     if (replyTo) {
@@ -43,6 +44,8 @@ io.on("connection", (socket) => {
       senderId,
       text,
       createdAt: new Date(),
+      sentAt,
+      receivedAt: Date.now(),
       ...(replyMessage && { replyTo: replyMessage }),
     };
 

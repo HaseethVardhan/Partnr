@@ -103,11 +103,13 @@ const Conversation = () => {
         }
       );
 
-      
       const savedMessage = response.data.data;
-      
+
       if (socket) {
-        socket.emit("send_message", savedMessage);
+        socket.emit("send_message", {
+          ...savedMessage,
+          sentAt: Date.now(),
+        });
       }
       // setMessages((prev) => [...prev, savedMessage]);
 
@@ -196,10 +198,25 @@ const Conversation = () => {
     socket.emit("join_conversation", conversationId);
 
     const handleReceiveMessage = (message) => {
+      const deliveredAt = Date.now();
+      if (message.sentAt && message.receivedAt) {
+        const clientToServer = message.receivedAt - message.sentAt;
+        const serverToClient = deliveredAt - message.receivedAt;
+        const total = deliveredAt - message.sentAt;
+        console.log("Socket Latency (ms):", {
+          clientToServer,
+          serverToClient,
+          total,
+          sentAt: message.sentAt,
+          receivedAt: message.receivedAt,
+          deliveredAt,
+        });
+      }
+
       const exists = messages.some((msg) => msg._id === message._id);
-    if (message.conversationId === conversationId && !exists) {
-      setMessages((prev) => [...prev, message]);
-    }
+      if (message.conversationId === conversationId && !exists) {
+        setMessages((prev) => [...prev, message]);
+      }
     };
 
     socket.on("receive_message", handleReceiveMessage);
@@ -320,10 +337,10 @@ const Conversation = () => {
                 className={`rounded-2xl px-4 py-2 shadow-md 
                   "select-none"
                   ${
-                  message.senderId === otherUser?._id
-                    ? "bg-violet-600 text-white rounded-br-none"
-                    : "bg-[#232323] text-[#eaeaea] rounded-bl-none"
-                }`}
+                    message.senderId === otherUser?._id
+                      ? "bg-violet-600 text-white rounded-br-none"
+                      : "bg-[#232323] text-[#eaeaea] rounded-bl-none"
+                  }`}
               >
                 {message.replyTo && (
                   <div className="text-sm text-gray-400 border-l-2 border-gray-600 pl-2 mb-1">
