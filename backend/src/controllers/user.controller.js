@@ -788,15 +788,30 @@ const login = asyncHandler(async (req, res) => {
 const suggestedUsers = asyncHandler(async (req, res) => {
   const user = await User.findById(req.user._id);
 
-  if (!user.swipeResetAt || (Date.now() - new Date(user.swipeResetAt).getTime()) > 24 * 60 * 60 * 1000) {
+  if (!user.swipeResetAt || (Date.now() - new Date(user.swipeResetAt).getTime()) > 14 * 24 * 60 * 60 * 1000) {
     user.SwipedArray = [];
     user.swipeResetAt = Date.now();
     await user.save();
   }
 
-  const { SwipedArray, halfSwipedArray, preferences, _id } = user;
+  const { SwipedArray, halfSwipedArray, preferences, _id, connectionsArray } = user;
 
-  const excludedUsers = [...SwipedArray, ...halfSwipedArray, _id];
+  const connections = await Connection.find({
+    _id: { $in: connectionsArray }
+  }).select("first_connect second_connect");
+
+  const connectedUserIds = connections
+    .map(conn => {
+      if (conn.first_connect.toString() !== _id.toString()) {
+        return conn.first_connect.toString();
+      } else if (conn.second_connect.toString() !== _id.toString()) {
+        return conn.second_connect.toString();
+      }
+      return null;
+    })
+    .filter(Boolean);
+
+  const excludedUsers = [...SwipedArray, ...halfSwipedArray, ...connectedUserIds, _id];
   const halfSwipedLimit = 5;
 
   const halfSwipedResults = await User.find({
