@@ -105,6 +105,10 @@ const Conversation = () => {
 
       const savedMessage = response.data.data;
 
+      setText("");
+      setReplyTo(null);
+      textareaRef.current.style.height = "auto";
+      
       if (socket) {
         socket.emit("send_message", {
           ...savedMessage,
@@ -113,9 +117,6 @@ const Conversation = () => {
       }
       // setMessages((prev) => [...prev, savedMessage]);
 
-      setText("");
-      setReplyTo(null);
-      textareaRef.current.style.height = "auto";
     } catch (err) {
       console.error(err);
     } finally {
