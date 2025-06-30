@@ -50,6 +50,14 @@ const SettingsPage = () => {
             About Developer
         </button>
         </Link>
+        <Link to='https://x.com/ashux_ui'>
+        <button
+            
+            className="bg-[#333333] w-full hover:bg-gray-800 text-white font-semibold py-3 px-6 rounded shadow"
+            >
+            About UI/UX Designer
+        </button>
+        </Link>
     </div>
     </div>
   );
