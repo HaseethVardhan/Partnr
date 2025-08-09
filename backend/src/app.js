@@ -35,6 +35,10 @@ app.use(cookieParser())
 app.use(passport.initialize())
 app.use(passport.session())
 
+app.head("/", (req, res) => {
+  res.status(200).end();
+});
+
 app.use('/user', userRouter)
 app.use('/auth', oauthRouter)
 app.use('/message', messageRouter)
